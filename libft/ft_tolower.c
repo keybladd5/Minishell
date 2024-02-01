@@ -1,15 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   ft_tolower.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: polmarti <polmarti@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/01 11:14:16 by polmarti          #+#    #+#             */
-/*   Updated: 2024/02/01 11:14:22 by polmarti         ###   ########.fr       */
+/*   Created: 2023/09/14 21:14:30 by polmarti          #+#    #+#             */
+/*   Updated: 2023/09/14 21:14:36 by polmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include <fcntl.h>
-# include <sys/wait.h>
-# include <sys/errno.h>
+#include "libft.h"
+
+int	ft_tolower(int c)
+{
+	if (c >= 65 && c <= 90)
+		c = c + 32;
+	return (c);
+}
