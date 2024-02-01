@@ -1,15 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   ft_striteri.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: polmarti <polmarti@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/01 11:14:16 by polmarti          #+#    #+#             */
-/*   Updated: 2024/02/01 11:14:22 by polmarti         ###   ########.fr       */
+/*   Created: 2023/09/26 13:41:03 by polmarti          #+#    #+#             */
+/*   Updated: 2023/09/26 13:41:12 by polmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include <fcntl.h>
-# include <sys/wait.h>
-# include <sys/errno.h>
+#include "libft.h"
+
+void	ft_striteri(char *s, void (*f)(unsigned int, char*))
+{
+	int	i;
+
+	i = 0;
+	while (s[i])
+	{
+		f(i, &s[i]);
+		i++;
+	}
+}

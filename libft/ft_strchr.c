@@ -1,15 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   ft_strchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: polmarti <polmarti@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/01 11:14:16 by polmarti          #+#    #+#             */
-/*   Updated: 2024/02/01 11:14:22 by polmarti         ###   ########.fr       */
+/*   Created: 2023/09/14 21:17:15 by polmarti          #+#    #+#             */
+/*   Updated: 2023/09/14 21:17:17 by polmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include <fcntl.h>
-# include <sys/wait.h>
-# include <sys/errno.h>
+#include "libft.h"
+
+char	*ft_strchr(const char *s, int c)
+{
+	while (*(char *)s && *(char *)s != (char)c)
+		s++;
+	if (*(char *)s != (char)c)
+		return (0);
+	return ((char *)s);
+}
+
+/*#include <stdio.h>
+int	main(void)
+{
+	char	*ptr = "Hola que tal estas hoy?";
+	printf("%s\n", ft_strchr(ptr, 'a'));
+	return (0);
+}*/
