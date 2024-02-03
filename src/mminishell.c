@@ -14,6 +14,7 @@
 
 #include "../inc/minishell.h"
 
+
 void	try_exec(char *buff, char *envp[])
 {
 	int i = 0;
@@ -60,9 +61,10 @@ void gnl_input(char *envp[])
 {	
 	while(42) 
 	{
-		write(1, "./minishell ", 12);
-		char *buff = get_next_line(0);
-		if (ft_strncmp(buff, "exit\n", 6) == 0)
+		//write(1, "./minishell ", 12);
+		//char *buff = get_next_line(0);
+		char *buff = readline("./minishell ");
+		if (ft_strncmp(buff, "exit", 6) == 0)
 			exit(0);
 		else
 			try_exec(buff, envp);
