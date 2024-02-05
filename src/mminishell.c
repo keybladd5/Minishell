@@ -12,11 +12,11 @@
 
 #include "../libft/libft.h"
 #include "../inc/minishell.h"
-
+/*
 void ft_catch_env(char **envp)
 {
 	
-}
+}*/
 /*void	try_exec(char *buff, char *envp[])
 {
 	int i = 0;
