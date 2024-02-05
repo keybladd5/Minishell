@@ -14,3 +14,18 @@
 # include <sys/wait.h>
 # include <sys/errno.h>
 # include <readline/readline.h>
+
+typedef struct s_env
+{
+	char			*key_name;
+	char			*value;
+	struct s_env	*next;
+}	t_env;
+
+typedef struct s_lexer
+{
+	char			*str;
+	char			*aux_str;
+	int				type;
+	struct s_lexer	*next;
+}	t_lexer;
