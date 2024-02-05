@@ -13,9 +13,34 @@
 #include "../libft/libft.h"
 #include "../inc/minishell.h"
 
-void ft_catch_env(char **envp)
+
+void ft_catch_env(char **envp, t_env **head)
 {
-	
+	int	x = 0;
+	char	*div;
+	t_env	*tmp;
+	t_env	*last;
+	while (envp[x])
+	{
+		tmp = (t_env *)malloc(sizeof(t_env) * 1);
+		if (!tmp)
+			exit(1);
+		div = ft_strchr(envp[x], '=');
+		tmp->key_name = ft_substr(envp[x], 0, (div - envp[x]));
+		if (!tmp->key_name)
+			exit (1);
+		tmp->value = ft_substr(div+1, 0, ft_strlen(div));
+		if (!tmp->value)
+			exit (1);
+		
+		if (x == 0)
+			*head = tmp;
+		else
+			last->next = tmp;
+		last = tmp;
+		x++;
+	}
+	last->next = NULL;
 }
 /*void	try_exec(char *buff, char *envp[])
 {
@@ -59,8 +84,9 @@ void ft_catch_env(char **envp)
 	wait (NULL);
 }*/
 // This is a test to check how to work with Readline in the input user
-void input_loop(char *envp[])
+/*void input_loop(char *envp[])
 {	
+
 	while(42) 
 	{
 		char *buff = readline("./minishell ");
@@ -68,12 +94,14 @@ void input_loop(char *envp[])
 		//try_exec(buff, envp);
 		free(buff);
 	}
-}
+}*/
 
 int main(int argc, char *argv[], char *envp[])
 {
 	if (argc != 1 || !argv[0] || !envp[0])
 		return (1);
-	input_loop(envp);
+	t_env	*head;
+	ft_catch_env(envp, &head);
+	//input_loop(envp);
 	return (0);
 }
