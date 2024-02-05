@@ -13,8 +13,11 @@
 #include "../libft/libft.h"
 #include "../inc/minishell.h"
 
-
-void	try_exec(char *buff, char *envp[])
+void ft_catch_env(char **envp)
+{
+	
+}
+/*void	try_exec(char *buff, char *envp[])
 {
 	int i = 0;
 	int x = 0;
@@ -23,12 +26,12 @@ void	try_exec(char *buff, char *envp[])
 	char *filename = NULL;
 	char *cmd_exec = NULL;
 	int pid = fork();
-	//printf("%d\n", pid);
+	dprintf(0, "%d\n", pid);
 	if (pid == 0)
 	{
-		/*int loop = 1;
+		int loop = 1;
 		while (loop)
-			;*/
+			;
 		while (ft_strncmp("PATH=", envp[i], 5) != 0)
 		{
 			i++;
@@ -37,7 +40,7 @@ void	try_exec(char *buff, char *envp[])
 		}
 		path = ft_split(envp[i], ':');
 		path[x] = ft_substr(path[x], 5, ft_strlen(path[x]));
-		cmd_exec = ft_substr(buff, 0, (ft_strlen(buff) - 1));
+		cmd_exec = ft_substr(buff, 0, (ft_strlen(buff)));
 		cmd = ft_strjoin("/", cmd_exec);
 		while (path[x])
 		{
@@ -54,22 +57,15 @@ void	try_exec(char *buff, char *envp[])
 		execve(filename, &cmd_exec, NULL);
 	}
 	wait (NULL);
-}
-// This is a test to check how to work with GNL in the input user, we ill gona need ReadLine 4sure
-void gnl_input(char *envp[])
+}*/
+// This is a test to check how to work with Readline in the input user
+void input_loop(char *envp[])
 {	
 	while(42) 
 	{
-		//write(1, "./minishell ", 12);
-		//char *buff = get_next_line(0);
 		char *buff = readline("./minishell ");
-		if (ft_strncmp(buff, "exit", 4) == 0)
-			exit(0);
-		else
-		{
-			ft_putstr_fd(buff, 1);
-			try_exec(buff, envp);
-		}
+		
+		//try_exec(buff, envp);
 		free(buff);
 	}
 }
@@ -78,7 +74,6 @@ int main(int argc, char *argv[], char *envp[])
 {
 	if (argc != 1 || !argv[0] || !envp[0])
 		return (1);
-	gnl_input(envp);
-
+	input_loop(envp);
 	return (0);
 }
