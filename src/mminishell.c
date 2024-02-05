@@ -63,10 +63,13 @@ void gnl_input(char *envp[])
 		//write(1, "./minishell ", 12);
 		//char *buff = get_next_line(0);
 		char *buff = readline("./minishell ");
-		if (ft_strncmp(buff, "exit", 6) == 0)
+		if (ft_strncmp(buff, "exit", 4) == 0)
 			exit(0);
 		else
+		{
+			ft_putstr_fd(buff, 1);
 			try_exec(buff, envp);
+		}
 		free(buff);
 	}
 }
@@ -75,6 +78,7 @@ int main(int argc, char *argv[], char *envp[])
 {
 	if (argc != 1 || !argv[0] || !envp[0])
 		return (1);
-	
+	gnl_input(envp);
+
 	return (0);
 }
