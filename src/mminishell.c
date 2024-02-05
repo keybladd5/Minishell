@@ -22,7 +22,7 @@ void ft_catch_env(char **envp, t_env **head)
 	t_env	*last;
 	while (envp[x])
 	{
-		tmp = (t_env *)malloc(sizeof(t_env) * 1);
+		tmp = (t_env *)malloc(sizeof(t_env));
 		if (!tmp)
 			exit(1);
 		div = ft_strchr(envp[x], '=');
@@ -33,7 +33,7 @@ void ft_catch_env(char **envp, t_env **head)
 		if (!tmp->value)
 			exit (1);
 		
-		if (x == 0)
+		if (!*head)
 			*head = tmp;
 		else
 			last->next = tmp;
@@ -83,25 +83,75 @@ void ft_catch_env(char **envp, t_env **head)
 	}
 	wait (NULL);
 }*/
-// This is a test to check how to work with Readline in the input user
-/*void input_loop(char *envp[])
-{	
 
-	while(42) 
+int		ft_tokenlen(char *input)
+{
+	int	len = 0;
+
+	while (*input)
 	{
-		char *buff = readline("./minishell ");
 		
-		//try_exec(buff, envp);
-		free(buff);
 	}
-}*/
+}
+
+void	split_input(t_token **tokens, char *input)
+{
+	int	i = 0;
+	t_token	*tmp;
+	t_token	*last;
+
+	while (input[i])
+	{
+		while (input[i] == ' ' || input[i] == '\t')
+			i++;
+		tmp = (t_token *)malloc(sizeof(t_token));
+		if (!tmp)
+			exit(1);
+		//leer caracteres del input hasta espacio/tab
+		//guardar en tmp->str
+
+		tmp->str = ft_substr(input, i, ft_tokenlen(input + i))
+		//checkear 1er caracter siguiente token. '-' -> flag
+		//leer caracteres del input hasta espacio/tab
+		//guardar en tmp->aux_str
+		//set type
+		
+	if (!*tokens)
+			*tokens = tmp;
+	else
+		last->next = tmp;
+	last = tmp;
+	}
+}
+
+// This is a test to check how to work with Readline in the input user
+void input_loop(char **head)
+{
+	char	*input;
+	t_token	 *tokens;
+
+	while(42)
+	{
+		input = readline("./minishell ");
+		//if (!input)//fallo readline. Exit
+		split_input(&tokens, input);
+		free(input);
+
+		
+		
+		
+	}
+}
 
 int main(int argc, char *argv[], char *envp[])
 {
+	t_env	*head = NULL;
+
 	if (argc != 1 || !argv[0] || !envp[0])
 		return (1);
-	t_env	*head;
+
 	ft_catch_env(envp, &head);
-	//input_loop(envp);
+	input_loop(&head);
+
 	return (0);
 }

@@ -22,10 +22,10 @@ typedef struct s_env
 	struct s_env	*next;
 }	t_env;
 
-typedef struct s_lexer
+typedef struct s_token
 {
 	char			*str;
 	char			*aux_str;
 	int				type;
-	struct s_lexer	*next;
-}	t_lexer;
+	struct s_token	*next;
+}	t_token;
