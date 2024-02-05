@@ -110,7 +110,7 @@ void	split_input(t_token **tokens, char *input)
 		//leer caracteres del input hasta espacio/tab
 		//guardar en tmp->str
 
-		tmp->str = ft_substr(input, i, ft_tokenlen(input + i))
+		tmp->str = ft_substr(input, i, ft_tokenlen(input + i));
 		//checkear 1er caracter siguiente token. '-' -> flag
 		//leer caracteres del input hasta espacio/tab
 		//guardar en tmp->aux_str
