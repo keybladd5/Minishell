@@ -15,6 +15,8 @@
 # include <sys/errno.h>
 # include <readline/readline.h>
 
+#define MALLOC_ERROR 1
+
 typedef struct s_env
 {
 	char			*key_name;
