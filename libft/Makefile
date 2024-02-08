@@ -13,6 +13,7 @@
 NAME = libft.a
 SRCS = ft_calloc.c \
 	   ft_isdigit.c \
+	   ft_isspace.c \
 	   ft_memcpy.c \
 	   ft_strdup.c \
 	   ft_strlen.c \

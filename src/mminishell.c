@@ -15,7 +15,34 @@
 
 #define MALLOC_ERROR 1
 
+#include <stdio.h>
+//debug function
+void	print_tokens(t_token **head)
+{
+	t_token	*current = *head;
 
+	while (current)
+	{
+		dprintf(0, "stack = %s\n", current->str);
+		current = current->next;
+	}
+}
+
+void free_tokens(t_token **head)
+{
+	t_token	*current;
+
+	while (*head)
+	{
+		current = (*head)->next;
+		free((*head)->str);
+		/*if ((*head)->aux_str)
+			free((*head)->aux_str);*/
+		free(*head);
+		*head = current;
+	}
+	*head = NULL;
+}
 void ft_catch_env(char **envp, t_env **head)
 {
 	int	x = 0;
@@ -44,7 +71,7 @@ void ft_catch_env(char **envp, t_env **head)
 	}
 	last->next = NULL;
 }
-void	try_exec(char *buff, char *envp[])
+/*void	try_exec(char *buff, char *envp[])
 {
 	int i = 0;
 	int x = 0;
@@ -87,20 +114,19 @@ void	try_exec(char *buff, char *envp[])
 		execve(filename, &cmd_exec, NULL);
 	}
 	wait (NULL);
-}
+}*/
 
 int		ft_tokenlen(char *input)
 {
 	int	len;
 
-	/*while (*input)
-	{}*/
-	while (input[len] !=  ' ' && input[len] != '\t')
+	len = 0;
+	while (ft_isalpha(input[len]) || input[len] == '-')
 		len++;
 	return (len);
 }
 
-void	split_input(t_token **tokens, char *input)
+void	lexer(t_token **tokens, char *input)
 {
 	int	i = 0;
 	t_token	*tmp;
@@ -108,11 +134,15 @@ void	split_input(t_token **tokens, char *input)
 
 	while (input[i])
 	{
-		while (input[i] == ' ' || input[i] == '\t')
+		while (ft_isspace(input[i]))
 			i++;
 		tmp = (t_token *)malloc(sizeof(t_token));
 		if (!tmp)
 			exit(MALLOC_ERROR);
+		tmp->aux_str = NULL;
+		tmp->str = NULL;
+		tmp->type = 0;
+		tmp->next = NULL; 
 		//leer caracteres del input hasta espacio/tab
 		//guardar en tmp->str
 
@@ -120,6 +150,10 @@ void	split_input(t_token **tokens, char *input)
 		if (!tmp->str)
 			exit (MALLOC_ERROR);
 		i += ft_tokenlen(input + i);
+
+
+		/*  ------------⬇️ESTA PARTE SE POSPONE AL PARSER⬇️-----------------------
+
 		//checkear 1er caracter siguiente token. '-' -> flag
 		if (input[i+1] == '-' &&  ft_isalpha(input[i+2])) //si es el caso anterior
 		{
@@ -129,10 +163,22 @@ void	split_input(t_token **tokens, char *input)
 			//tambien esta la opcion e hacer un acces y checkear todo lo que venga despues como argumento
 			//hasta el siguiente acces valido
 			int j = i;
+			int i2 = 0;
 			j++;
-			while ((input[j] == '-' && ft_isalpha(input[j+2]) || )
-			tmp->aux_str =
-		}
+			i++;
+
+			while (input[i] == '-' && ft_isalpha(input[i+j]))
+			{
+				tmp->aux_str[i2] = input[i+j];
+				i++;
+				j++;
+			}
+			
+		} 
+		
+		----------- ⬆️ESTA PARTE SE POSPONE AL PARSER⬆️-----------------*/
+
+
 		//leer caracteres del input hasta espacio/tab
 		//guardar en tmp->aux_str
 		//set type
@@ -146,16 +192,18 @@ void	split_input(t_token **tokens, char *input)
 }
 
 // This is a test to check how to work with Readline in the input user
-void input_loop(char **head)
+void input_loop(void)
 {
-	char	*input;
-	t_token	 *tokens;
+	char	*input = NULL;
+	t_token	 *tokens = NULL;
 
 	while(42)
 	{
 		input = readline("./minishell ");
 		//if (!input)//fallo readline. Exit
-		split_input(&tokens, input);
+		lexer(&tokens, input);
+		print_tokens(&tokens);
+		free_tokens(&tokens);
 		free(input);
 	}
 }
@@ -168,7 +216,7 @@ int main(int argc, char *argv[], char *envp[])
 		return (1);
 
 	ft_catch_env(envp, &head);
-	input_loop(&head);
+	input_loop();
 
 	return (0);
 }
