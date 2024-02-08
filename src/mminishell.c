@@ -199,10 +199,11 @@ void input_loop(void)
 
 	while(42)
 	{
+		//signals
 		input = readline("./minishell ");
 		//if (!input)//fallo readline. Exit
-		lexer(&tokens, input);
-		print_tokens(&tokens);
+		lexer(&tokens, input);//separa input en tokens
+		print_tokens(&tokens);//debug
 		free_tokens(&tokens);
 		free(input);
 	}
