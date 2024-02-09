@@ -27,7 +27,7 @@ void	print_tokens(t_token **head)
 		current = current->next;
 	}
 }
-
+//free the list do it by lexer
 void free_tokens(t_token **head)
 {
 	t_token	*current;
@@ -36,13 +36,12 @@ void free_tokens(t_token **head)
 	{
 		current = (*head)->next;
 		free((*head)->str);
-		/*if ((*head)->aux_str)
-			free((*head)->aux_str);*/
 		free(*head);
 		*head = current;
 	}
 	*head = NULL;
 }
+//get env on a list
 void ft_catch_env(char **envp, t_env **head)
 {
 	int	x = 0;
@@ -71,57 +70,13 @@ void ft_catch_env(char **envp, t_env **head)
 	}
 	last->next = NULL;
 }
-/*void	try_exec(char *buff, char *envp[])
-{
-	int i = 0;
-	int x = 0;
-	char **path = NULL;
-	char *cmd = NULL;
-	char *filename = NULL;
-	char *cmd_exec = NULL;
-	int	*pipefd[2];
-	pipe(pipefd);
-	int pid = fork();
-	dprintf(0, "%d\n", pid);
-	if (pid == 0)
-	{
-		int loop = 1;
-		while (loop)
-			;
-		dup2(pipefd[1], 1);
-		while (ft_strncmp("PATH=", envp[i], 5) != 0)
-		{
-			i++;
-			if (envp[i] == NULL)
-				exit(1);
-		}
-		path = ft_split(envp[i], ':');
-		path[x] = ft_substr(path[x], 5, ft_strlen(path[x]));
-		cmd_exec = ft_substr(buff, 0, (ft_strlen(buff)));
-		cmd = ft_strjoin("/", cmd_exec);
-		while (path[x])
-		{
-			if (x > 0)
-				free(filename);
-			filename = ft_strjoin(path[x], cmd);
-			if (access(filename, X_OK) == -1)
-				x++;
-			else
-				break ;
-			if (path[x] == NULL)
-				break;
-		}
-		execve(filename, &cmd_exec, NULL);
-	}
-	wait (NULL);
-}*/
-
+//aux lexer
 int		ft_tokenlen(char *input)
 {
 	int	len;
 
 	len = 0;
-	while (ft_isalpha(input[len]) || input[len] == '-')
+	while (!ft_isspace(input[len]) && input[len]) // CAMBIO! ahora acepta cualquier tipo de caracter hasta espacio o  NULL como token
 		len++;
 	return (len);
 }
@@ -191,8 +146,7 @@ void	lexer(t_token **tokens, char *input)
 	}
 }
 
-// This is a test to check how to work with Readline in the input user
-void input_loop(void)
+void input_loop(t_env **env, char **envp)
 {
 	char	*input = NULL;
 	t_token	 *tokens = NULL;
@@ -200,16 +154,23 @@ void input_loop(void)
 	while(42)
 	{
 		//signals
-		input = readline("./minishell ");
-		//if (!input)//fallo readline. Exit
+		input = readline("\x1b[92m⌁./MiniShell→\x1b[0m ");
+		
+		if (!ft_strncmp("exit", input, 4))
+		{
+			ft_printf("exit\n");
+			exit(0);
+		}
 		lexer(&tokens, input);//separa input en tokens
 		print_tokens(&tokens);//debug
+		executor(&tokens, env, envp);
+		add_history(input);
 		free_tokens(&tokens);
 		free(input);
 	}
 }
 
-int main(int argc, char *argv[], char *envp[])
+int main(int argc, char *argv[], char **envp)
 {
 	t_env	*head = NULL;
 
@@ -217,7 +178,6 @@ int main(int argc, char *argv[], char *envp[])
 		return (1);
 
 	ft_catch_env(envp, &head);
-	input_loop();
-
+	input_loop(&head, envp);
 	return (0);
 }

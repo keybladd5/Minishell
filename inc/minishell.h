@@ -14,6 +14,7 @@
 # include <sys/wait.h>
 # include <sys/errno.h>
 # include <readline/readline.h>
+# include <readline/history.h>
 
 #define MALLOC_ERROR 1
 
@@ -31,3 +32,7 @@ typedef struct s_token
 	int				type; //all init in 0, because not used, wait 4 PARSER
 	struct s_token	*next;
 }	t_token;
+
+void	executor(t_token **tokens, t_env **env, char **envp);
+
+int		ft_token_lst_size(t_token *lst);
