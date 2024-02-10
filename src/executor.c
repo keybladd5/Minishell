@@ -35,6 +35,32 @@ int	ft_token_lst_size(t_token *lst)
 	}
 	return (i);
 }
+
+void	expansor(t_token **tokens, t_env **env)
+{
+	t_token *t_current; //token current
+	t_env	*e_current; //enviroment current
+
+	t_current = *tokens;
+	e_current = *env;
+
+	while (t_current)
+	{
+		if (!ft_strncmp(t_current->str, "$", 1)) //si el primer caracter es un $ recorre el env hasta encontrar el contenido y sustituirlo
+		{
+			while (e_current)
+			{
+				if (!ft_strncmp(t_current->str+1, e_current->key_name, ft_strlen(e_current->key_name+1)))
+					break;
+				 e_current = e_current->next;
+			}
+			if (!e_current)
+				return ;
+			free(t_current->str);
+			t_current->str = ft_substr(e_current)
+		}
+	}
+}
 void	executor(t_token **tokens, t_env **env, char **envp)
 {
 	int i = 0;
@@ -59,7 +85,7 @@ void	executor(t_token **tokens, t_env **env, char **envp)
 		{
 			*env = (*env)->next;
 			if ((*env)->next == NULL)
-				exit(1);
+				exit(1);//  ❌ ESTO NO ESTA BIEN! SI BORRAN LA PATH SIMPLEMENTE NO ENCUENTRA NADA Y SACA EL ERROR PERTIENENTE
 		}
 		path = ft_split((*env)->value, ':'); //lo splitea
 		if (!path)
