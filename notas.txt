@@ -1,5 +1,7 @@
 gcc src/mminishell.c libft/libft.a -lreadline -ltermcap
 
+-L ~/.brew/opt/readline/lib -I ~/.brew/opt/readline/include //sin pesto no pilla rl_replace_line
+
 
 -----------------ACTUALIZAR READ_LINE----------------------
 
