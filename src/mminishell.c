@@ -146,7 +146,41 @@ void	lexer(t_token **tokens, char *input)
 	}
 }
 
-void input_loop(t_env **env, char **envp)
+//pone exit_status en 1 si se ha recibido la señal SIGINT
+void	ctrl_C(int *exit_status)
+{
+	if (g_signal == SIGINT)
+		*exit_status = EXIT_FAILURE;
+	//signal(SIGINT, SIG_IGN); //esta linea hace q no funcione CNTL_C para interrumpir comandos (cat)
+}
+
+//al recibir la señal SIGINT se ejecuta esta funcion, salta de linea y vuelve a mostrar el prompt
+void	sig_handler(int sig)
+{
+	g_signal = sig;
+	if (sig == SIGINT)
+	{
+		write(1, "\n", 1);
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
+	}
+}
+
+//inicializa variable global y las señales. Variable tc y sus funciones usan la libreria termios.h para no escribir ^C
+void	sig_init()
+{
+	struct termios	tc;
+
+	g_signal = 0;
+	signal(SIGINT, sig_handler);
+	signal(SIGQUIT, SIG_IGN);
+	tcgetattr(0, &tc);
+	tc.c_lflag &= ~ECHOCTL;
+	tcsetattr(0, TCSANOW, &tc);
+}
+
+void	input_loop(t_env **env, char **envp)
 {
 	char	*input = NULL;
 	t_token	*tokens = NULL;
@@ -155,7 +189,11 @@ void input_loop(t_env **env, char **envp)
 	while(42)
 	{
 		//signals
+		sig_init();
+		
 		input = readline("\x1b[92m⌁./MiniShell→\x1b[0m ");
+
+		ctrl_C(&exit_status);
 		
 		/*if (!ft_strncmp("exit", input, 4))
 		{
@@ -164,6 +202,7 @@ void input_loop(t_env **env, char **envp)
 		}*/
 		lexer(&tokens, input);//separa input en tokens
 		print_tokens(&tokens);//debug
+		printf("%d\n%d\n", exit_status, g_signal);
 		executor(&tokens, env, envp);
 		add_history(input);
 		free_tokens(&tokens);
