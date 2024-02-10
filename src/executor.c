@@ -16,6 +16,8 @@
 
 int ft_is_built_in(t_token **tokens)
 {
+	if (!*tokens)
+		return (1);
 	if (!ft_strncmp("exit", (*tokens)->str, 4))
 	{
 			ft_printf("exit\n");
@@ -109,15 +111,15 @@ void	executor(t_token **tokens, t_env **env, char **envp)
 		i = 0;
 		while (path[i]) //Checkea el access de ese primer token recibido 
 		{
-			if (i > 0)
-				free(absolute_path);
 			absolute_path = ft_strjoin(path[i], cmd);
 			if (!absolute_path)
 				exit(MALLOC_ERROR);
 			if (access(absolute_path, X_OK) == 0) //Checkea a validez de la ruta absoluta
 				execve(absolute_path, cmd_argv, envp);
+			free(absolute_path);
 			i++;
 		}
 	}
 	wait (NULL);
+
 }
