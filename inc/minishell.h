@@ -10,6 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef MINISHELL_H
+# define MINISHELL_H
+
 # include <stdio.h>
 # include <fcntl.h>
 # include <sys/wait.h>
@@ -17,7 +20,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
-#define MALLOC_ERROR 1
+# define MALLOC_ERROR 1
 
 typedef struct s_env
 {
@@ -37,3 +40,8 @@ typedef struct s_token
 void	executor(t_token **tokens, t_env **env, char **envp);
 
 int		ft_token_lst_size(t_token *lst);
+
+
+int	g_signal;
+
+#endif

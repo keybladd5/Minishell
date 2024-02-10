@@ -146,15 +146,22 @@ void	lexer(t_token **tokens, char *input)
 	}
 }
 
+int	ctrl_C(int exit_status)
+{
+	if (g)
+}
+
 void input_loop(t_env **env, char **envp)
 {
 	char	*input = NULL;
-	t_token	 *tokens = NULL;
+	t_token	*tokens = NULL;
+	int		exit_status = 0;
 
 	while(42)
 	{
 		//signals
 		input = readline("\x1b[92m⌁./MiniShell→\x1b[0m ");
+		exit_status = ctrl_C(exit_status);
 		
 		/*if (!ft_strncmp("exit", input, 4))
 		{

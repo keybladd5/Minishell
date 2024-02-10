@@ -40,4 +40,14 @@ source ~/.zshrc
 	-Append
 	-Invalid cmd
 	-rutas absolutas
-- Implementar 
+- Implementar builtins
+	- echo (-n)
+	- cd (relative/absolute path)
+	- pwd
+	- export
+	- unset
+	- env
+	- exit ✅
+- Env variables (Expansor)
+- $? 
+- ctrl-C, ctrl-D, ctrl-\
