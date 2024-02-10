@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+# include <stdio.h>
 # include <fcntl.h>
 # include <sys/wait.h>
 # include <sys/errno.h>
