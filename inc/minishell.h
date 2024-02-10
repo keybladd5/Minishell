@@ -41,7 +41,4 @@ void	executor(t_token **tokens, t_env **env, char **envp);
 
 int		ft_token_lst_size(t_token *lst);
 
-
-int	g_signal;
-
 #endif
