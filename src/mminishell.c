@@ -156,11 +156,11 @@ void input_loop(t_env **env, char **envp)
 		//signals
 		input = readline("\x1b[92m⌁./MiniShell→\x1b[0m ");
 		
-		if (!ft_strncmp("exit", input, 4))
+		/*if (!ft_strncmp("exit", input, 4))
 		{
 			ft_printf("exit\n");
 			exit(0);
-		}
+		}*/
 		lexer(&tokens, input);//separa input en tokens
 		print_tokens(&tokens);//debug
 		executor(&tokens, env, envp);

@@ -13,6 +13,16 @@
 #include "../libft/libft.h"
 #include "../inc/minishell.h"
 
+
+int ft_is_built_in(t_token **tokens)
+{
+	if (!ft_strncmp("exit", (*tokens)->str, 4))
+	{
+			ft_printf("exit\n");
+			exit(0);
+	}
+	return (0);
+}
 int	ft_token_lst_size(t_token *lst)
 {
 	int	i;
@@ -32,8 +42,11 @@ void	executor(t_token **tokens, t_env **env, char **envp)
 	char *cmd = NULL;
 	char *absolute_path = NULL;
 	char **cmd_argv = NULL;
+
 	//int	*pipefd[2];
 	//pipe(pipefd);
+	if (ft_is_built_in(tokens))
+		return ;
 	int pid = fork();
 	//dprintf(0, "%d\n", pid);
 	if (pid == 0)
