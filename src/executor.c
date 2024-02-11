@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: polmarti <polmarti@student.42barcel>       +#+  +:+       +#+        */
+/*   By: Meritxu <Meritxu@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 10:36:31 by polmarti          #+#    #+#             */
-/*   Updated: 2024/02/09 10:36:34 by polmarti         ###   ########.fr       */
+/*   Updated: 2024/02/11 19:02:45 by Meritxu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,9 @@ void	expansor(t_token **tokens, t_env **env)
 			if (!e_current)
 				return ;
 			free(t_current->str);
-			t_current->str = ft_substr(e_current)
+			t_current->str = ft_substr(e_current->value, 0, ft_strlen(e_current->value));
 		}
+		t_current = t_current->next;
 	}
 }
 void	executor(t_token **tokens, t_env **env, char **envp)

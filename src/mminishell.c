@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mminishell.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: polmarti <polmarti@student.42barcel>       +#+  +:+       +#+        */
+/*   By: Meritxu <Meritxu@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 11:14:41 by polmarti          #+#    #+#             */
-/*   Updated: 2024/02/01 11:14:43 by polmarti         ###   ########.fr       */
+/*   Updated: 2024/02/11 18:55:58 by Meritxu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,7 @@ void	lexer(t_token **tokens, char *input)
 		last->next = tmp;
 	last = tmp;
 	}
+	
 }
 
 void input_loop(t_env **env, char **envp)
@@ -162,6 +163,7 @@ void input_loop(t_env **env, char **envp)
 			exit(0);
 		}*/
 		lexer(&tokens, input);//separa input en tokens
+		expansor(&tokens, env);
 		print_tokens(&tokens);//debug
 		executor(&tokens, env, envp);
 		add_history(input);
