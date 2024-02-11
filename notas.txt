@@ -43,6 +43,7 @@ source ~/.zshrc
 	-Invalid cmd
 	-rutas absolutas
 	-error executor (si solo hay un comando y despues un espacio detecta los espacios como un solo nodo, no debe tomarlo)
+	-error expansor si le pasas una $ o $NOEXISTE te printea algo y no deberia
 - Implementar builtins
 	- echo (-n)
 	- cd (relative/absolute path)
