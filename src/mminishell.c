@@ -173,11 +173,11 @@ void	sig_init()
 	struct termios	tc;
 
 	g_signal = 0;
-	signal(SIGINT, sig_handler);
-	signal(SIGQUIT, SIG_IGN);
-	tcgetattr(0, &tc);
-	tc.c_lflag &= ~ECHOCTL;
-	tcsetattr(0, TCSANOW, &tc);
+	signal(SIGINT, sig_handler); //Init SIGINT (ctrl+C) para ejecutar sig_handler cuando la reciba
+	signal(SIGQUIT, SIG_IGN); //Init SIGQUIT (ctrl+\) para ignorarla
+	tcgetattr(0, &tc); //Guarda los atributos del FD 0 (STDIN) en la estructura
+	tc.c_lflag &= ~ECHOCTL; //Modifica la flag 'local mode' para desactivar el printeo de ctrl+(X) como ^(X)
+	tcsetattr(0, TCSANOW, &tc); //Devuelve los atributos modificados al FD 0 (STDIN)
 }
 
 void	input_loop(t_env **env, char **envp)
