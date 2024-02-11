@@ -1,5 +1,7 @@
 gcc src/mminishell.c libft/libft.a -lreadline -ltermcap
 
+-L ~/.brew/opt/readline/lib -I ~/.brew/opt/readline/include //sin pesto no pilla rl_replace_line
+
 
 -----------------ACTUALIZAR READ_LINE----------------------
 
@@ -40,4 +42,15 @@ source ~/.zshrc
 	-Append
 	-Invalid cmd
 	-rutas absolutas
-- Implementar 
+	-error executor (si solo hay un comando y despues un espacio detecta los espacios como un solo nodo, no debe tomarlo)
+- Implementar builtins
+	- echo (-n)
+	- cd (relative/absolute path)
+	- pwd
+	- export
+	- unset
+	- env
+	- exit ✅
+- Env variables (Expansor)
+- $? 
+- ctrl-C, ctrl-D, ctrl-\
