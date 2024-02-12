@@ -91,6 +91,8 @@ void	lexer(t_token **tokens, char *input)
 	{
 		while (ft_isspace(input[i]))
 			i++;
+		if (!input[i]) //para no tomar los espacios como argumentos para crear un nodo
+			break ;
 		tmp = (t_token *)malloc(sizeof(t_token));
 		if (!tmp)
 			exit(MALLOC_ERROR);

@@ -56,7 +56,7 @@ void	expansor(t_token **tokens, t_env **env)
 					break;
 				 e_current = e_current->next;
 			}
-			if (!e_current)
+			if (!e_current->next)//por si no encuentra ninguna coincidencia con las variables de entorno a las que se puede expandir
 				return ;
 			free(t_current->str);
 			t_current->str = ft_substr(e_current->value, 0, ft_strlen(e_current->value));
