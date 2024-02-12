@@ -3,19 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   mminishell.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Meritxu <Meritxu@student.42.fr>            +#+  +:+       +#+        */
+/*   By: polmarti <polmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 11:14:41 by polmarti          #+#    #+#             */
-/*   Updated: 2024/02/11 18:55:58 by Meritxu          ###   ########.fr       */
+/*   Updated: 2024/02/11 18:55:58 by polmarti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../libft/libft.h"
 #include "../inc/minishell.h"
 
-#define MALLOC_ERROR 1
-
-#include <stdio.h>
 //debug function
 void	print_tokens(t_token **head)
 {
@@ -81,6 +77,7 @@ int		ft_tokenlen(char *input)
 	return (len);
 }
 
+//split all words by spaces in a linked list
 void	lexer(t_token **tokens, char *input)
 {
 	int	i = 0;
@@ -149,6 +146,7 @@ void	lexer(t_token **tokens, char *input)
 	
 }
 
+//infinte loop to get the user_input and parse it
 void input_loop(t_env **env, char **envp)
 {
 	char	*input = NULL;
@@ -167,7 +165,7 @@ void input_loop(t_env **env, char **envp)
 		lexer(&tokens, input);//separa input en tokens
 		expansor(&tokens, env);
 		print_tokens(&tokens);//debug
-		executor(&tokens, env, envp);
+		parser(&tokens, env, envp);
 		add_history(input);
 		free_tokens(&tokens);
 		free(input);

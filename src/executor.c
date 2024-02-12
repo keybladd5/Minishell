@@ -10,10 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../libft/libft.h"
 #include "../inc/minishell.h"
 
-
+//check if the word on the token is built in comand
 int ft_is_built_in(t_token **tokens)
 {
 	if (!*tokens)
@@ -25,6 +24,7 @@ int ft_is_built_in(t_token **tokens)
 	}
 	return (0);
 }
+//aux to malloc size on the executor function
 int	ft_token_lst_size(t_token *lst)
 {
 	int	i;
@@ -38,6 +38,7 @@ int	ft_token_lst_size(t_token *lst)
 	return (i);
 }
 
+//expand env variables on the tokens linked list, works whith a '$' char
 void	expansor(t_token **tokens, t_env **env)
 {
 	t_token *t_current; //token current
@@ -64,7 +65,8 @@ void	expansor(t_token **tokens, t_env **env)
 		t_current = t_current->next;
 	}
 }
-void	executor(t_token **tokens, t_env **env, char **envp)
+//fork, find the absolute path, get the argv to the comand (included comand name) check the acces and exec
+void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 {
 	int i = 0;
 	char **path = NULL;
@@ -74,6 +76,7 @@ void	executor(t_token **tokens, t_env **env, char **envp)
 
 	//int	*pipefd[2];
 	//pipe(pipefd);
+
 	if (ft_is_built_in(tokens))
 		return ;
 	int pid = fork();
@@ -83,7 +86,12 @@ void	executor(t_token **tokens, t_env **env, char **envp)
 		/*int loop = 1;
 		while (loop)
 			;*/
-		//dup2(pipefd[1], 1);
+		if (data_pipe->flag == YES)
+		{
+			dup2(data_pipe->pipefd[1], 1);//comunica la salida con la entrada del siguiente proceso
+			close(data_pipe->pipefd[1]); //cierra pipes
+			close(data_pipe->pipefd[0]);
+		}
 		while (ft_strncmp("PATH", (*env)->key_name, 4) != 0) //LOCALIZA EL PATH
 		{
 			*env = (*env)->next;
@@ -101,7 +109,7 @@ void	executor(t_token **tokens, t_env **env, char **envp)
 		if (!cmd_argv)
 			exit(MALLOC_ERROR);
 		cmd_argv[ft_token_lst_size(*tokens)] = NULL;
-		while (*tokens) //llena la matriz con todos los tokens PENDIENTE CAMBIAR
+		while (*tokens && (*tokens)->type == WORD) //llena la matriz con todos los tokens PENDIENTE CAMBIAR
 		{
 			cmd_argv[i] = ft_strdup((*tokens)->str);
 			if (!cmd_argv[i])
@@ -121,6 +129,5 @@ void	executor(t_token **tokens, t_env **env, char **envp)
 			i++;
 		}
 	}
-	wait (NULL);
-
+	wait (NULL);//4 the parent process
 }
