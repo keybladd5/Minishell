@@ -80,13 +80,13 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 	if (ft_is_built_in(tokens))
 		return ;
 	int pid = fork();
-	//dprintf(0, "%d\n", pid);
+	//dprintf(2, "%d\n", pid);
 	if (pid == 0)
 	{
 		/*int loop = 1;
 		while (loop)
 			;*/
-		if (data_pipe->flag == YES)
+		if (data_pipe->flag == YES && data_pipe->pipe_counter)
 		{
 			dup2(data_pipe->pipefd[1], 1);//comunica la salida con la entrada del siguiente proceso
 			close(data_pipe->pipefd[1]); //cierra pipes
@@ -129,5 +129,5 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			i++;
 		}
 	}
-	wait (NULL);//4 the parent process
+	//wait (NULL);//4 the parent process
 }

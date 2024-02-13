@@ -44,6 +44,8 @@ typedef struct s_pipe
 	int pipefd[2];
 	int pipe_counter;
 	int flag;
+	int og_stdin;
+	int og_stdout;
 }	t_pipe;
 
 void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe);
