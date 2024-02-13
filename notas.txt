@@ -36,7 +36,7 @@ source ~/.zshrc
 
 
 - Añadir el PARSER entre el lexer y el executor
-	-Pipeline 
+	-Pipeline [✅ Hace falta optimizar el codigo para simplificarlo]
 	-Redirections
 	-Heredoc
 	-Append

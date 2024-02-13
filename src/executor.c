@@ -129,5 +129,5 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			i++;
 		}
 	}
-	//wait (NULL);//4 the parent process
+	//wait (NULL);//moved this part to the parser
 }

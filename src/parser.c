@@ -85,10 +85,10 @@ void parser(t_token **tokens, t_env **env, char **envp)
 			wait (NULL);
 			dup2(data_pipe->og_stdin, 0);
 			dup2(data_pipe->og_stdout, 1);
+			close(data_pipe->og_stdin);
+			close(data_pipe->og_stdout);
 			return ;
 		}
 		t_current = t_current->next;
 	}
 }
-
-//ORGANIZAR BIEN EL BUCLE I REVISAR PORQUE NO SE DETIENE EN LA READ LINE, QUE RELACION PUEDE TENER CON CLONAR SALIDA Y ENTRADA A PIPES
