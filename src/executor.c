@@ -39,6 +39,13 @@ int	ft_token_lst_size(t_token *lst)
 }
 
 //expand env variables on the tokens linked list, works whith a '$' char
+//ECHO:
+//-Uno o mas strings simples ✅
+//-Una o mas variables de entorno ($USER$USER$PWD) ✅
+//-Caraccteres + Variable de entorno (AAAA$USER) 
+//-Variable de entorno + Caracteres ($USERAAAA)
+//-SOLO SIMBOLO $ ✅
+
 void	expansor(t_token **tokens, t_env **env)
 {
 	t_token *t_current; //token current
@@ -56,37 +63,42 @@ void	expansor(t_token **tokens, t_env **env)
 	while (t_current)
 	{
 		i = 0;
-		while (t_current->str[i])
+		tmp = t_current->str;
+		t_current->str = NULL;
+		while (tmp[i])
 		{
-			if (!ft_strncmp(t_current->str + i, "$", 1)) //si el primer caracter es un $ recorre el env hasta encontrar el contenido y sustituirlo
+			if (!ft_strncmp(tmp + i, "$", 1)) //si el primer caracter es un $ recorre el env hasta encontrar el contenido y sustituirlo
 			{
 				i++;
+				if (!tmp[i])
+					break;
 				x = i;
-				while(t_current->str[x] != '$' && !ft_isspace(t_current->str[x]) && t_current->str[x])
+				while(tmp[x] != '$' && !ft_isspace(tmp[x]) && tmp[x])
 					x++;
 				while (e_current)
 				{
-					if (!ft_strncmp(&(t_current->str[i]), e_current->key_name, x - i))
+					if (!ft_strncmp(&(tmp[i]), e_current->key_name, x - i))
 					{
-						str = ft_strjoin_s(str, ft_strdup(e_current->value));
+						str = ft_strdup(e_current->value);
 						if (!str)
 							exit (MALLOC_ERROR);
-						//i += ft_strlen(e_current->key_name);
+						i = x;
 						break;
 					}
 					else
 						 e_current = e_current->next;
 				}
+				if (str)
+					t_current->str = ft_strjoin_f(t_current->str, str);
 				e_current = *env;
 			}
 			else
 				i++;
 		}
-		if (str)
-		{
-			free(t_current->str);
-			t_current->str = str;
-		}
+		if (!t_current->str)
+			t_current->str = tmp;
+		else
+			free (tmp);
 		t_current = t_current->next;
 	}
 }

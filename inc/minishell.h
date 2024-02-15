@@ -54,4 +54,6 @@ int		ft_token_lst_size(t_token *lst);
 
 void	expansor(t_token **tokens, t_env **env);
 
-void parser(t_token **tokens, t_env **env, char **envp);
+void	parser(t_token **tokens, t_env **env, char **envp);
+
+char	*ft_strjoin_f(char *s1, char *s2);
