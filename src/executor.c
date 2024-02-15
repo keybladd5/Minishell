@@ -43,28 +43,54 @@ void	expansor(t_token **tokens, t_env **env)
 {
 	t_token *t_current; //token current
 	t_env	*e_current; //enviroment current
+	char	*tmp;
+	char	*str = NULL;
+	int		i;
+	int		x;
 
 	t_current = *tokens;
 	e_current = *env;
+	x = 0;
 
+	//hay que comprobar cuando hay caracteres de mas en la variable y los del principio del string
 	while (t_current)
 	{
-		if (!ft_strncmp(t_current->str, "$", 1)) //si el primer caracter es un $ recorre el env hasta encontrar el contenido y sustituirlo
+		i = 0;
+		while (t_current->str[i])
 		{
-			while (e_current)
+			if (!ft_strncmp(t_current->str + i, "$", 1)) //si el primer caracter es un $ recorre el env hasta encontrar el contenido y sustituirlo
 			{
-				if (!ft_strncmp(t_current->str+1, e_current->key_name, ft_strlen(e_current->key_name+1)))
-					break;
-				 e_current = e_current->next;
+				i++;
+				x = i;
+				while(t_current->str[x] != '$' && !ft_isspace(t_current->str[x]) && t_current->str[x])
+					x++;
+				while (e_current)
+				{
+					if (!ft_strncmp(&(t_current->str[i]), e_current->key_name, x - i))
+					{
+						str = ft_strjoin_s(str, ft_strdup(e_current->value));
+						if (!str)
+							exit (MALLOC_ERROR);
+						//i += ft_strlen(e_current->key_name);
+						break;
+					}
+					else
+						 e_current = e_current->next;
+				}
+				e_current = *env;
 			}
-			if (!e_current->next)//por si no encuentra ninguna coincidencia con las variables de entorno a las que se puede expandir
-				return ;
+			else
+				i++;
+		}
+		if (str)
+		{
 			free(t_current->str);
-			t_current->str = ft_substr(e_current->value, 0, ft_strlen(e_current->value));
+			t_current->str = str;
 		}
 		t_current = t_current->next;
 	}
 }
+
 //fork, find the absolute path, get the argv to the comand (included comand name) check the acces and exec
 void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 {
