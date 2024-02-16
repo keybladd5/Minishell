@@ -88,12 +88,26 @@ void	expansor(t_token **tokens, t_env **env)
 					else
 						 e_current = e_current->next;
 				}
-				if (str)
+				if (str && e_current)
+				{
 					t_current->str = ft_strjoin_f(t_current->str, str);
+					if (!t_current->str)
+						exit(MALLOC_ERROR);
+				}
+				else if (!e_current)
+					i = x;
 				e_current = *env;
 			}
 			else
+			{
 				i++;
+				if (tmp[i] == '$')
+				{
+					t_current->str = ft_substr(tmp, 0, i);
+					if (!t_current->str)
+						exit(MALLOC_ERROR);
+				}
+			}
 		}
 		if (!t_current->str)
 			t_current->str = tmp;
