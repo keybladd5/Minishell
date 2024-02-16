@@ -46,6 +46,7 @@ source ~/.zshrc
 	-expansor da error con "echo $USER$USER" y bash si lo reproduce
 	-[SOLVED✅]error executor (si solo hay un comando y despues un espacio detecta los espacios como un solo nodo, no debe tomarlo)
 	-[SOLVED✅]error expansor si le pasas una $ o $NOEXISTE te printea algo y no deberia
+	-[SOLVED✅]echo $USER | cat | cat | wc | cat NO FUNCIONA CORRECTAMENTE (output: polmarti  bash:      1       1       9  )
 - Implementar builtins
 	- echo (-n)
 	- cd (relative/absolute path)

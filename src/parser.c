@@ -21,12 +21,10 @@ void parser(t_token **tokens, t_env **env, char **envp)
 	data_pipe->og_stdout = dup(1);
 	data_pipe->pipe_counter = 0;
 	t_current = *tokens;
+
 	//el siguiente bucle da valor a la variable type de cada nodo de la lista obtenida por el lexer, llamada tokens
 	while(t_current)
 	{	
-			//creas pipe y conectas salida y entrada con primer comando y segundo comando
-			//hay que marcar de alguna forma que todo los anteriores nodos se deben mandar al executor y que seran el primer comando
-			//todo lo que se encuentre despues hasta final de string o siguiente pipe seran el segundo comando
 		if (!ft_strncmp(t_current->str, "|", 1)) //si encuentras pipe
 		{
 				t_current->type = PIPE; //seteo type
@@ -40,17 +38,7 @@ void parser(t_token **tokens, t_env **env, char **envp)
 		}
 	}
 	t_current = *tokens; //vuelve al princio de la lista
-	/*if (data_pipe->pipe_counter)//si hay minimo 1 pipe leido
-	{
-		data_pipe->flag = YES;
-		pipe(data_pipe->pipefd); //Crea pipe para comunicar solo 2 comandos
-		exec_cmd(tokens, env, envp, data_pipe); //ejecuta el comando y en el proceso hijo comunica la salida con el pipe
-		dup2(data_pipe->pipefd[0], 0); //comunica la salida del cmd ejecutado a la pipe
-		close(data_pipe->pipefd[0]);// cierra pipes
-		close(data_pipe->pipefd[1]);
-		data_pipe->pipe_counter--;
-		wait (NULL);
-	}*/
+
 	//ahora ya esta toda la lista seteada, debo abrir los pipes necesarios y llamar a ejecutar los procesos.
 	while(t_current)//para en un futuro si hay mas pipes
 	{
@@ -67,7 +55,7 @@ void parser(t_token **tokens, t_env **env, char **envp)
 		{
 			data_pipe->flag = YES;
 			pipe(data_pipe->pipefd); //Crea pipe para comunicar solo 2 comandos
-			exec_cmd(tokens, env, envp, data_pipe); //ejecuta el comando y en el proceso hijo comunica la salida con el pipe
+			exec_cmd(&t_current, env, envp, data_pipe); //ejecuta el comando y en el proceso hijo comunica la salida con el pipe
 			dup2(data_pipe->pipefd[0], 0); //comunica la salida del cmd ejecutado a la pipe
 			close(data_pipe->pipefd[0]);// cierra pipes
 			close(data_pipe->pipefd[1]);
@@ -92,3 +80,5 @@ void parser(t_token **tokens, t_env **env, char **envp)
 		t_current = t_current->next;
 	}
 }
+
+//este bucle con el input  "echo $USER | echo $USER | cat | cat | wc | cat" ha ejecutado echo 4 veces y 1 cat 
