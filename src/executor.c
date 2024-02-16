@@ -11,7 +11,17 @@
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
+int	ft_aux_abs(char *str)
+{
+	int	i;
 
+	i = 0;
+	while(str[i])
+		i++;
+	while (str[i] != '/')
+		i--;
+	return (i+1);
+}
 //check if the word on the token is built in comand
 int ft_is_built_in(t_token **tokens)
 {
@@ -30,7 +40,7 @@ int	ft_token_lst_size(t_token *lst)
 	int	i;
 
 	i = 0;
-	while (lst)
+	while (lst && lst->type == WORD)//PARA QUE SOLO CUENTE HASTA LA PIPE SI HAY
 	{
 		lst = lst->next;
 		i++;
@@ -121,6 +131,7 @@ void	expansor(t_token **tokens, t_env **env)
 void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 {
 	int i = 0;
+	int flag_absoluthepath = 0;
 	char **path = NULL;
 	char *cmd = NULL;
 	char *absolute_path = NULL;
@@ -144,18 +155,28 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			close(data_pipe->pipefd[1]); //cierra pipes
 			close(data_pipe->pipefd[0]);
 		}
-		while (ft_strncmp("PATH", (*env)->key_name, 4) != 0) //LOCALIZA EL PATH
+		if ((*tokens)->str[0] ==  '/')//en caso de ser posible ruta absoluta
+		{
+			flag_absoluthepath = 1; //flag activada
+			absolute_path = (*tokens)->str; //setemos la variable directamente sin buscar en path
+		}
+		while (ft_strncmp("PATH", (*env)->key_name, 4) != 0 && !flag_absoluthepath) //LOCALIZA EL PATH si la flag no esta
 		{
 			*env = (*env)->next;
 			if ((*env)->next == NULL)
 				exit(1);//  ❌ ESTO NO ESTA BIEN! SI BORRAN LA PATH SIMPLEMENTE NO ENCUENTRA NADA Y SACA EL ERROR PERTIENENTE
 		}
+
+		//hace algunas acciones que no son necesarias en caso de ruta absoluta, hay que ver como se gestiona
+
 		path = ft_split((*env)->value, ':'); //lo splitea
 		if (!path)
 			exit (MALLOC_ERROR);
 		cmd = ft_strjoin("/", (*tokens)->str); //prepara el primer comando con el slash
 		if (!cmd)
 			exit (MALLOC_ERROR);
+
+
 		//condicion temporal que acogera en una matriz todos los strings de la lista tokens
 		cmd_argv = (char **)malloc(sizeof(char * ) * ft_token_lst_size(*tokens) + 1); //crea la matriz a pasar al execve
 		if (!cmd_argv)
@@ -163,6 +184,17 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 		cmd_argv[ft_token_lst_size(*tokens)] = NULL;
 		while (*tokens && (*tokens)->type == WORD) //llena la matriz con todos los tokens PENDIENTE CAMBIAR
 		{
+			if (flag_absoluthepath)
+			{
+				cmd_argv[i] = ft_substr((*tokens)->str, ft_aux_abs((*tokens)->str), ft_strlen((*tokens)->str));
+				if (!cmd_argv[i])
+					exit(MALLOC_ERROR);
+				*tokens = (*tokens)->next;
+				flag_absoluthepath = 0;
+				if (!*tokens || (*tokens)->type != WORD)
+					break ;
+				i++;
+			}
 			cmd_argv[i] = ft_strdup((*tokens)->str);
 			if (!cmd_argv[i])
 				exit(MALLOC_ERROR);
@@ -170,6 +202,8 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			i++;
 		}
 		i = 0;
+		if (access(absolute_path, X_OK) == 0) //Checkea a validez de la ruta absoluta
+				execve(absolute_path, cmd_argv, envp);
 		while (path[i]) //Checkea el access de ese primer token recibido 
 		{
 			absolute_path = ft_strjoin(path[i], cmd);
