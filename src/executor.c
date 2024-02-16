@@ -48,14 +48,6 @@ int	ft_token_lst_size(t_token *lst)
 	return (i);
 }
 
-//expand env variables on the tokens linked list, works whith a '$' char
-//ECHO:
-//-Uno o mas strings simples ✅
-//-Una o mas variables de entorno ($USER$USER$PWD) ✅
-//-Caraccteres + Variable de entorno (AAAA$USER) 
-//-Variable de entorno + Caracteres ($USERAAAA)
-//-SOLO SIMBOLO $ ✅
-
 void	expansor(t_token **tokens, t_env **env)
 {
 	t_token *t_current; //token current

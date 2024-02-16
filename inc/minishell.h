@@ -34,7 +34,6 @@ typedef struct s_env
 typedef struct s_token
 {
 	char			*str;
-	char			*aux_str; //non used at this actual point, wait 4 take it in the PARSER
 	int				type; //all init in 0, because not used, wait 4 PARSER
 	struct s_token	*next;
 }	t_token;

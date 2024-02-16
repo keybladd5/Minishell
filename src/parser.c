@@ -81,4 +81,3 @@ void parser(t_token **tokens, t_env **env, char **envp)
 	}
 }
 
-//este bucle con el input  "echo $USER | echo $USER | cat | cat | wc | cat" ha ejecutado echo 4 veces y 1 cat 
