@@ -17,13 +17,15 @@
 int ft_is_built_in(t_token **tokens)
 {
 	if (!*tokens)
-		return (1);
-	if (!ft_strncmp("exit", (*tokens)->str, 4))
+		return (0);
+	if (!ft_strncmp("echo", (*tokens)->str, 4))
+		return (ft_echo((*tokens)->next));
+	else if (!ft_strncmp("exit", (*tokens)->str, 4))
 	{
 			ft_printf("exit\n");
 			exit(0);
 	}
-	return (0);
+	return (1);
 }
 int	ft_token_lst_size(t_token *lst)
 {
@@ -47,7 +49,7 @@ void	executor(t_token **tokens, t_env **env, char **envp)
 
 	//int	*pipefd[2];
 	//pipe(pipefd);
-	if (ft_is_built_in(tokens))
+	if (!ft_is_built_in(tokens))
 		return ;
 	int pid = fork();
 	//dprintf(0, "%d\n", pid);
