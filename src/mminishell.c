@@ -64,6 +64,12 @@ void ft_catch_env(char **envp, t_env **head)
 		last = tmp;
 		x++;
 	}
+	tmp = (t_env *)malloc(sizeof(t_env));
+	if (!tmp)
+		exit(MALLOC_ERROR);
+	tmp->key_name = "?";
+	tmp->value = "0";
+	last = tmp;
 	last->next = NULL;
 }
 //aux lexer
@@ -100,11 +106,11 @@ void	lexer(t_token **tokens, char *input)
 		if (!tmp->str)
 			exit (MALLOC_ERROR);
 		i += ft_tokenlen(input + i);
-	if (!*tokens)
-			*tokens = tmp;
-	else
-		last->next = tmp;
-	last = tmp;
+		if (!*tokens)
+				*tokens = tmp;
+		else
+			last->next = tmp;
+		last = tmp;
 	}
 	
 }

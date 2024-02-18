@@ -56,3 +56,7 @@ void	expansor(t_token **tokens, t_env **env);
 void	parser(t_token **tokens, t_env **env, char **envp);
 
 char	*ft_strjoin_f(char *s1, char *s2);
+
+void	print_tokens(t_token **head);
+
+void 	free_tokens(t_token **head);

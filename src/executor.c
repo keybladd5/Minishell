@@ -151,12 +151,28 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 		{
 			flag_absoluthepath = 1; //flag activada
 			absolute_path = (*tokens)->str; //setemos la variable directamente sin buscar en path
+			if (access(absolute_path, X_OK) != 0)
+			{
+				//pendiente fallo 127 ruta absoluta
+			}
+
 		}
 		while (ft_strncmp("PATH", (*env)->key_name, 4) != 0 && !flag_absoluthepath) //LOCALIZA EL PATH si la flag no esta
 		{
 			*env = (*env)->next;
+			//pendiente fallo 127 no path
 			if ((*env)->next == NULL)
-				exit(1);//  ❌ ESTO NO ESTA BIEN! SI BORRAN LA PATH SIMPLEMENTE NO ENCUENTRA NADA Y SACA EL ERROR PERTIENENTE
+			{	
+				while(*env)
+				{
+					if (ft_strncmp((*env)->key_name, "?", 1) == 0)
+						break ;
+					*env = (*env)->next;
+				}
+				free((*env)->value);
+				(*env)->value = ft_strdup("127");
+				return ;
+			}
 		}
 
 		//hace algunas acciones que no son necesarias en caso de ruta absoluta, hay que ver como se gestiona
@@ -174,7 +190,7 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 		if (!cmd_argv)
 			exit(MALLOC_ERROR);
 		cmd_argv[ft_token_lst_size(*tokens)] = NULL;
-		while (*tokens && (*tokens)->type == WORD) //llena la matriz con todos los tokens PENDIENTE CAMBIAR
+		while (*tokens) //llena la matriz con todos los tokens PENDIENTE CAMBIAR
 		{
 			if (flag_absoluthepath)
 			{
