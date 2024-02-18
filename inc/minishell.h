@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Meritxu <Meritxu@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ade-tole <ade-tole@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/01 11:14:16 by polmarti          #+#    #+#             */
-/*   Updated: 2024/02/11 18:54:59 by Meritxu          ###   ########.fr       */
+/*   Created: 2024/02/18 19:33:49 by ade-tole          #+#    #+#             */
+/*   Updated: 2024/02/18 19:34:03 by ade-tole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,10 @@ void	print_tokens(t_token **head);
 int		ft_token_lst_size(t_token *lst);
 
 void 	free_tokens(t_token **head);
+
+int		ft_echo(t_token *tokens);
+
+int		ft_cd(t_token *tokens, t_env *env);
 
 int	g_signal;
 

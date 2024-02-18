@@ -61,7 +61,7 @@ void parser(t_token **tokens, t_env **env, char **envp)
 	//el siguiente bucle da valor a la variable type de cada nodo de la lista obtenida por el lexer, llamada tokens
 	while(t_current)
 	{	
-		if (!ft_strncmp(t_current->str, "|", 1)) //si encuentras pipe
+		if (!ft_strncmp(t_current->str, "|", 1)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
 		{
 				t_current->type = PIPE; //seteo type
 				data_pipe->pipe_counter++;
@@ -87,8 +87,9 @@ void parser(t_token **tokens, t_env **env, char **envp)
 			t_current = t_current->next;
 		}
 	}
+
 	//BUCLE prototipo para modificar las acciones del parser, pendiente de propuesta
-	//se realiza el siguien te proceso para copiar la lista hasta la pipe y mandar solo eso. Se almacena en t_tmp
+	//se realiza el siguiente proceso para copiar la lista hasta la pipe y mandar solo eso. Se almacena en t_tmp
 	t_current = *tokens; //vuelve al princio de la lista
 	while (t_current)
 	{
@@ -103,65 +104,71 @@ void parser(t_token **tokens, t_env **env, char **envp)
 		while (t_current && t_current->type == WORD)
 			t_current = t_current->next;
 	}
-	t_current = *tokens;
+	
 	//ahora ya esta toda la lista seteada, debo abrir los pipes necesarios y llamar a ejecutar los procesos.
-	while(t_current)//para en un futuro si hay mas pipes
-	{
-		//Condicion por si solo hay 1 comando
-		if (!data_pipe->pipe_counter && t_current->type == WORD)
+	t_current = *tokens;
+	//Condicion por si solo hay 1 comando
+	if (!data_pipe->pipe_counter && t_current->type == WORD)
 		{
 			data_pipe->flag = NO;
 			ft_tokens_to_exec(&t_current, &t_tmp);
 			exec_cmd(&t_tmp, env, envp, data_pipe);
 			wait (&status);
 			free_tokens(&t_tmp);
-			if (WIFEXITED(status) != 0)
+			/*if (WIFEXITED(status) != 0)
 			{	
 				while(*env)
 				{
 					if (ft_strncmp((*env)->key_name, "?", 1) == 0)
 						break ;
 					*env = (*env)->next;
+					if (!*env)
+						return ;
 				}
 				free((*env)->value);
 				(*env)->value = ft_itoa(WEXITSTATUS(status));
 				ft_printf("minishell %s: command not found", t_tmp->str);
 				return ;
+			}*/
+		}
+	else
+	{
+		while(t_current)//para en un futuro si hay mas pipes
+		{
+			//entra aqui si hay pipes leidas, y ejecuta hasta nodos hasta la pipe(en el exec)
+			if (t_current->type == WORD && data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
+			{
+				ft_tokens_to_exec(&t_current, &t_tmp);
+				data_pipe->flag = YES;
+				pipe(data_pipe->pipefd); //Crea pipe para comunicar solo 2 comandos
+				exec_cmd(&t_tmp, env, envp, data_pipe); //ejecuta el comando y en el proceso hijo comunica la salida con el pipe
+				dup2(data_pipe->pipefd[0], 0); //comunica la salida del cmd ejecutado a la pipe
+				close(data_pipe->pipefd[0]);// cierra pipes
+				close(data_pipe->pipefd[1]);
+				data_pipe->pipe_counter--;
+				wait (NULL);
+				free_tokens(&t_tmp);
 			}
-		}
-		//entra aqui si hay pipes leidas, y ejecuta hasta nodos hasta la pipe(en el exec)
-		if (t_current->type == WORD && data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
-		{
-			ft_tokens_to_exec(&t_current, &t_tmp);
-			data_pipe->flag = YES;
-			pipe(data_pipe->pipefd); //Crea pipe para comunicar solo 2 comandos
-			exec_cmd(&t_tmp, env, envp, data_pipe); //ejecuta el comando y en el proceso hijo comunica la salida con el pipe
-			dup2(data_pipe->pipefd[0], 0); //comunica la salida del cmd ejecutado a la pipe
-			close(data_pipe->pipefd[0]);// cierra pipes
-			close(data_pipe->pipefd[1]);
-			data_pipe->pipe_counter--;
-			wait (NULL);
-			free_tokens(&t_tmp);
-		}
-		//ahora quiero iterar hasta que los nodos sean de otro comando, los diferencia el nodo pipe
-		while (!(t_current->type == PIPE))
+			//ahora quiero iterar hasta que los nodos sean de otro comando, los diferencia el nodo pipe
+			while (t_current && !(t_current->type == PIPE))
+				t_current = t_current->next;
+			//caso del ultimo comando a ejecutar, donde se recoge el exit status
+			if (!data_pipe->pipe_counter && t_current->type == PIPE)
+			{
+				data_pipe->flag = NO;
+				t_current = t_current->next;
+				ft_tokens_to_exec(&t_current, &t_tmp);	
+				exec_cmd(&t_tmp, env, envp, data_pipe);
+				wait (NULL);
+				dup2(data_pipe->og_stdin, 0);
+				dup2(data_pipe->og_stdout, 1);
+				close(data_pipe->og_stdin);
+				close(data_pipe->og_stdout);
+				free_tokens(&t_tmp);
+				return ;
+			}
 			t_current = t_current->next;
-		//caso del ultimo comando a ejecutar, donde se recoge el exit status
-		if (!data_pipe->pipe_counter && t_current->type == PIPE)
-		{
-			data_pipe->flag = NO;
-			t_current = t_current->next;
-			ft_tokens_to_exec(&t_current, &t_tmp);	
-			exec_cmd(&t_tmp, env, envp, data_pipe);
-			wait (NULL);
-			dup2(data_pipe->og_stdin, 0);
-			dup2(data_pipe->og_stdout, 1);
-			close(data_pipe->og_stdin);
-			close(data_pipe->og_stdout);
-			free_tokens(&t_tmp);
-			return ;
 		}
-		t_current = t_current->next;
 	}
 }
 

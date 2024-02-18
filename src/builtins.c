@@ -6,12 +6,12 @@
 //ECHO
 //Al llamar a la funcion desde ft_is_built_in ((hacen falta tantas _ ??)) se pasa como argumento el siguiente token al propio comando 'echo'
 //Imprime todos los tokens siguientes (habrá que modificarlo para cuando haya pipes o redirects) y \n excepto cuando hay flag -n
-int  ft_echo(t_token **tokens)
+int	ft_echo(t_token *tokens)
 {
 	t_token	*t_current;
 	int		flag;
 
-	t_current = *tokens;
+	t_current = tokens;
 	flag = 0;
 	if (!ft_strncmp("-n\0", t_current->str, 3)) //comprueba si el primer token es la flag "-n" (null terminated para evitar falsos positivos tipo -na)
 	{
@@ -27,5 +27,62 @@ int  ft_echo(t_token **tokens)
 	}
 	if (!flag) //si no habia flag imprime newline al final
 		ft_putstr_fd("\n", 1);
-	return (0)		
+	return (0);
+}
+
+//CD
+//INPUT: Siguiente token al comando (puede ser NULL)
+//-Guardar valor inicial de PWD en OLDPWD (env list)
+//-Cambiar CWD al path especificado (o HOME si es NULL) con chdir
+//-Guardar el path en PWD (env list)
+int	ft_cd(t_token *tokens, t_env *env)
+{
+	char	*path;
+	t_env	*tmp_env;
+
+	tmp_env = env;
+	if (!tokens) //si no hay token despues del comando debe mandar a HOME
+	{
+		while (tmp_env)
+		{
+			if (!ft_strncmp(tmp_env->key_name, "HOME", 4))
+			{
+				path = tmp_env->value;
+				break ;
+			}
+			tmp_env = tmp_env->next;
+		}
+		tmp_env = env;
+	}
+	else //guarda el path especificado
+		path = tokens->str;
+	if (chdir(path) != 0) //cambia el directrio actual al que le pasa y si falla (return -1) printea el error y sale
+	{
+		ft_putstr_fd("minishell: cd: ", 2);
+		ft_putstr_fd(path, 2);
+		ft_putstr_fd(": No such file or directory", 2);
+		return (1); //!!!Este 1 lo pasaria a ft_is_built_in, que lo pasaria a executor y petaria. REVISAR
+	}
+	while (tmp_env) //Busca en la env list el dato guardado en PWD, lo guarda en path y lo actualiza
+	{
+		if (!ft_strncmp(tmp_env->key_name, "PWD", 3))
+		{
+			path = tmp_env->value;
+			tmp_env->value = getcwd(NULL, 0);
+			tmp_env = env;
+			break;
+		}
+		tmp_env = tmp_env->next;
+	}
+	while (tmp_env) //Ahora busca OLDPWD y lo cambia por el que habia antes en PWD
+	{
+		if (!ft_strncmp(tmp_env->key_name, "OLDPWD", 6))
+		{
+			free(tmp_env->value);
+			tmp_env->value = path;
+			break;
+		}
+		tmp_env = tmp_env->next;
+	}
+	return (0);
 }

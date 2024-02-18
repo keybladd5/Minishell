@@ -23,12 +23,15 @@ int	ft_aux_abs(char *str)
 	return (i+1);
 }
 //check if the word on the token is built in comand
-int ft_is_built_in(t_token **tokens)
+//!!!ft_strncmp puede dar falsos positivos si hay mas caracteres despues del comando
+int ft_is_built_in(t_token **tokens, t_env **env)
 {
 	if (!*tokens)
 		return (0);
 	if (!ft_strncmp("echo", (*tokens)->str, 4))
 		return (ft_echo((*tokens)->next));
+	else if (!ft_strncmp("cd", (*tokens)->str, 2))
+		return (ft_cd((*tokens)->next, *env));
 	else if (!ft_strncmp("exit", (*tokens)->str, 4))
 	{
 			ft_printf("exit\n");
@@ -133,7 +136,7 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 
 	//int	*pipefd[2];
 	//pipe(pipefd);
-	if (!ft_is_built_in(tokens))
+	if (!ft_is_built_in(tokens, env))
 		return ;
 	int pid = fork();
 	//dprintf(2, "%d\n", pid);

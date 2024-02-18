@@ -15,5 +15,13 @@ START
 | |-Parser/Syntax ❗
 | |-Expander ❗
 | |-Executor ⏳
+|   |-BUILTINS
+|     |-Echo (-n) ✅
+|     |-cd (relative/absolute path) ✅
+|	  |-pwd 
+|	  |-export
+|	  |-unset
+|	  |-env
+|	  |-exit ✅
 |
 |-CLEANUP ❓
