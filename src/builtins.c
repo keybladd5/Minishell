@@ -86,3 +86,33 @@ int	ft_cd(t_token *tokens, t_env *env)
 	}
 	return (0);
 }
+
+//PWD
+//Con getcwd se hace malloc del string y guarda el path actual
+//Imprime el path seguido de \n y libera el string
+int	ft_pwd(void)
+{
+	char	*cwd;
+
+	cwd = getcwd(NULL, 0);
+	if (!cwd)
+		return (1);
+	ft_putstr_fd(cwd, 1);
+	write(1, "\n", 1);
+	free (cwd);
+	return (0);
+}
+
+//ENV
+//Recore la env list y va printeando los valores
+int	ft_env(t_env *env)
+{
+	while (env)
+	{
+		ft_putstr_fd(env->key_name, 1);
+		write(1, "=", 1);
+		ft_putendl_fd(env->value, 1);
+		env = env->next;
+	}
+	return (0);
+}

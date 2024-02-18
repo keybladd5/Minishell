@@ -18,10 +18,10 @@ START
 |   |-BUILTINS
 |     |-Echo (-n) ✅
 |     |-cd (relative/absolute path) ✅
-|	  |-pwd 
+|	  |-pwd ✅
 |	  |-export
-|	  |-unset
-|	  |-env
+|	  |-unset 
+|	  |-env ✅
 |	  |-exit ✅
 |
 |-CLEANUP ❓

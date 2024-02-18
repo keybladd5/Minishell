@@ -32,6 +32,10 @@ int ft_is_built_in(t_token **tokens, t_env **env)
 		return (ft_echo((*tokens)->next));
 	else if (!ft_strncmp("cd", (*tokens)->str, 2))
 		return (ft_cd((*tokens)->next, *env));
+	else if (!ft_strncmp("pwd", (*tokens)->str, 3))
+		return (ft_pwd());
+	else if (!ft_strncmp("env", (*tokens)->str, 3))
+		return (ft_env(*env));
 	else if (!ft_strncmp("exit", (*tokens)->str, 4))
 	{
 			ft_printf("exit\n");
