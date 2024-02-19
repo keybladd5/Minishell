@@ -57,7 +57,7 @@ int		ft_token_lst_size(t_token *lst);
 
 void	expansor(t_token **tokens, t_env **env);
 
-void	parser(t_token **tokens, t_env **env, char **envp);
+void	parser(t_token **tokens, t_env **env, char **envp, int *exit_status);
 
 char	*ft_strjoin_f(char *s1, char *s2);
 
@@ -66,6 +66,10 @@ void	print_tokens(t_token **head);
 int		ft_token_lst_size(t_token *lst);
 
 void 	free_tokens(t_token **head);
+
+int 	ft_is_built_in(t_token **tokens);
+
+int		ft_exec_builtin(t_token **tokens, t_env **env);
 
 int		ft_echo(t_token *tokens);
 

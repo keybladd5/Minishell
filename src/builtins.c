@@ -1,5 +1,38 @@
 #include "../inc/minishell.h"
 
+//check if the word on the token is built in comand
+//!!!ft_strncmp puede dar falsos positivos si hay mas caracteres despues del comando
+int ft_is_built_in(t_token **tokens)
+{
+	if (!*tokens)
+		return (0);
+	if (!ft_strncmp("echo", (*tokens)->str, 4) || \
+	!ft_strncmp("cd", (*tokens)->str, 2) || \
+	!ft_strncmp("pwd", (*tokens)->str, 3) || \
+	!ft_strncmp("env", (*tokens)->str, 3) || \
+	!ft_strncmp("exit", (*tokens)->str, 4))
+		return (1);
+	return (0);
+}
+
+int	ft_exec_builtin(t_token **tokens, t_env **env)
+{
+	if (!ft_strncmp("echo", (*tokens)->str, 4))
+		return (ft_echo((*tokens)->next));
+	else if (!ft_strncmp("cd", (*tokens)->str, 2))
+		return (ft_cd((*tokens)->next, *env));
+	else if (!ft_strncmp("pwd", (*tokens)->str, 3))
+		return (ft_pwd());
+	else if (!ft_strncmp("env", (*tokens)->str, 3))
+		return (ft_env(*env));
+	else if (!ft_strncmp("exit", (*tokens)->str, 4))
+	{
+			ft_printf("exit\n");
+			exit(0);
+	}
+	return (0);
+}
+
 //Depende de como hagamos la funcion que llame a los builtins habra que modificar los parametros y returns
 //Por defecto todos los builtins tienen que retornar 0 (= EXIT_SUCCESS) el cual habra q guardar en algun sitio para el $?
 
@@ -60,7 +93,7 @@ int	ft_cd(t_token *tokens, t_env *env)
 	{
 		ft_putstr_fd("minishell: cd: ", 2);
 		ft_putstr_fd(path, 2);
-		ft_putstr_fd(": No such file or directory", 2);
+		ft_putendl_fd(": No such file or directory", 2);
 		return (1); //!!!Este 1 lo pasaria a ft_is_built_in, que lo pasaria a executor y petaria. REVISAR
 	}
 	while (tmp_env) //Busca en la env list el dato guardado en PWD, lo guarda en path y lo actualiza
@@ -96,7 +129,7 @@ int	ft_pwd(void)
 
 	cwd = getcwd(NULL, 0);
 	if (!cwd)
-		return (1);
+		exit (MALLOC_ERROR);
 	ft_putstr_fd(cwd, 1);
 	write(1, "\n", 1);
 	free (cwd);
@@ -113,6 +146,8 @@ int	ft_env(t_env *env)
 		write(1, "=", 1);
 		ft_putendl_fd(env->value, 1);
 		env = env->next;
+		if (ft_strncmp (env->key_name, "?", 1) == 0)
+			env = env->next;
 	}
 	return (0);
 }

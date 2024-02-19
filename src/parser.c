@@ -46,17 +46,18 @@ void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 }
 
 
-void parser(t_token **tokens, t_env **env, char **envp)
+void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 {
 	t_token		*t_current;
 	t_token		*t_tmp = NULL;
 	t_pipe		*data_pipe = malloc(sizeof(t_pipe));
-	int			status = 0;
+	t_env		*e_current;
 	
 	data_pipe->og_stdin = dup(0);
 	data_pipe->og_stdout = dup(1);
 	data_pipe->pipe_counter = 0;
 	t_current = *tokens;
+	e_current = *env;
 
 	//el siguiente bucle da valor a la variable type de cada nodo de la lista obtenida por el lexer, llamada tokens
 	while(t_current)
@@ -68,15 +69,17 @@ void parser(t_token **tokens, t_env **env, char **envp)
 				t_current = t_current->next;
 				if (!t_current)
 				{
-					ft_printf("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n");
-					while(*env)
+					ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n", 2);
+					while(e_current)
 					{
-						if (ft_strncmp((*env)->key_name, "?", 1) == 0)
+						if (ft_strncmp(e_current->key_name, "?", 1) == 0)
 							break ;
-						*env = (*env)->next;
+						e_current = e_current->next;
 					}
-					free((*env)->value);
-					(*env)->value = ft_strdup("258");
+					if (!e_current)
+						return ;
+					free(e_current->value);
+					e_current->value = ft_strdup("258");
 					return ;
 				}
 
@@ -90,7 +93,7 @@ void parser(t_token **tokens, t_env **env, char **envp)
 
 	//BUCLE prototipo para modificar las acciones del parser, pendiente de propuesta
 	//se realiza el siguiente proceso para copiar la lista hasta la pipe y mandar solo eso. Se almacena en t_tmp
-	t_current = *tokens; //vuelve al princio de la lista
+	/*t_current = *tokens; //vuelve al princio de la lista
 	while (t_current)
 	{
 		if (t_current->type == PIPE)
@@ -103,33 +106,41 @@ void parser(t_token **tokens, t_env **env, char **envp)
 			break;
 		while (t_current && t_current->type == WORD)
 			t_current = t_current->next;
-	}
+	}*/
 	
 	//ahora ya esta toda la lista seteada, debo abrir los pipes necesarios y llamar a ejecutar los procesos.
 	t_current = *tokens;
+	e_current = *env;
 	//Condicion por si solo hay 1 comando
-	if (!data_pipe->pipe_counter && t_current->type == WORD)
+	if (!data_pipe->pipe_counter && t_current && t_current->type == WORD)
 		{
 			data_pipe->flag = NO;
 			ft_tokens_to_exec(&t_current, &t_tmp);
-			exec_cmd(&t_tmp, env, envp, data_pipe);
-			wait (&status);
-			free_tokens(&t_tmp);
-			/*if (WIFEXITED(status) != 0)
-			{	
-				while(*env)
-				{
-					if (ft_strncmp((*env)->key_name, "?", 1) == 0)
-						break ;
-					*env = (*env)->next;
-					if (!*env)
-						return ;
-				}
-				free((*env)->value);
-				(*env)->value = ft_itoa(WEXITSTATUS(status));
-				ft_printf("minishell %s: command not found", t_tmp->str);
+			if (ft_is_built_in(&t_tmp))
+			{
+				*exit_status = ft_exec_builtin(&t_tmp, env);
 				return ;
-			}*/
+			}
+			exec_cmd(&t_tmp, env, envp, data_pipe);
+			wait (exit_status);
+			free_tokens(&t_tmp);
+			*exit_status = WIFEXITED(*exit_status);
+			while (e_current)
+			{
+				if (ft_strncmp((e_current)->key_name, "?", 1) == 0)
+					break ;
+				e_current = e_current->next;
+				if (!e_current)
+					return ;
+			}
+			free(e_current->value);
+			e_current->value = ft_itoa(WEXITSTATUS(*exit_status));
+			if (WIFEXITED(*exit_status) != 0)
+			{
+				ft_putstr_fd("minishell ", 2);
+				ft_putstr_fd(t_tmp->str, 2);
+				ft_putendl_fd(": command not found", 2);
+			}
 		}
 	else
 	{

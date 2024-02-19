@@ -67,8 +67,9 @@ void ft_catch_env(char **envp, t_env **head)
 	tmp = (t_env *)malloc(sizeof(t_env));
 	if (!tmp)
 		exit(MALLOC_ERROR);
-	tmp->key_name = "?";
-	tmp->value = "0";
+	tmp->key_name = ft_strdup("?");
+	tmp->value = ft_strdup("0");
+	last->next = tmp;
 	last = tmp;
 	last->next = NULL;
 }
@@ -167,9 +168,11 @@ void 	input_loop(t_env **env, char **envp)
 		
 		lexer(&tokens, input);//separa input en tokens
 		expansor(&tokens, env);
-		print_tokens(&tokens);//debug
-		printf("%d\n%d\n", exit_status, g_signal);
-		parser(&tokens, env, envp);
+		//print_tokens(&tokens);//debug
+		//printf("%d\n%d\n", exit_status, g_signal);
+		parser(&tokens, env, envp , &exit_status);
+		dprintf(1, "%i\n", exit_status);
+
 		add_history(input);
 		free_tokens(&tokens);
 		free(input);

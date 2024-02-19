@@ -22,27 +22,7 @@ int	ft_aux_abs(char *str)
 		i--;
 	return (i+1);
 }
-//check if the word on the token is built in comand
-//!!!ft_strncmp puede dar falsos positivos si hay mas caracteres despues del comando
-int ft_is_built_in(t_token **tokens, t_env **env)
-{
-	if (!*tokens)
-		return (0);
-	if (!ft_strncmp("echo", (*tokens)->str, 4))
-		return (ft_echo((*tokens)->next));
-	else if (!ft_strncmp("cd", (*tokens)->str, 2))
-		return (ft_cd((*tokens)->next, *env));
-	else if (!ft_strncmp("pwd", (*tokens)->str, 3))
-		return (ft_pwd());
-	else if (!ft_strncmp("env", (*tokens)->str, 3))
-		return (ft_env(*env));
-	else if (!ft_strncmp("exit", (*tokens)->str, 4))
-	{
-			ft_printf("exit\n");
-			exit(0);
-	}
-	return (1);
-}
+
 //aux to malloc size on the executor function
 int	ft_token_lst_size(t_token *lst)
 {
@@ -131,17 +111,16 @@ void	expansor(t_token **tokens, t_env **env)
 //fork, find the absolute path, get the argv to the comand (included comand name) check the acces and exec
 void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 {
-	int i = 0;
-	int flag_absoluthepath = 0;
-	char **path = NULL;
-	char *cmd = NULL;
-	char *absolute_path = NULL;
-	char **cmd_argv = NULL;
-
+	int 	i = 0;
+	int 	flag_absoluthepath = 0;
+	char 	**path = NULL;
+	char 	*cmd = NULL;
+	char 	*absolute_path = NULL;
+	char 	**cmd_argv = NULL;
+	t_env	*e_current = *env;
 	//int	*pipefd[2];
 	//pipe(pipefd);
-	if (!ft_is_built_in(tokens, env))
-		return ;
+	
 	int pid = fork();
 	//dprintf(2, "%d\n", pid);
 	if (pid == 0)
@@ -165,27 +144,30 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			}
 
 		}
-		while (ft_strncmp("PATH", (*env)->key_name, 4) != 0 && !flag_absoluthepath) //LOCALIZA EL PATH si la flag no esta
+		while (ft_strncmp("PATH", e_current->key_name, 4) != 0 && !flag_absoluthepath) //LOCALIZA EL PATH si la flag no esta
 		{
-			*env = (*env)->next;
+			e_current = e_current->next;
 			//pendiente fallo 127 no path
-			if ((*env)->next == NULL)
+			if (e_current->next == NULL)
 			{	
-				while(*env)
+				e_current = *env;
+				while (e_current)
 				{
-					if (ft_strncmp((*env)->key_name, "?", 1) == 0)
+					if (ft_strncmp(e_current->key_name, "?", 1) == 0)
 						break ;
-					*env = (*env)->next;
+					e_current = e_current->next;
 				}
-				free((*env)->value);
-				(*env)->value = ft_strdup("127");
+				if (!*env)
+					return ;
+				free(e_current->value);
+				e_current->value = ft_strdup("127");
 				return ;
 			}
 		}
 
 		//hace algunas acciones que no son necesarias en caso de ruta absoluta, hay que ver como se gestiona
 
-		path = ft_split((*env)->value, ':'); //lo splitea
+		path = ft_split(e_current->value, ':'); //lo splitea
 		if (!path)
 			exit (MALLOC_ERROR);
 		cmd = ft_strjoin("/", (*tokens)->str); //prepara el primer comando con el slash
@@ -218,7 +200,7 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			i++;
 		}
 		i = 0;
-		if (access(absolute_path, X_OK) == 0) //Checkea a validez de la ruta absoluta
+		if (access(absolute_path, X_OK) == 0) //Checkea a validez de la ruta absoluta, si no lo es en el input es un NULL y no entra
 				execve(absolute_path, cmd_argv, envp);
 		while (path[i]) //Checkea el access de ese primer token recibido 
 		{
@@ -231,5 +213,4 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			i++;
 		}
 	}
-	//wait (NULL);//moved this part to the parser
 }
