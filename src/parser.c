@@ -135,10 +135,10 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 			}
 			free(e_current->value);
 			e_current->value = ft_itoa(WEXITSTATUS(*exit_status));
-			if (WIFEXITED(*exit_status) != 0)
+			if (*exit_status != 0)
 			{
 				ft_putstr_fd("minishell ", 2);
-				ft_putstr_fd(t_tmp->str, 2);
+				ft_putstr_fd(t_current->str, 2);
 				ft_putendl_fd(": command not found", 2);
 			}
 		}
