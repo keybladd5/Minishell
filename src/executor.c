@@ -118,9 +118,7 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 	char 	*absolute_path = NULL;
 	char 	**cmd_argv = NULL;
 	t_env	*e_current = *env;
-	//int	*pipefd[2];
-	//pipe(pipefd);
-	
+
 	int pid = fork();
 	//dprintf(2, "%d\n", pid);
 	if (pid == 0)
@@ -139,42 +137,20 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			flag_absoluthepath = 1; //flag activada
 			absolute_path = (*tokens)->str; //setemos la variable directamente sin buscar en path
 			if (access(absolute_path, X_OK) != 0)
-			{
-				//pendiente fallo 127 ruta absoluta
-			}
-
+				exit(127);
 		}
 		while (ft_strncmp("PATH", e_current->key_name, 4) != 0 && !flag_absoluthepath) //LOCALIZA EL PATH si la flag no esta
 		{
 			e_current = e_current->next;
-			//pendiente fallo 127 no path
 			if (e_current->next == NULL)
-			{	
-				e_current = *env;
-				while (e_current)
-				{
-					if (ft_strncmp(e_current->key_name, "?", 1) == 0)
-						break ;
-					e_current = e_current->next;
-				}
-				if (!*env)
-					return ;
-				free(e_current->value);
-				e_current->value = ft_strdup("127");
-				return ;
-			}
+				exit(127);
 		}
-
-		//hace algunas acciones que no son necesarias en caso de ruta absoluta, hay que ver como se gestiona
-
 		path = ft_split(e_current->value, ':'); //lo splitea
 		if (!path)
 			exit (MALLOC_ERROR);
 		cmd = ft_strjoin("/", (*tokens)->str); //prepara el primer comando con el slash
 		if (!cmd)
 			exit (MALLOC_ERROR);
-
-
 		//condicion temporal que acogera en una matriz todos los strings de la lista tokens
 		cmd_argv = (char **)malloc(sizeof(char * ) * ft_token_lst_size(*tokens) + 1); //crea la matriz a pasar al execve
 		if (!cmd_argv)
@@ -212,5 +188,6 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			free(absolute_path);
 			i++;
 		}
+		exit(127);
 	}
 }
