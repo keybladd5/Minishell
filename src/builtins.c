@@ -146,7 +146,7 @@ int	ft_env(t_env *env)
 		write(1, "=", 1);
 		ft_putendl_fd(env->value, 1);
 		env = env->next;
-		if (ft_strncmp (env->key_name, "?", 1) == 0)
+		if (ft_strncmp (env->key_name, "?", 1) == 0) //pendiente eliminar esto con el cambio del exit status
 			env = env->next;
 	}
 	return (0);
