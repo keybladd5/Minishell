@@ -11,6 +11,40 @@
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
+
+void ft_error_syntax(int *exit_status, int name)
+{
+	if (name == PIPE)
+		ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n", 2);
+	//pending add more message error
+	*exit_status = 258;
+}
+void ft_wait_child_process(char *cmd, int *exit_status)
+{
+	int status;
+
+	wait(&status);
+	if (WIFEXITED(status))
+		*exit_status = WEXITSTATUS(status);
+	else if (WIFSIGNALED(status)) //esta opcion no sera funcional hasta implementar signals en procesos hijos
+	{
+		if (WTERMSIG(status) == SIGINT)
+			*exit_status = 130;
+		else if (WTERMSIG(status) == SIGQUIT)
+		{
+			*exit_status = 131;
+			ft_putstr_fd("Quit 3:", 1);
+			exit(0);
+		}
+	}
+	if (*exit_status == 127)
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(cmd, 2);
+		ft_putendl_fd(": command not found", 2);
+	}
+}
+
 //funcion aux del prototipo para modificar el parser
 t_token *ft_tokendup(t_token *token)
 {
@@ -45,7 +79,6 @@ void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 	}
 }
 
-
 void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 {
 	t_token		*t_current;
@@ -68,21 +101,7 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 				data_pipe->pipe_counter++;
 				t_current = t_current->next;
 				if (!t_current)
-				{
-					ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n", 2);
-					while(e_current)
-					{
-						if (ft_strncmp(e_current->key_name, "?", 1) == 0)
-							break ;
-						e_current = e_current->next;
-					}
-					if (!e_current)
-						return ;
-					free(e_current->value);
-					e_current->value = ft_strdup("258");
-					return ;
-				}
-
+					return (ft_error_syntax(exit_status, PIPE));
 		}
 		else
 		{
@@ -90,96 +109,58 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 			t_current = t_current->next;
 		}
 	}
-
-	//BUCLE prototipo para modificar las acciones del parser, pendiente de propuesta
-	//se realiza el siguiente proceso para copiar la lista hasta la pipe y mandar solo eso. Se almacena en t_tmp
-	/*t_current = *tokens; //vuelve al princio de la lista
-	while (t_current)
-	{
-		if (t_current->type == PIPE)
-			t_current = t_current->next;
-		ft_printf("---COPY LINKED LIST TO SEND IN EXEC---\n");
-		ft_tokens_to_exec(&t_current, &t_tmp);
-		print_tokens(&t_tmp);
-		free_tokens(&t_tmp);
-		if (!t_current)
-			break;
-		while (t_current && t_current->type == WORD)
-			t_current = t_current->next;
-	}*/
-	
 	//ahora ya esta toda la lista seteada, debo abrir los pipes necesarios y llamar a ejecutar los procesos.
 	t_current = *tokens;
-	e_current = *env;
 	//Condicion por si solo hay 1 comando
 	if (!data_pipe->pipe_counter && t_current && t_current->type == WORD)
+	{
+		data_pipe->flag = NO;
+		ft_tokens_to_exec(&t_current, &t_tmp);
+		if (ft_is_built_in(&t_tmp))
+		{
+			*exit_status = ft_exec_builtin(&t_tmp, env);
+			return ;
+		}
+		exec_cmd(&t_tmp, env, envp, data_pipe);
+		free_tokens(&t_tmp);
+		ft_wait_child_process(t_current->str, exit_status);
+		return ;
+	}
+	while(t_current)//para en un futuro si hay mas pipes
+	{
+		//entra aqui si hay pipes leidas, y ejecuta hasta nodos hasta la pipe(en el exec)
+		if (t_current->type == WORD && data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
+		{
+			ft_tokens_to_exec(&t_current, &t_tmp);
+			data_pipe->flag = YES;
+			pipe(data_pipe->pipefd); //Crea pipe para comunicar solo 2 comandos
+			exec_cmd(&t_tmp, env, envp, data_pipe); //ejecuta el comando y en el proceso hijo comunica la salida con el pipe
+			dup2(data_pipe->pipefd[0], 0); //comunica la salida del cmd ejecutado a la pipe
+			close(data_pipe->pipefd[0]);// cierra pipes
+			close(data_pipe->pipefd[1]);
+			data_pipe->pipe_counter--;
+			free_tokens(&t_tmp);
+			ft_wait_child_process(t_current->str, exit_status);
+		}
+		//ahora quiero iterar hasta que los nodos sean de otro comando, los diferencia el nodo pipe
+		while (t_current && !(t_current->type == PIPE))
+			t_current = t_current->next;
+		//caso del ultimo comando a ejecutar, donde se recoge el exit status
+		if (!data_pipe->pipe_counter && t_current->type == PIPE)
 		{
 			data_pipe->flag = NO;
-			ft_tokens_to_exec(&t_current, &t_tmp);
-			if (ft_is_built_in(&t_tmp))
-			{
-				*exit_status = ft_exec_builtin(&t_tmp, env);
-				return ;
-			}
-			exec_cmd(&t_tmp, env, envp, data_pipe);
-			wait (exit_status);
-			free_tokens(&t_tmp);
-			*exit_status = WIFEXITED(*exit_status);
-			while (e_current)
-			{
-				if (ft_strncmp((e_current)->key_name, "?", 1) == 0)
-					break ;
-				e_current = e_current->next;
-				if (!e_current)
-					return ;
-			}
-			free(e_current->value);
-			e_current->value = ft_itoa(WEXITSTATUS(*exit_status));
-			if (*exit_status != 0)
-			{
-				ft_putstr_fd("minishell ", 2);
-				ft_putstr_fd(t_current->str, 2);
-				ft_putendl_fd(": command not found", 2);
-			}
-		}
-	else
-	{
-		while(t_current)//para en un futuro si hay mas pipes
-		{
-			//entra aqui si hay pipes leidas, y ejecuta hasta nodos hasta la pipe(en el exec)
-			if (t_current->type == WORD && data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
-			{
-				ft_tokens_to_exec(&t_current, &t_tmp);
-				data_pipe->flag = YES;
-				pipe(data_pipe->pipefd); //Crea pipe para comunicar solo 2 comandos
-				exec_cmd(&t_tmp, env, envp, data_pipe); //ejecuta el comando y en el proceso hijo comunica la salida con el pipe
-				dup2(data_pipe->pipefd[0], 0); //comunica la salida del cmd ejecutado a la pipe
-				close(data_pipe->pipefd[0]);// cierra pipes
-				close(data_pipe->pipefd[1]);
-				data_pipe->pipe_counter--;
-				wait (NULL);
-				free_tokens(&t_tmp);
-			}
-			//ahora quiero iterar hasta que los nodos sean de otro comando, los diferencia el nodo pipe
-			while (t_current && !(t_current->type == PIPE))
-				t_current = t_current->next;
-			//caso del ultimo comando a ejecutar, donde se recoge el exit status
-			if (!data_pipe->pipe_counter && t_current->type == PIPE)
-			{
-				data_pipe->flag = NO;
-				t_current = t_current->next;
-				ft_tokens_to_exec(&t_current, &t_tmp);	
-				exec_cmd(&t_tmp, env, envp, data_pipe);
-				wait (NULL);
-				dup2(data_pipe->og_stdin, 0);
-				dup2(data_pipe->og_stdout, 1);
-				close(data_pipe->og_stdin);
-				close(data_pipe->og_stdout);
-				free_tokens(&t_tmp);
-				return ;
-			}
 			t_current = t_current->next;
+			ft_tokens_to_exec(&t_current, &t_tmp);	
+			exec_cmd(&t_tmp, env, envp, data_pipe);
+			free_tokens(&t_tmp);
+			ft_wait_child_process(t_current->str, exit_status);
+			dup2(data_pipe->og_stdin, 0);
+			dup2(data_pipe->og_stdout, 1);
+			close(data_pipe->og_stdin);
+			close(data_pipe->og_stdout);
+			return ;
 		}
+		t_current = t_current->next;
 	}
 }
 
