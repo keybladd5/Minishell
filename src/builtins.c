@@ -46,6 +46,8 @@ int	ft_echo(t_token *tokens)
 
 	t_current = tokens;
 	flag = 0;
+	if (!tokens)
+		return(ft_putstr_fd("\n", 1), 0);
 	if (!ft_strncmp("-n\0", t_current->str, 3)) //comprueba si el primer token es la flag "-n" (null terminated para evitar falsos positivos tipo -na)
 	{
 		t_current = t_current->next;
