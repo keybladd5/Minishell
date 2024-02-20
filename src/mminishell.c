@@ -159,20 +159,15 @@ void 	input_loop(t_env **env, char **envp)
 
 	while(42)
 	{
-		//signals
 		sig_init();
-		
 		input = readline("\x1b[92m⌁./MiniShell→\x1b[0m ");
-
 		ctrl_C(&exit_status);
-		
-		lexer(&tokens, input);//separa input en tokens
+		lexer(&tokens, input);
 		expansor(&tokens, env);
 		//print_tokens(&tokens);//debug
 		//printf("%d\n%d\n", exit_status, g_signal);
 		parser(&tokens, env, envp , &exit_status);
-		dprintf(1, "%i\n", exit_status);
-
+		dprintf(1, "%i", exit_status);
 		add_history(input);
 		free_tokens(&tokens);
 		free(input);
