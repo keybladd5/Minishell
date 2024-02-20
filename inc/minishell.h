@@ -51,6 +51,8 @@ typedef struct s_pipe
 	int og_stdout;
 }	t_pipe;
 
+void	sig_init(int i);
+
 void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe);
 
 int		ft_token_lst_size(t_token *lst);

@@ -129,6 +129,7 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 
 	int pid = fork();
 	//dprintf(2, "%d\n", pid);
+	sig_init(0);//cambio anadido pendiente analizar🐸
 	if (pid == 0)
 	{
 		/*int loop = 1;

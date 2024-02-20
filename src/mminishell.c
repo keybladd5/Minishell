@@ -125,7 +125,7 @@ void	ctrl_C(int *exit_status)
 }
 
 //al recibir la señal SIGINT se ejecuta esta funcion, salta de linea y vuelve a mostrar el prompt
-void	sig_handler(int sig)
+void	sig_handler(int sig)//cambio anadido pendiente analizar🐸
 {
 	g_signal = sig;
 	if (sig == SIGINT)
@@ -136,15 +136,38 @@ void	sig_handler(int sig)
 		rl_redisplay();
 	}
 }
+//cambio anadido pendiente analizar🐸
+void	process_sig_handler(int sig)
+{
+	g_signal = sig;
+	if (sig == SIGINT)
+	{
+		write(1, "\n", 1);
+		g_signal = 130;
+	}
+	else if (sig == SIGQUIT)
+	{
+		ft_putstr_fd("Quit: 3\n", 1);
+		g_signal = 131;
+	}
+}
 
 //inicializa variable global y las señales. Variable tc y sus funciones usan la libreria termios.h para no escribir ^C
-void	sig_init()
+void	sig_init(int i)//cambio anadido pendiente analizar🐸
 {
 	struct termios	tc;
 
 	g_signal = 0;
-	signal(SIGINT, sig_handler); //Init SIGINT (ctrl+C) para ejecutar sig_handler cuando la reciba
-	signal(SIGQUIT, SIG_IGN); //Init SIGQUIT (ctrl+\) para ignorarla
+	if (i == 1)//cambio anadido pendiente analizar🐸
+	{
+		signal(SIGINT, sig_handler); //Init SIGINT (ctrl+C) para ejecutar sig_handler cuando la reciba
+		signal(SIGQUIT, SIG_IGN); //Init SIGQUIT (ctrl+\) para ignorarla
+	}
+	else//cambio anadido pendiente analizar🐸
+	{
+		signal(SIGINT, process_sig_handler);
+		signal(SIGQUIT, process_sig_handler);
+	}
 	tcgetattr(0, &tc); //Guarda los atributos del FD 0 (STDIN) en la estructura
 	tc.c_lflag &= ~ECHOCTL; //Modifica la flag 'local mode' para desactivar el printeo de ctrl+(X) como ^(X)
 	tcsetattr(0, TCSANOW, &tc); //Devuelve los atributos modificados al FD 0 (STDIN)
@@ -159,9 +182,14 @@ void 	input_loop(t_env **env, char **envp)
 
 	while(42)
 	{
-		sig_init();
+		sig_init(1);
 		input = readline("\x1b[92m⌁./MiniShell→\x1b[0m ");
 		ctrl_C(&exit_status);
+		if (!input)//cambio anadido pendiente analizar🐸
+		{
+			printf("exit\n");
+			exit(EXIT_SUCCESS);
+		}
 		lexer(&tokens, input);
 		expansor(&tokens, env, exit_status);
 		//print_tokens(&tokens);//debug
