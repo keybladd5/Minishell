@@ -55,7 +55,7 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe);
 
 int		ft_token_lst_size(t_token *lst);
 
-void	expansor(t_token **tokens, t_env **env);
+void	expansor(t_token **tokens, t_env **env, int exit_status);
 
 void	parser(t_token **tokens, t_env **env, char **envp, int *exit_status);
 
@@ -79,6 +79,6 @@ int		ft_pwd(void);
 
 int		ft_env(t_env *env);
 
-int	g_signal;
+int		g_signal;
 
 #endif

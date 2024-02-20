@@ -37,7 +37,7 @@ int	ft_token_lst_size(t_token *lst)
 	return (i);
 }
 
-void	expansor(t_token **tokens, t_env **env)
+void	expansor(t_token **tokens, t_env **env, int exit_status)
 {
 	t_token *t_current; //token current
 	t_env	*e_current; //enviroment current
@@ -74,7 +74,15 @@ void	expansor(t_token **tokens, t_env **env)
 						if (!str)
 							exit (MALLOC_ERROR);
 						i = x;
-						break;
+						break ;
+					}
+					else if (!ft_strncmp(&(tmp[i]), "?", x - i))
+					{
+						str = ft_itoa(exit_status);
+						if (!str)
+							exit (MALLOC_ERROR);
+						i = x;
+						break ;
 					}
 					else
 						 e_current = e_current->next;
