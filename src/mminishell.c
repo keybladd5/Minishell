@@ -64,13 +64,13 @@ void ft_catch_env(char **envp, t_env **head)
 		last = tmp;
 		x++;
 	}
-	tmp = (t_env *)malloc(sizeof(t_env));
+	/*tmp = (t_env *)malloc(sizeof(t_env));
 	if (!tmp)
 		exit(MALLOC_ERROR);
 	tmp->key_name = ft_strdup("?");
 	tmp->value = ft_strdup("0");
 	last->next = tmp;
-	last = tmp;
+	last = tmp;*/
 	last->next = NULL;
 }
 //aux lexer
