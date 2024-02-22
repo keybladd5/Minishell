@@ -27,6 +27,7 @@
 # define PIPE 3
 # define YES 4
 # define NO 5
+# define BUILTIN 6
 
 typedef struct s_env
 {

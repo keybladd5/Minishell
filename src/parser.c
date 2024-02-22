@@ -26,17 +26,16 @@ void ft_wait_child_process(char *cmd, int *exit_status)
 	wait(&status);
 	if (WIFEXITED(status))
 		*exit_status = WEXITSTATUS(status);
-	/*else if (WIFSIGNALED(status)) //esta opcion no sera funcional hasta implementar signals en procesos hijos
+	else if (WIFSIGNALED(status)) //esta opcion no sera funcional hasta implementar signals en procesos hijos
 	{
 		if (WTERMSIG(status) == SIGINT)
 			*exit_status = 130;
 		else if (WTERMSIG(status) == SIGQUIT)
 		{
 			*exit_status = 131;
-			ft_putstr_fd("Quit 3:", 1);
-			exit(0);
+			//ft_putstr_fd("Quit 3:", 1);
 		}
-	}*/
+	}
 	if (*exit_status == 127)
 	{
 		ft_putstr_fd("minishell: ", 2);

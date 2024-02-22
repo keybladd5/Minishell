@@ -40,10 +40,12 @@ void free_tokens(t_token **head)
 //get env on a list
 void ft_catch_env(char **envp, t_env **head)
 {
-	int	x = 0;
+	int	x;
 	char	*div;
 	t_env	*tmp;
 	t_env	*last;
+
+	x = 0;
 	while (envp[x])
 	{
 		tmp = (t_env *)malloc(sizeof(t_env));
@@ -56,7 +58,6 @@ void ft_catch_env(char **envp, t_env **head)
 		tmp->value = ft_substr(div+1, 0, ft_strlen(div));
 		if (!tmp->value)
 			exit (MALLOC_ERROR);
-		
 		if (!*head)
 			*head = tmp;
 		else
@@ -64,13 +65,6 @@ void ft_catch_env(char **envp, t_env **head)
 		last = tmp;
 		x++;
 	}
-	/*tmp = (t_env *)malloc(sizeof(t_env));
-	if (!tmp)
-		exit(MALLOC_ERROR);
-	tmp->key_name = ft_strdup("?");
-	tmp->value = ft_strdup("0");
-	last->next = tmp;
-	last = tmp;*/
 	last->next = NULL;
 }
 //aux lexer

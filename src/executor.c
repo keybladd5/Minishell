@@ -132,15 +132,21 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 	sig_init(0);//cambio anadido pendiente analizar🐸
 	if (pid == 0)
 	{
-		/*int loop = 1;
-		while (loop)
-			;*/
+		//int loop = 1;
+		//while (loop)
+		//	;
 		if (data_pipe->flag == YES && data_pipe->pipe_counter)
 		{
 			dup2(data_pipe->pipefd[1], 1);//comunica la salida con la entrada del siguiente proceso
 			close(data_pipe->pipefd[1]); //cierra pipes
 			close(data_pipe->pipefd[0]);
 		}
+		/*if (data_pipe->flag == BUILTIN )
+		{
+			dup2(data_pipe->pipefd[0], 0);
+			close(data_pipe->pipefd[1]); 
+			close(data_pipe->pipefd[0]);
+		}*/
 		if ((*tokens)->str[0] ==  '/')//en caso de ser posible ruta absoluta
 		{
 			flag_absoluthepath = 1; //flag activada
