@@ -12,11 +12,24 @@
 
 #include "../inc/minishell.h"
 
-void ft_error_syntax(int *exit_status, int name)
+//pending add more message error
+void ft_error_syntax(int *exit_status, int name, t_token *t_current)
 {
 	if (name == PIPE)
 		ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n", 2);
-	//pending add more message error
+	else if (name == RED_IN)
+	{
+		if (t_current)
+		{
+			ft_putstr_fd("\033[31mminishell: ", 2);
+			ft_putstr_fd(t_current->str, 2);
+			ft_putstr_fd(": No such file or directory\x1b[0m\n", 2);
+			*exit_status = 1;
+			return ;
+		}
+		else
+			ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `newline'\x1b[0m\n", 2);
+	}
 	*exit_status = 258;
 }
 void ft_wait_child_process(char *cmd, int *exit_status)
@@ -31,10 +44,7 @@ void ft_wait_child_process(char *cmd, int *exit_status)
 		if (WTERMSIG(status) == SIGINT)
 			*exit_status = 130;
 		else if (WTERMSIG(status) == SIGQUIT)
-		{
 			*exit_status = 131;
-			//ft_putstr_fd("Quit 3:", 1);
-		}
 	}
 	if (*exit_status == 127)
 	{
@@ -82,12 +92,21 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 {
 	t_token		*t_current;
 	t_token		*t_tmp = NULL;
-	t_pipe		*data_pipe = malloc(sizeof(t_pipe));
+	t_pipe		*data_pipe;
+	t_redir		*data_redir;
 	t_env		*e_current;
 	
+	data_pipe = malloc(sizeof(t_pipe));
+	if (!data_pipe)
+		exit (MALLOC_ERROR);
+	data_redir = malloc(sizeof(t_redir));
+	if (!data_redir)
+		exit (MALLOC_ERROR);
 	data_pipe->og_stdin = dup(0);
 	data_pipe->og_stdout = dup(1);
 	data_pipe->pipe_counter = 0;
+	data_redir->fd_infile = -1;
+	data_redir->fd_outfile = -1;
 	t_current = *tokens;
 	e_current = *env;
 
@@ -100,7 +119,14 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 				data_pipe->pipe_counter++;
 				t_current = t_current->next;
 				if (!t_current)
-					return (ft_error_syntax(exit_status, PIPE));
+					return (ft_error_syntax(exit_status, PIPE, NULL));
+		}
+		if (!ft_strncmp(t_current->str, "<", 1)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
+		{
+				t_current->type = RED_IN; //seteo type
+				t_current = t_current->next;
+				if (!t_current || (data_redir->fd_infile = open(t_current->str, O_RDONLY)) == -1)
+					return (ft_error_syntax(exit_status, RED_IN, t_current));
 		}
 		else
 		{
@@ -110,6 +136,9 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	}
 	//ahora ya esta toda la lista seteada, debo abrir los pipes necesarios y llamar a ejecutar los procesos.
 	t_current = *tokens;
+	if (data_redir->fd_infile && ) 
+	{
+		dup2(data_redir->fd_infile, 0);
 	//Condicion por si solo hay 1 comando
 	if (!data_pipe->pipe_counter && t_current && t_current->type == WORD)
 	{
@@ -145,7 +174,7 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		while (t_current && !(t_current->type == PIPE))
 			t_current = t_current->next;
 		//caso del ultimo comando a ejecutar, donde se recoge el exit status
-		if (!data_pipe->pipe_counter && t_current->type == PIPE)
+		if (t_current && (t_current->type == PIPE && !data_pipe->pipe_counter))
 		{
 			data_pipe->flag = NO;
 			t_current = t_current->next;
@@ -157,10 +186,14 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 			dup2(data_pipe->og_stdout, 1);
 			close(data_pipe->og_stdin);
 			close(data_pipe->og_stdout);
-			return ;
 		}
-		t_current = t_current->next;
+		if (t_current)
+			t_current = t_current->next;
 	}
+	free(data_pipe);
+	close(data_redir->fd_infile);
+	close(data_redir->fd_outfile);
+	free(data_redir);
 }
 
 //este parser solo manda la lista a partir del comando que se quiere ejecutar, y ya en el executor se pone el stop de iteracion de la lista donde se encuentra el pipe
