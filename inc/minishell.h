@@ -27,7 +27,9 @@
 # define PIPE 3
 # define YES 4
 # define NO 5
-# define BUILTIN 6
+# define RED_IN 6
+# define RED_OUT 7
+# define DOC 8
 
 typedef struct s_env
 {
@@ -51,6 +53,12 @@ typedef struct s_pipe
 	int og_stdin;
 	int og_stdout;
 }	t_pipe;
+
+typedef struct s_redir
+{
+	int fd_infile;
+	int fd_outfile;
+}	t_redir;
 
 void	sig_init(int i);
 
