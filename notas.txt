@@ -50,6 +50,7 @@ source ~/.zshrc
 	-[SOLVED✅]error expansor si lLSe pasas una $ o $NOEXISTE te printea algo y no deberia
 	-[SOLVED✅]echo $USER | cat | cat | wc | cat NO FUNCIONA CORRECTAMENTE (output: polmarti  bash:      1       1       9  )
 	- ls -lR $HOME | wc PETA!!!!❌
+	-⌁./MiniShell→ | $ = minishell: $: command not found = da SEGMENTATION!! 
 - Implementar builtins
 	- echo (-n) ✅
 	- cd (relative/absolute path) ✅
