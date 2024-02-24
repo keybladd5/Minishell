@@ -90,6 +90,8 @@ int		ft_pwd(void);
 
 int		ft_env(t_env *env);
 
+int		ft_export(t_token *tokens, t_env *env);
+
 int		g_signal;
 
 #endif
