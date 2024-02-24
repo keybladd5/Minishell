@@ -11,7 +11,21 @@
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
-
+//Reestablece los fd originales, cierra el resto de fd y libera estructuras de pipes y redirs
+void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir)
+{
+	if (data_redir->fd_infile >= 0 || data_redir->fd_outfile>= 0)
+	{
+		dup2(data_pipe->og_stdin, 0);
+		dup2(data_pipe->og_stdout, 1);
+	}
+	close(data_redir->fd_infile);
+	close(data_redir->fd_outfile);
+	close(data_pipe->og_stdin);
+	close(data_pipe->og_stdout);
+	free(data_pipe);
+	free(data_redir);
+}
 //pending add more message error
 void ft_error_syntax(int *exit_status, int name, t_token *t_current)
 {
@@ -19,7 +33,9 @@ void ft_error_syntax(int *exit_status, int name, t_token *t_current)
 		ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n", 2);
 	else if (name == RED_IN)
 	{
-		if (t_current)
+		if (t_current && !ft_strncmp(t_current->str, "|", 1))
+			ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n", 2);
+		else if (t_current && (!t_current->next || t_current->next->type != PIPE))
 		{
 			ft_putstr_fd("\033[31mminishell: ", 2);
 			ft_putstr_fd(t_current->str, 2);
@@ -76,6 +92,8 @@ void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 	t_token	*last = NULL;
 	t_token *curr = NULL;
 	curr = *og_tokens;
+	while (curr && curr->type != WORD)//para saltar casos como "< test cat" hasta la palabra necesaria para ejecutar como es el cat
+		curr = curr->next;
 	while (curr && curr->type == WORD)
 	{
 		tmp = ft_tokendup(curr);
@@ -127,6 +145,8 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 				t_current = t_current->next;
 				if (!t_current || (data_redir->fd_infile = open(t_current->str, O_RDONLY)) == -1)
 					return (ft_error_syntax(exit_status, RED_IN, t_current));
+				t_current->type = DOC;
+				t_current = t_current->next;	
 		}
 		else
 		{
@@ -136,13 +156,15 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	}
 	//ahora ya esta toda la lista seteada, debo abrir los pipes necesarios y llamar a ejecutar los procesos.
 	t_current = *tokens;
-	if (data_redir->fd_infile && ) 
+	if (!data_pipe->pipe_counter && t_current)
 	{
-		dup2(data_redir->fd_infile, 0);
-	//Condicion por si solo hay 1 comando
-	if (!data_pipe->pipe_counter && t_current && t_current->type == WORD)
-	{
+		if (data_redir->fd_infile)
+		{ 
+			dup2(data_redir->fd_infile, 0);// modifico el stdin con el archivo pasado y ya abierto
+		}
 		data_pipe->flag = NO;
+		while (t_current->type != WORD && t_current)//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
+			t_current = t_current->next;
 		ft_tokens_to_exec(&t_current, &t_tmp);
 		if (ft_is_built_in(&t_tmp))
 		{
@@ -152,10 +174,19 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		exec_cmd(&t_tmp, env, envp, data_pipe);
 		free_tokens(&t_tmp);
 		ft_wait_child_process(t_current->str, exit_status);
+		ft_aux_close(data_pipe, data_redir);
 		return ;
 	}
-	while(t_current)//para en un futuro si hay mas pipes
+	while(t_current)//PIPELINE
 	{
+		if (data_redir->fd_infile >= 0)
+		{ 
+			dup2(data_redir->fd_infile, 0);// modifico el stdin con el archivo pasado y ya abierto
+			close(data_redir->fd_infile);
+			data_redir->fd_infile = -1;
+		}
+		while (t_current->type != WORD && t_current)//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
+			t_current = t_current->next;
 		//entra aqui si hay pipes leidas, y ejecuta hasta nodos hasta la pipe(en el exec)
 		if (t_current->type == WORD && data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
 		{
@@ -190,12 +221,7 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		if (t_current)
 			t_current = t_current->next;
 	}
-	free(data_pipe);
-	close(data_redir->fd_infile);
-	close(data_redir->fd_outfile);
-	free(data_redir);
+	ft_aux_close(data_pipe, data_redir);
 }
 
-//este parser solo manda la lista a partir del comando que se quiere ejecutar, y ya en el executor se pone el stop de iteracion de la lista donde se encuentra el pipe
-//Propuesta-> crear una copia de los nodos en una nueva lista hasta encontrar la pipe y mandarla al executor, todo des de el parser.
-//hace falta revisar que sucede con los pipes cuando se interrumpe con una senyal.
+//El problema actual es que no se puede ejecutar el REDIR_IN en cualquier parte de la pipeline substituyendo los fds
