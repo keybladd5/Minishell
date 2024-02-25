@@ -52,6 +52,7 @@ source ~/.zshrc
 	- ls -lR $HOME | wc PETA!!!!❌
 	- El EXPANSOR no debe mantener strings como $varnoexist en la lista de tokens si no existen ❌ 
 	- < test cat | wc | cat NOP va ❌
+	- < test cat | echo PETA ❌
 	- [SOLVED✅]< asd NO VA 
 	- [SOLVED✅]< cat 
 - Implementar builtins

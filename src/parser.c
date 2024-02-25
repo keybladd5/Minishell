@@ -15,15 +15,15 @@
 //Funcion que abre los fds en caso de redireccion input, el retorno se usa para iterar en el parser en base a los tokens
 int	ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
 {
-	if (t_current->type == RED_IN\
-	 && t_current->next && \
-	 (data_redir->fd_infile = open(t_current->next->str, O_RDONLY)) != -1) // < test cat
-		dup2(data_redir->fd_infile, 0);
-	else if (t_current->next && t_current->next->type == RED_IN) // cat < test
-	{
-		data_redir->fd_infile = open(t_current->next->next->str, O_RDONLY);
-		dup2(data_redir->fd_infile, 0);// modifico el stdin con el archivo pasado y ya abierto
-	}
+	t_token	*dir_doc;
+
+	dir_doc = t_current;
+	while (dir_doc && dir_doc->type != RED_IN) //busca el token '<'. Puede salir con la direccion del token o NULL si no lo ha encontrado
+		dir_doc = dir_doc->next;
+	if (!dir_doc)
+		return (0);
+	data_redir->fd_infile = open(dir_doc->next->str, O_RDONLY);
+	dup2(data_redir->fd_infile, 0);
 	if (data_pipe->pipe_counter)
 	{
 		close(data_redir->fd_infile);
@@ -35,7 +35,7 @@ int	ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
 //Reestablece los fd originales, cierra el resto de fd y libera estructuras de pipes y redirs
 void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir)
 {
-	if (!data_pipe->pipe_counter)
+	if (!data_pipe->pipe_counter)//pedniente modificar ya se hace dup2 de mas
 	{
 		dup2(data_pipe->og_stdin, 0);
 		dup2(data_pipe->og_stdout, 1);
@@ -48,7 +48,7 @@ void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir)
 	free(data_redir);
 }
 //Muestra mensajes de error por el fd 2 y modifica el exit status
-void ft_error_syntax(int *exit_status, int name, t_token *t_current)
+int ft_error_syntax(int *exit_status, int name, t_token *t_current)
 {
 	if (name == PIPE)
 		ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n", 2);
@@ -62,15 +62,16 @@ void ft_error_syntax(int *exit_status, int name, t_token *t_current)
 			ft_putstr_fd(t_current->str, 2);
 			ft_putstr_fd(": No such file or directory\x1b[0m\n", 2);
 			*exit_status = 1;
-			return ;
+			return (*exit_status);
 		}
 		else
 			ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `newline'\x1b[0m\n", 2);
 	}
 	*exit_status = 258;
+	return (*exit_status);
 }
 //funcion que setea los tipos a todos los nodos de la lista
-void typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int *exit_status)
+int typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int *exit_status)
 {
 	while(t_current)
 	{	
@@ -89,6 +90,7 @@ void typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, in
 			if (!t_current || (data_redir->fd_infile = open(t_current->str, O_RDONLY)) == -1)
 				return (ft_error_syntax(exit_status, RED_IN, t_current));
 			close(data_redir->fd_infile);
+			data_redir->fd_infile = -1;
 			t_current->type = DOC;
 			t_current = t_current->next;	
 		}
@@ -98,6 +100,7 @@ void typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, in
 			t_current = t_current->next;
 		}
 	}
+	return (0);
 }
 //Espera los procesos hijo y recoge los exit status, ademas muestra el error de comando no encontrado
 void ft_wait_child_process(char *cmd, int *exit_status)
@@ -178,9 +181,10 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	data_redir->fd_infile = -1;
 	data_redir->fd_outfile = -1;
 	t_current = *tokens;
-	typer_tokens(data_redir, t_current, data_pipe, exit_status);
+	if (typer_tokens(data_redir, t_current, data_pipe, exit_status))
+		return (ft_aux_close(data_pipe, data_redir));
 	t_current = *tokens;
-	if (!data_pipe->pipe_counter && t_current)//SI SOLO HAY UN TOKEN
+	if (!data_pipe->pipe_counter && t_current)//SI SOLO HAY UN COMANDO 
 	{
 		ft_red_in_aux(data_redir, t_current, data_pipe);
 		data_pipe->flag = NO;
@@ -205,7 +209,7 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 			t_current = t_current->next;
 		}
 		//entra aqui si hay pipes leidas, y ejecuta hasta nodos hasta la pipe(en el exec)
-		if (t_current && t_current->type == WORD && data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
+		if (t_current && data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
 		{
 			ft_tokens_to_exec(&t_current, &t_tmp);
 			data_pipe->flag = YES;
