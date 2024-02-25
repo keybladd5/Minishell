@@ -12,44 +12,13 @@
 
 #include "../inc/minishell.h"
 
-//funcion que setea los ipos a todos los nodos de la lista
-void typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int *exit_status)
-{
-	while(t_current)
-	{	
-		if (!ft_strncmp(t_current->str, "|", 1)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
-		{
-				t_current->type = PIPE; //seteo type
-				data_pipe->pipe_counter++;
-				t_current = t_current->next;
-				if (!t_current)
-					return (ft_error_syntax(exit_status, PIPE, NULL));
-		}
-		if (!ft_strncmp(t_current->str, "<", 1)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
-		{
-				t_current->type = RED_IN; //seteo type
-				t_current = t_current->next;
-				if (!t_current || (data_redir->fd_infile = open(t_current->str, O_RDONLY)) == -1)
-					return (ft_error_syntax(exit_status, RED_IN, t_current));
-				close(data_redir->fd_infile);
-				data_redir->fd_infile = -1;
-				t_current->type = DOC;
-				t_current = t_current->next;	
-		}
-		else
-		{
-			t_current->type = WORD; //seteo type default
-			t_current = t_current->next;
-		}
-	}
-}
 //Funcion que abre los fds en caso de redireccion input, el retorno se usa para iterar en el parser en base a los tokens
 int	ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
 {
-	if (t_current->type == RED_IN && t_current->next && (data_redir->fd_infile = open(t_current->next->str, O_RDONLY)) != -1) // < test cat
-	{
-		dup2(data_redir->fd_infile, 0);// modifico el stdin con el archivo pasado y ya abierto
-	}
+	if (t_current->type == RED_IN\
+	 && t_current->next && \
+	 (data_redir->fd_infile = open(t_current->next->str, O_RDONLY)) != -1) // < test cat
+		dup2(data_redir->fd_infile, 0);
 	else if (t_current->next && t_current->next->type == RED_IN) // cat < test
 	{
 		data_redir->fd_infile = open(t_current->next->next->str, O_RDONLY);
@@ -99,6 +68,36 @@ void ft_error_syntax(int *exit_status, int name, t_token *t_current)
 			ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `newline'\x1b[0m\n", 2);
 	}
 	*exit_status = 258;
+}
+//funcion que setea los tipos a todos los nodos de la lista
+void typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int *exit_status)
+{
+	while(t_current)
+	{	
+		if (!ft_strncmp(t_current->str, "|\0", 2)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
+		{
+			t_current->type = PIPE; //seteo type
+			data_pipe->pipe_counter++;
+			t_current = t_current->next;
+			if (!t_current)
+				return (ft_error_syntax(exit_status, PIPE, NULL));
+		}
+		else if (!ft_strncmp(t_current->str, "<\0", 2)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
+		{
+			t_current->type = RED_IN; //seteo type
+			t_current = t_current->next;
+			if (!t_current || (data_redir->fd_infile = open(t_current->str, O_RDONLY)) == -1)
+				return (ft_error_syntax(exit_status, RED_IN, t_current));
+			close(data_redir->fd_infile);
+			t_current->type = DOC;
+			t_current = t_current->next;	
+		}
+		else
+		{
+			t_current->type = WORD; //seteo type default
+			t_current = t_current->next;
+		}
+	}
 }
 //Espera los procesos hijo y recoge los exit status, ademas muestra el error de comando no encontrado
 void ft_wait_child_process(char *cmd, int *exit_status)
