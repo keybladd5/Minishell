@@ -11,10 +11,62 @@
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
+
+//funcion que setea los ipos a todos los nodos de la lista
+void typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int *exit_status)
+{
+	while(t_current)
+	{	
+		if (!ft_strncmp(t_current->str, "|", 1)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
+		{
+				t_current->type = PIPE; //seteo type
+				data_pipe->pipe_counter++;
+				t_current = t_current->next;
+				if (!t_current)
+					return (ft_error_syntax(exit_status, PIPE, NULL));
+		}
+		if (!ft_strncmp(t_current->str, "<", 1)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
+		{
+				t_current->type = RED_IN; //seteo type
+				t_current = t_current->next;
+				if (!t_current || (data_redir->fd_infile = open(t_current->str, O_RDONLY)) == -1)
+					return (ft_error_syntax(exit_status, RED_IN, t_current));
+				close(data_redir->fd_infile);
+				data_redir->fd_infile = -1;
+				t_current->type = DOC;
+				t_current = t_current->next;	
+		}
+		else
+		{
+			t_current->type = WORD; //seteo type default
+			t_current = t_current->next;
+		}
+	}
+}
+//Funcion que abre los fds en caso de redireccion input, el retorno se usa para iterar en el parser en base a los tokens
+int	ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
+{
+	if (t_current->type == RED_IN && t_current->next && (data_redir->fd_infile = open(t_current->next->str, O_RDONLY)) != -1) // < test cat
+	{
+		dup2(data_redir->fd_infile, 0);// modifico el stdin con el archivo pasado y ya abierto
+	}
+	else if (t_current->next && t_current->next->type == RED_IN) // cat < test
+	{
+		data_redir->fd_infile = open(t_current->next->next->str, O_RDONLY);
+		dup2(data_redir->fd_infile, 0);// modifico el stdin con el archivo pasado y ya abierto
+	}
+	if (data_pipe->pipe_counter)
+	{
+		close(data_redir->fd_infile);
+		data_redir->fd_infile = -1;
+		return (1);
+	}
+	return (0);
+}
 //Reestablece los fd originales, cierra el resto de fd y libera estructuras de pipes y redirs
 void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir)
 {
-	if (data_redir->fd_infile >= 0 || data_redir->fd_outfile>= 0)
+	if (!data_pipe->pipe_counter)
 	{
 		dup2(data_pipe->og_stdin, 0);
 		dup2(data_pipe->og_stdout, 1);
@@ -26,7 +78,7 @@ void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir)
 	free(data_pipe);
 	free(data_redir);
 }
-//pending add more message error
+//Muestra mensajes de error por el fd 2 y modifica el exit status
 void ft_error_syntax(int *exit_status, int name, t_token *t_current)
 {
 	if (name == PIPE)
@@ -48,6 +100,7 @@ void ft_error_syntax(int *exit_status, int name, t_token *t_current)
 	}
 	*exit_status = 258;
 }
+//Espera los procesos hijo y recoge los exit status, ademas muestra el error de comando no encontrado
 void ft_wait_child_process(char *cmd, int *exit_status)
 {
 	int status;
@@ -70,7 +123,7 @@ void ft_wait_child_process(char *cmd, int *exit_status)
 	}
 }
 
-//funcion aux del prototipo para modificar el parser
+//funcion aux, crea un nuevo token copiando el que recibe por parametro
 t_token *ft_tokendup(t_token *token)
 {
 	t_token *new_token;
@@ -85,7 +138,7 @@ t_token *ft_tokendup(t_token *token)
 	new_token->next = NULL;
 	return (new_token);
 }
-//funcion aux del prototipo para modificar el parser 2
+//Crea una copia de los tokens a enviar al executor 
 void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 {
 	t_token	*tmp = NULL;
@@ -106,13 +159,13 @@ void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 	}
 }
 
+//Procesa los tokens de izquierda a derecha uno por uno.
 void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 {
 	t_token		*t_current;
 	t_token		*t_tmp = NULL;
 	t_pipe		*data_pipe;
 	t_redir		*data_redir;
-	t_env		*e_current;
 	
 	data_pipe = malloc(sizeof(t_pipe));
 	if (!data_pipe)
@@ -126,45 +179,12 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	data_redir->fd_infile = -1;
 	data_redir->fd_outfile = -1;
 	t_current = *tokens;
-	e_current = *env;
-
-	//el siguiente bucle da valor a la variable type de cada nodo de la lista obtenida por el lexer, llamada tokens
-	while(t_current)
-	{	
-		if (!ft_strncmp(t_current->str, "|", 1)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
-		{
-				t_current->type = PIPE; //seteo type
-				data_pipe->pipe_counter++;
-				t_current = t_current->next;
-				if (!t_current)
-					return (ft_error_syntax(exit_status, PIPE, NULL));
-		}
-		if (!ft_strncmp(t_current->str, "<", 1)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
-		{
-				t_current->type = RED_IN; //seteo type
-				t_current = t_current->next;
-				if (!t_current || (data_redir->fd_infile = open(t_current->str, O_RDONLY)) == -1)
-					return (ft_error_syntax(exit_status, RED_IN, t_current));
-				t_current->type = DOC;
-				t_current = t_current->next;	
-		}
-		else
-		{
-			t_current->type = WORD; //seteo type default
-			t_current = t_current->next;
-		}
-	}
-	//ahora ya esta toda la lista seteada, debo abrir los pipes necesarios y llamar a ejecutar los procesos.
+	typer_tokens(data_redir, t_current, data_pipe, exit_status);
 	t_current = *tokens;
-	if (!data_pipe->pipe_counter && t_current)
+	if (!data_pipe->pipe_counter && t_current)//SI SOLO HAY UN TOKEN
 	{
-		if (data_redir->fd_infile)
-		{ 
-			dup2(data_redir->fd_infile, 0);// modifico el stdin con el archivo pasado y ya abierto
-		}
+		ft_red_in_aux(data_redir, t_current, data_pipe);
 		data_pipe->flag = NO;
-		while (t_current->type != WORD && t_current)//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
-			t_current = t_current->next;
 		ft_tokens_to_exec(&t_current, &t_tmp);
 		if (ft_is_built_in(&t_tmp))
 		{
@@ -179,23 +199,21 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	}
 	while(t_current)//PIPELINE
 	{
-		if (data_redir->fd_infile >= 0)
-		{ 
-			dup2(data_redir->fd_infile, 0);// modifico el stdin con el archivo pasado y ya abierto
-			close(data_redir->fd_infile);
-			data_redir->fd_infile = -1;
-		}
-		while (t_current->type != WORD && t_current)//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
+		while (t_current && t_current->type != WORD || (t_current->next && t_current->next->type == RED_IN ))//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
+		{
+			if (ft_red_in_aux(data_redir, t_current, data_pipe))
+				break ;
 			t_current = t_current->next;
+		}
 		//entra aqui si hay pipes leidas, y ejecuta hasta nodos hasta la pipe(en el exec)
-		if (t_current->type == WORD && data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
+		if (t_current && t_current->type == WORD && data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
 		{
 			ft_tokens_to_exec(&t_current, &t_tmp);
 			data_pipe->flag = YES;
-			pipe(data_pipe->pipefd); //Crea pipe para comunicar solo 2 comandos
-			exec_cmd(&t_tmp, env, envp, data_pipe); //ejecuta el comando y en el proceso hijo comunica la salida con el pipe
-			dup2(data_pipe->pipefd[0], 0); //comunica la salida del cmd ejecutado a la pipe
-			close(data_pipe->pipefd[0]);// cierra pipes
+			pipe(data_pipe->pipefd);
+			exec_cmd(&t_tmp, env, envp, data_pipe);
+			dup2(data_pipe->pipefd[0], 0); 
+			close(data_pipe->pipefd[0]);
 			close(data_pipe->pipefd[1]);
 			data_pipe->pipe_counter--;
 			free_tokens(&t_tmp);
@@ -209,19 +227,17 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		{
 			data_pipe->flag = NO;
 			t_current = t_current->next;
+			ft_red_in_aux(data_redir, t_current, data_pipe);
 			ft_tokens_to_exec(&t_current, &t_tmp);	
 			exec_cmd(&t_tmp, env, envp, data_pipe);
 			free_tokens(&t_tmp);
 			ft_wait_child_process(t_current->str, exit_status);
-			dup2(data_pipe->og_stdin, 0);
-			dup2(data_pipe->og_stdout, 1);
-			close(data_pipe->og_stdin);
-			close(data_pipe->og_stdout);
+			ft_aux_close(data_pipe, data_redir);
+			return ;
 		}
 		if (t_current)
 			t_current = t_current->next;
 	}
-	ft_aux_close(data_pipe, data_redir);
 }
 
 //El problema actual es que no se puede ejecutar el REDIR_IN en cualquier parte de la pipeline substituyendo los fds
