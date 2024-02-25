@@ -157,8 +157,8 @@ int	ft_env(t_env *env)
 
 //EXPORT
 //no args -> printea env list en formato {declare -x env->key_name="env->value"}
-//
-
+//!!!{export A} -> segfault
+//!!!{export A=}
 static int	ft_isvalidkey(char *str)
 {
 	if (!(ft_isalpha(str[0]) || str[0] == '_'))
@@ -183,9 +183,9 @@ int	ft_export(t_token *tokens, t_env *env)
 		{
 			ft_putstr_fd("declare -x ", 1);
 			ft_putstr_fd(env->key_name, 1);
-			write(1, "=""", 1);
+			write(1, "=\"", 1);
 			ft_putstr_fd(env->value, 1);
-			ft_putendl_fd("""", 1);
+			ft_putendl_fd("\"", 1);
 			env = env->next;
 		}
 		return (1);
