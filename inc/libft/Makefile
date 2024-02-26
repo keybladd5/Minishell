@@ -46,6 +46,7 @@ SRCS = ft_calloc.c \
 	   ft_putstr_fd.c \
 	   ft_putendl_fd.c \
 	   ft_putnbr_fd.c \
+	   ft_strjoin_free.c \
 	   gnl/get_next_line.c \
 	   gnl/get_next_line_utils.c \
 	   printf/ft_printf.c \
@@ -70,19 +71,19 @@ all: $(NAME)
 CC = gcc
 
 %.o:%.c Makefile
-	$(CC) $(FLAGS) -I ./ -c $< -o $@
+	@$(CC) $(FLAGS) -I ./ -c $< -o $@
 
 $(NAME): $(OBJS)
-	ar rcs $(NAME) $(OBJS)
+	@ar rcs $(NAME) $(OBJS)
 bonus: $(BONUS)
 	
 $(BONUS): $(OBJS) $(OBJS_BONUS)
 	ar rcs $(NAME) $(OBJS) $(OBJS_BONUS)
 	touch $@
 clean:
-	rm -f $(OBJS) $(OBJS_BONUS) $(DEPS) $(DEPS_BONUS)
+	@rm -f $(OBJS) $(OBJS_BONUS) $(DEPS) $(DEPS_BONUS)
 fclean: clean
-	rm -f $(NAME)
+	@rm -f $(NAME)
 re: fclean all
 -include $(DEPS)
 -include $(DEPS_BONUS)

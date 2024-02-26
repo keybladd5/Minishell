@@ -202,7 +202,7 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	}
 	while(t_current)//PIPELINE
 	{
-		while (t_current && t_current->type != WORD || (t_current->next && t_current->next->type == RED_IN ))//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
+		while ((t_current && t_current->type != WORD) || (t_current->next && t_current->next->type == RED_IN ))//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
 		{
 			if (ft_red_in_aux(data_redir, t_current, data_pipe))
 				break ;

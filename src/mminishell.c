@@ -13,6 +13,8 @@
 #include "../inc/minishell.h"
 
 //debug function
+
+
 void	print_tokens(t_token **head)
 {
 	t_token	*current = *head;
@@ -173,10 +175,15 @@ void 	input_loop(t_env **env, char **envp)
 	char	*input = NULL;
 	t_token	*tokens = NULL;
 	int		exit_status = 0;
+	char	*cwd;
 
 	while(42)
 	{
 		sig_init(1);
+		cwd = getcwd(NULL, 0);
+		if (!cwd)
+			exit (MALLOC_ERROR);
+		ft_putstr_fd(cwd, 0);
 		input = readline("\x1b[92m⌁./MiniShell→\x1b[0m ");
 		ctrl_C(&exit_status);
 		if (!input)//cambio anadido pendiente analizar🐸

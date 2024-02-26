@@ -97,6 +97,8 @@ void	ft_putchar_fd(char c, int fd);
 
 char	**ft_split(char const *s, char c);
 
+char	*ft_strjoin_free(char *s1, char *s2);
+
 t_list	*ft_lstnew(void *content);
 
 void	ft_lstadd_front(t_list **lst, t_list *new);

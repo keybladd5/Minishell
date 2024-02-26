@@ -13,7 +13,7 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "../libft/libft.h"
+# include "libft/libft.h"
 # include <stdio.h>
 # include <fcntl.h>
 # include <sys/wait.h>
@@ -41,7 +41,7 @@ typedef struct s_env
 typedef struct s_token
 {
 	char			*str;
-	int				type; //all init in 0, because not used, wait 4 PARSER
+	int				type; 
 	struct s_token	*next;
 }	t_token;
 
@@ -69,8 +69,6 @@ int		ft_token_lst_size(t_token *lst);
 void	expansor(t_token **tokens, t_env **env, int exit_status);
 
 void	parser(t_token **tokens, t_env **env, char **envp, int *exit_status);
-
-char	*ft_strjoin_f(char *s1, char *s2);
 
 void	print_tokens(t_token **head);
 

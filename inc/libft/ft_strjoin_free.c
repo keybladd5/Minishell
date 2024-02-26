@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/minishell.h"
+#include "libft.h"
 
-char	*ft_strjoin_f(char *s1, char *s2)
+char	*ft_strjoin_free(char *s1, char *s2)
 {
 	char	*rtrn;
 	size_t	i;
