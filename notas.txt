@@ -4,6 +4,7 @@
 -QUOTES
 -Redirections
 	-RED_IN ✅
+		- En archivos sin permisos Permission denied no controlado ❌
 -Heredoc
 -Append
 -[SOLVED✅]Invalid cmd
