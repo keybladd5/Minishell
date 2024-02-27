@@ -168,6 +168,34 @@ void	sig_init(int i)//cambio anadido pendiente analizar🐸
 	tc.c_lflag &= ~ECHOCTL; //Modifica la flag 'local mode' para desactivar el printeo de ctrl+(X) como ^(X)
 	tcsetattr(0, TCSANOW, &tc); //Devuelve los atributos modificados al FD 0 (STDIN)
 }
+char	*prompt_builder(void)
+{
+	char	*cwd;
+	char	*aux;
+
+	cwd = getcwd(NULL, 0); //direccion
+	if (!cwd)
+		exit (MALLOC_ERROR);
+	aux = ft_strdup("\x1b[94m"); //aux 1
+	if (!aux)
+		exit (MALLOC_ERROR);
+	cwd = ft_strjoin_free(aux, cwd); //unir aux+dir
+	if (!cwd)
+		exit (MALLOC_ERROR);
+	aux = ft_strdup("\x1b[0m "); //aux normal
+	if (!aux)
+		exit (MALLOC_ERROR);
+	cwd = ft_strjoin_free(cwd, aux); //unir dir+aux normal
+	if (!cwd)
+		exit (MALLOC_ERROR);
+	aux = ft_strdup("\x1b[92m⌁./MiniShell→\x1b[0m ");
+	if (!aux)
+		exit(MALLOC_ERROR);
+	cwd = ft_strjoin_free(cwd, aux);
+	if (!cwd)
+		exit(MALLOC_ERROR);
+	return (cwd);
+}
 
 //infinte loop to get the user_input and parse it
 void 	input_loop(t_env **env, char **envp)
@@ -175,16 +203,12 @@ void 	input_loop(t_env **env, char **envp)
 	char	*input = NULL;
 	t_token	*tokens = NULL;
 	int		exit_status = 0;
-	char	*cwd;
-
+	char	*prompt;
 	while(42)
 	{
 		sig_init(1);
-		cwd = getcwd(NULL, 0);
-		if (!cwd)
-			exit (MALLOC_ERROR);
-		ft_putstr_fd(cwd, 0);
-		input = readline("\x1b[92m⌁./MiniShell→\x1b[0m ");
+		prompt = prompt_builder();
+		input = readline(prompt);
 		ctrl_C(&exit_status);
 		if (!input)//cambio anadido pendiente analizar🐸
 		{
@@ -200,6 +224,7 @@ void 	input_loop(t_env **env, char **envp)
 		add_history(input);
 		free_tokens(&tokens);
 		free(input);
+
 	}
 }
 
