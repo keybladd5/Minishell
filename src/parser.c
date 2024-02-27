@@ -12,17 +12,21 @@
 
 #include "../inc/minishell.h"
 
+
 //Funcion que abre los fds en caso de redireccion input, el retorno se usa para iterar en el parser en base a los tokens
 int	ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
 {
 	t_token	*dir_doc;
 
 	dir_doc = t_current;
+	if (!data_redir->red_in_counter)
+		return (0);
 	while (dir_doc && dir_doc->type != RED_IN) //busca el token '<'. Puede salir con la direccion del token o NULL si no lo ha encontrado
 		dir_doc = dir_doc->next;
 	if (!dir_doc)
 		return (0);
 	data_redir->fd_infile = open(dir_doc->next->str, O_RDONLY);
+	data_redir->red_in_counter--;
 	dup2(data_redir->fd_infile, 0);
 	if (data_pipe->pipe_counter)
 	{
@@ -52,7 +56,7 @@ int ft_error_syntax(int *exit_status, int name, t_token *t_current)
 {
 	if (name == PIPE)
 		ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n", 2);
-	else if (name == RED_IN)
+	else if (name == RED_IN || name == RED_OUT)
 	{
 		if (t_current && !ft_strncmp(t_current->str, "|", 1))
 			ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n", 2);
@@ -92,6 +96,18 @@ int typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int
 			close(data_redir->fd_infile);
 			data_redir->fd_infile = -1;
 			t_current->type = DOC;
+			data_redir->red_in_counter++;
+			t_current = t_current->next;	
+		}
+		else if (!ft_strncmp(t_current->str, ">\0", 2))
+		{
+			t_current->type = RED_OUT; //seteo type
+			t_current = t_current->next;
+			//para checkear que esto funcione, en la segunda opcion del if, n
+			if (!t_current) 
+				return (ft_error_syntax(exit_status, RED_OUT, t_current));
+			t_current->type = DOC;
+			data_redir->red_out_counter++;
 			t_current = t_current->next;	
 		}
 		else
@@ -168,13 +184,14 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	t_token		*t_tmp = NULL;
 	t_pipe		*data_pipe;
 	t_redir		*data_redir;
-	
+
 	data_pipe = malloc(sizeof(t_pipe));
 	if (!data_pipe)
 		exit (MALLOC_ERROR);
 	data_redir = malloc(sizeof(t_redir));
 	if (!data_redir)
 		exit (MALLOC_ERROR);
+	data_redir->red_in_counter = 0;
 	data_pipe->og_stdin = dup(0);
 	data_pipe->og_stdout = dup(1);
 	data_pipe->pipe_counter = 0;
