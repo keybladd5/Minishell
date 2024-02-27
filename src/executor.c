@@ -128,6 +128,11 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 	t_env	*e_current = *env;
 
 	int pid = fork();
+	if (pid < 0)
+	{
+		perror("Fork error 😓");
+		exit(MALLOC_ERROR);
+	}
 	//dprintf(2, "%d\n", pid);
 	sig_init(0);//cambio anadido pendiente analizar🐸
 	if (pid == 0)
