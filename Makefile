@@ -58,7 +58,7 @@ $(NAME): $(OBJS)
 
 #DEPENDENCIAS
 %.o:%.c Makefile inc/libft/libft.a inc/minishell.h
-	@$(CC) $(FLAGS) -DREADLINE_LIBRARY=1 $(INCLUDE) -c $< -o $@
+	@$(CC) $(FLAGS)  $(INCLUDE) -c $< -o $@
 
 #NORMA PARA LIBFT
 makelibft:
@@ -90,7 +90,14 @@ rdline:
 	done; \
 	echo "${GREEN}Readline Compiled${NC}"
 
-#NORMA PARA LIMPIAR OBJETOS Y DEPENDENCIAS
+#NORMA PARA LIMPIAR OBJETOS Y DEPENDENCIAS DE SRC/
+sclean:
+	@echo "${RED}Clean objects and deps...${NC}"
+	@rm -rf $(OBJS) $(DEPS)
+	@rm -rf $(OBJS_BONUS) $(DEPS_BONUS)
+	@echo "${GREEN}Done clean ${NC}"
+
+#NORMA PARA LIMPIAR OBJETOS Y DEPENDENCIAS Y LIBFT Y READLINE
 clean:
 	@echo "${RED}Clean objects and deps...${NC}"
 	@rm -rf $(OBJS) $(DEPS)
@@ -114,4 +121,4 @@ re: fclean all
 
 -include $(DEPS)
 
-.PHONY: all clean fclean re makelibft
+.PHONY: all clean fclean sclean re makelibft
