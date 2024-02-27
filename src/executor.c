@@ -163,7 +163,7 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 		if (!cmd)
 			exit (MALLOC_ERROR);
 		//condicion temporal que acogera en una matriz todos los strings de la lista tokens
-		cmd_argv = (char **)malloc(sizeof(char * ) * ft_token_lst_size(*tokens) + 1); //crea la matriz a pasar al execve
+		cmd_argv = (char **)malloc(sizeof(char * ) * (ft_token_lst_size(*tokens) + 1)); //crea la matriz a pasar al execve
 		if (!cmd_argv)
 			exit(MALLOC_ERROR);
 		cmd_argv[ft_token_lst_size(*tokens)] = NULL;
