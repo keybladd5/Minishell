@@ -57,7 +57,9 @@ typedef struct s_pipe
 typedef struct s_redir
 {
 	int fd_infile;
+	int red_in_counter;
 	int fd_outfile;
+	int red_out_counter;
 }	t_redir;
 
 void	sig_init(int i);
