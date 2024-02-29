@@ -1,16 +1,16 @@
 
 -Makefile ✅ [PENDIENTE TESTS DE RELINK]
 -Pipeline ✅ [Hace falta optimizar el codigo para simplificarlo]
--QUOTES
+-QUOTES ❌
 -Redirections
 	-RED_IN ✅
-		- En archivos sin permisos Permission denied no controlado ❌
-		- < test.c da SEGV EN exec_cmd
--Heredoc
--Append
+		- En archivos sin permisos Permission denied no controlado ✅
+		- < test.c da SEGV EN exec_cmd ✅
+-Heredoc ❌
+-Append ❌
 -[SOLVED✅]Invalid cmd
 -[SOLVED✅]rutas absolutas
-- ls -lR $HOME | wc PETA!!!!❌
+- ls -lR $HOME | wc PETA!!!! ❌
 - Env variables (Expansor) ✅
 	- El EXPANSOR no debe mantener strings como $varnoexist en la lista de tokens si no existen ❌ 
 	- '~' esto hay que expandirlo a la variable HOME
@@ -24,6 +24,7 @@
 	- exit ✅
 - $? ✅
 - ctrl-C, ctrl-D, ctrl-\ [❌  Hace falta optimizar el codigo para simplificarlo] 
+	- ctrl-D dentro de child (cat) debe printear {Quit: 3} ❌ 
 
 
 gcc src/mminishell.c libft/libft.a -lreadline -ltermcap
