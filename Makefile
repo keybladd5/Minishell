@@ -63,7 +63,7 @@ $(NAME): $(OBJS)
 #NORMA PARA LIBFT
 makelibft:
 	@echo "${BLUE}Compiling Libft...${NC}"
-	@$(MAKE) -C inc/libft/ & pid=$$!; \
+	@$(MAKE) -j 4 -C inc/libft/ & pid=$$!; \
 	echo "."; \
 	while ps -p $$pid > /dev/null; do \
 		sleep 1; \
@@ -83,7 +83,7 @@ rdline_condition:
 #NORMA QUE SE EJECUTA EN CASO DE NO ESTAR COMPILADA LA READLINE
 rdline:
 	@cd ./inc/readline/ && ./configure &> /dev/null
-	@make -C ./inc/readline/ &> /dev/null & pid=$$!; \
+	@make -j 8 -C ./inc/readline/ &> /dev/null & pid=$$!; \
 	echo "."; \
 	while ps -p $$pid > /dev/null; do \
 		sleep 1; \

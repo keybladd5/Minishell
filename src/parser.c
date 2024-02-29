@@ -54,7 +54,7 @@ void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir)
 //Muestra mensajes de error por el fd 2 y modifica el exit status
 int ft_error_syntax(int *exit_status, int name, t_token *t_current)
 {
-	char tmp_abs_path;
+	char *tmp_abs_path;
 	if (name == PIPE)
 		ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n", 2);
 	else if (name == RED_IN || name == RED_OUT)
