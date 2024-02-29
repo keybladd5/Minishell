@@ -127,6 +127,8 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 	char 	**cmd_argv = NULL;
 	t_env	*e_current = *env;
 
+	if (!*tokens)//proteccion para cuando no hay tokens que mandar
+		return ;
 	int pid = fork();
 	if (pid < 0)
 	{

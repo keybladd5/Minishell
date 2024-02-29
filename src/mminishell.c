@@ -224,6 +224,7 @@ void 	input_loop(t_env **env, char **envp)
 		add_history(input);
 		free_tokens(&tokens);
 		free(input);
+		free(prompt);
 
 	}
 }

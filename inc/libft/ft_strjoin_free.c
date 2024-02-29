@@ -19,13 +19,17 @@ char	*ft_strjoin_free(char *s1, char *s2)
 	size_t	j;
 
 	if (!s1)
+	{
 		rtrn = ft_strdup(s2);
+		if (!rtrn)
+			exit (1);
+	}
 	else
 	{
 		i = ft_strlen(s1);
 		rtrn = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) +1));
 		if (!rtrn)
-			return (0);
+			exit (1);
 		rtrn = ft_memcpy(rtrn, s1, (int)i);
 		free(s1);
 		j = 0;

@@ -5,6 +5,7 @@
 -Redirections
 	-RED_IN ✅
 		- En archivos sin permisos Permission denied no controlado ❌
+		- < test.c da SEGV EN exec_cmd
 -Heredoc
 -Append
 -[SOLVED✅]Invalid cmd
@@ -12,6 +13,7 @@
 - ls -lR $HOME | wc PETA!!!!❌
 - Env variables (Expansor) ✅
 	- El EXPANSOR no debe mantener strings como $varnoexist en la lista de tokens si no existen ❌ 
+	- '~' esto hay que expandirlo a la variable HOME
 - Implementar builtins
 	- echo (-n) ✅
 	- cd (relative/absolute path) ✅
