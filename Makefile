@@ -76,8 +76,9 @@ rdline_condition:
 	@echo "${BLUE}Compiling Readline...${NC}"
 	@if [ ! -f ./inc/readline/libreadline.a ] || [ ! -f ./inc/readline/libhistory.a ]; then \
 		$(MAKE) rdline; \
+	else \
+		echo "${PURPLE}Readline already compiled.${NC}"; \
 	fi
-	@echo "${PURPLE}Readline already compiled.${NC}"; 
 
 #NORMA QUE SE EJECUTA EN CASO DE NO ESTAR COMPILADA LA READLINE
 rdline:
