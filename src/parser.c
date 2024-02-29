@@ -54,14 +54,28 @@ void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir)
 //Muestra mensajes de error por el fd 2 y modifica el exit status
 int ft_error_syntax(int *exit_status, int name, t_token *t_current)
 {
+	char tmp_abs_path;
 	if (name == PIPE)
 		ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n", 2);
 	else if (name == RED_IN || name == RED_OUT)
 	{
 		if (t_current && !ft_strncmp(t_current->str, "|", 1))
 			ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n", 2);
-		else if (t_current && (!t_current->next || t_current->next->type != PIPE))
+		else if (t_current && (!t_current->next || t_current->next->type != PIPE)) //porque la ultima condicion??, suele entrar por error de apertura o < 
 		{
+			tmp_abs_path = getcwd(NULL, 0);
+			if (!tmp_abs_path)
+				exit (MALLOC_ERROR);
+			tmp_abs_path = ft_strjoin_s(tmp_abs_path, t_current->str);
+			if (!tmp_abs_path)
+				exit(MALLOC_ERROR);
+			if (access(tmp_abs_path, R_OK) != 0)
+			{
+				ft_putstr_fd("\033[31mminishell: ", 2);
+				ft_putstr_fd(t_current->str, 2);
+				ft_putstr_fd(": Permission denied\x1b[0m\n", 2);
+				free(tmp_abs_path);
+			}
 			ft_putstr_fd("\033[31mminishell: ", 2);
 			ft_putstr_fd(t_current->str, 2);
 			ft_putstr_fd(": No such file or directory\x1b[0m\n", 2);
@@ -103,7 +117,7 @@ int typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int
 		{
 			t_current->type = RED_OUT; //seteo type
 			t_current = t_current->next;
-			//para checkear que esto funcione, en la segunda opcion del if, n
+			//para checkear que esto funcione, en la segunda opcion del if, 
 			if (!t_current) 
 				return (ft_error_syntax(exit_status, RED_OUT, t_current));
 			t_current->type = DOC;
