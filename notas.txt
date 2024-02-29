@@ -13,7 +13,13 @@
 - ls -lR $HOME | wc PETA!!!! ❌
 - Env variables (Expansor) ✅
 	- El EXPANSOR no debe mantener strings como $varnoexist en la lista de tokens si no existen ❌ 
-	- '~' esto hay que expandirlo a la variable HOME
+		- {$AAA} -> newline ✅
+		- {$AAA cmd} -> ejecuta comando ✅
+		- {cmd $AAA} -> ejecuta comando ✅
+		- {echo $AAA $HOME} -> ignora $AAA y ejecuta {echo $HOME} ✅
+	- '~' esto hay que expandirlo a la variable HOME ❌
+	- solo un comando com '$' -> Printea 'command not found', deberia ser 'is a directory' ❌
+	- '$$' se expande a username ❓❓❓
 - Implementar builtins
 	- echo (-n) ✅
 	- cd (relative/absolute path) ✅

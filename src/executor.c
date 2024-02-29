@@ -37,6 +37,34 @@ int	ft_token_lst_size(t_token *lst)
 	return (i);
 }
 
+void	ft_remove_token(t_token **tokens, t_token **t_current)
+{
+	t_token	*tmp_current;
+
+	tmp_current = NULL;
+	if (*tokens == *t_current)
+	{
+		*tokens = (*t_current)->next;
+		tmp_current = *t_current;
+		*t_current = (*t_current)->next;
+	}
+	else
+	{
+		while (*tokens)
+		{
+			if ((*tokens)->next == *t_current)
+			{
+				tmp_current = *t_current;
+				(*tokens)->next = (*t_current)->next;
+				*t_current = (*t_current)->next;
+				break ;
+			}
+			*tokens = (*tokens)->next;
+		}
+	}
+	free (tmp_current);
+}
+
 void	expansor(t_token **tokens, t_env **env, int exit_status)
 {
 	t_token *t_current; //token current
@@ -93,7 +121,7 @@ void	expansor(t_token **tokens, t_env **env, int exit_status)
 					if (!t_current->str)
 						exit(MALLOC_ERROR);
 				}
-				else if (!e_current)
+				else
 					i = x;
 				e_current = *env;
 			}
@@ -108,11 +136,19 @@ void	expansor(t_token **tokens, t_env **env, int exit_status)
 				}
 			}
 		}
-		if (!t_current->str)
-			t_current->str = tmp;
-		else
+		if (!t_current->str && tmp[0] == '$')
+		{
+			ft_remove_token(tokens, &t_current);
 			free (tmp);
-		t_current = t_current->next;
+		}
+		else
+		{
+			if (!t_current->str)
+				t_current->str = tmp;
+			else
+				free (tmp);
+			t_current = t_current->next;
+		}
 	}
 }
 
