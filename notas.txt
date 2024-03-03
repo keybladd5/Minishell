@@ -17,6 +17,7 @@
 		- {$AAA cmd} -> ejecuta comando ✅
 		- {cmd $AAA} -> ejecuta comando ✅
 		- {echo $AAA $HOME} -> ignora $AAA y ejecuta {echo $HOME} ✅
+		- {echho $HOME$} -> expande $HOME y deja el ulltimo $
 	- '~' esto hay que expandirlo a la variable HOME ❌
 	- solo un comando con '$' -> Printea 'command not found', deberia ser 'is a directory' ❌
 	- '$$' se expande a username ❓❓❓ -> Debe expandir a PID ❌
