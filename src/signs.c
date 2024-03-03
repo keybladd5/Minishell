@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signs.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: polmarti <polmarti@student.42barcel>       +#+  +:+       +#+        */
+/*   By: Meritxu <Meritxu@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 15:06:22 by polmarti          #+#    #+#             */
-/*   Updated: 2024/03/03 15:06:23 by polmarti         ###   ########.fr       */
+/*   Updated: 2024/03/03 21:03:43 by Meritxu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	process_sig_handler(int sig)
 	g_signal = sig;
 	if (sig == SIGINT)
 	{
-		write(1, "\n", 1);
+		write(1, "^C\n", 3);//solo aparece asi en el proceso hijo
 		g_signal = 130;
 	}
 	else if (sig == SIGQUIT)
