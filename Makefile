@@ -52,7 +52,7 @@ librarys :
 
 #NORMA PARA COMPILAR MINISHELL
 $(NAME): $(OBJS)
-	@echo "${GREEN}Compiling Minishell${NC}"
+	@echo "${BLUE}Compiling Minishell${NC}"
 	@gcc $(FLAGS) $(OBJS) $(LIB_ADD_DIR) $(FLAGS_LIB_SEARCH) $(LIB_A) -o $(NAME)
 	@echo "${GREEN}Minishell Compiled${NC}"
 
@@ -82,7 +82,12 @@ rdline_condition:
 
 #NORMA QUE SE EJECUTA EN CASO DE NO ESTAR COMPILADA LA READLINE
 rdline:
-	@cd ./inc/readline/ && ./configure &> /dev/null
+	@cd ./inc/readline/ && ./configure &> /dev/null & pid=$$!; \
+	echo "."; \
+	while ps -p $$pid > /dev/null; do \
+		sleep 1; \
+		echo "."; \
+	done;
 	@make -j 8 -C ./inc/readline/ &> /dev/null & pid=$$!; \
 	echo "."; \
 	while ps -p $$pid > /dev/null; do \

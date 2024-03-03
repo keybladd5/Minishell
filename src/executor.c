@@ -69,9 +69,9 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			dup2(data_pipe->pipefd[1], 1);//comunica la salida con la entrada del siguiente proceso
 			close(data_pipe->pipefd[1]); //cierra pipes
 			close(data_pipe->pipefd[0]);
-			if (ft_is_built_in(tokens))
-				exit(ft_exec_builtin(tokens, env));
 		}
+		if (ft_is_built_in(tokens))
+			exit(ft_exec_builtin(tokens, env));
 		if ((*tokens)->str[0] ==  '/')//en caso de ser posible ruta absoluta
 		{
 			flag_absoluthepath = 1; //flag activada

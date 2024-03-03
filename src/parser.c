@@ -176,25 +176,28 @@ int typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int
 	return (0);
 }
 //Espera los procesos hijo y recoge los exit status, ademas muestra el error de comando no encontrado
-void ft_wait_child_process(char *cmd, int *exit_status)
+void ft_wait_child_process(char *cmd, int *exit_status, int process)
 {
 	int status;
-
-	wait(&status);
-	if (WIFEXITED(status))
-		*exit_status = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status)) //esta opcion no sera funcional hasta implementar signals en procesos hijos
+	while (process)
 	{
-		if (WTERMSIG(status) == SIGINT)
-			*exit_status = 130;
-		else if (WTERMSIG(status) == SIGQUIT)
-			*exit_status = 131;
-	}
-	if (*exit_status == 127)
-	{
-		ft_putstr_fd("minishell: ", 2);
-		ft_putstr_fd(cmd, 2);
-		ft_putendl_fd(": command not found", 2);
+		wait(&status);
+		if (WIFEXITED(status))
+			*exit_status = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status)) //esta opcion no sera funcional hasta implementar signals en procesos hijos
+		{
+			if (WTERMSIG(status) == SIGINT)
+				*exit_status = 130;
+			else if (WTERMSIG(status) == SIGQUIT)
+				*exit_status = 131;
+		}
+		if (*exit_status == 127)
+		{
+			ft_putstr_fd("minishell: ", 2);
+			ft_putstr_fd(cmd, 2);
+			ft_putendl_fd(": command not found", 2);
+		}
+		process--;
 	}
 }
 
@@ -241,6 +244,7 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	t_token		*t_tmp = NULL;
 	t_pipe		*data_pipe;
 	t_redir		*data_redir;
+	int			process = 0;
 
 	data_pipe = malloc(sizeof(t_pipe));
 	if (!data_pipe)
@@ -249,6 +253,7 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	if (!data_redir)
 		exit (MALLOC_ERROR);
 	data_redir->red_in_counter = 0;
+	data_redir->red_out_counter = 0;
 	data_pipe->og_stdin = dup(0);
 	data_pipe->og_stdout = dup(1);
 	data_pipe->pipe_counter = 0;
@@ -271,7 +276,7 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		}
 		exec_cmd(&t_tmp, env, envp, data_pipe);
 		free_tokens(&t_tmp);
-		ft_wait_child_process(t_current->str, exit_status);
+		ft_wait_child_process(t_current->str, exit_status, 1);
 		ft_aux_close(data_pipe, data_redir);
 		return ;
 	}
@@ -281,23 +286,35 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		{
 			if (ft_red_in_aux(data_redir, t_current, data_pipe))
 				break ;
-			if (ft_red_out_aux(data_redir, t_current, data_pipe))
-				break ;
+			/*if (ft_red_out_aux(data_redir, t_current, data_pipe))
+				break ;*/
 			t_current = t_current->next;
 		}
 		//entra aqui si hay pipes leidas, y ejecuta hasta nodos hasta la pipe(en el exec)
 		if (t_current && data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
 		{
+			if (ft_red_out_aux(data_redir, t_current, data_pipe))
+			{
+				data_pipe->flag = NO;
+			}
+			else
+				data_pipe->flag = YES;
 			ft_tokens_to_exec(&t_current, &t_tmp);
-			data_pipe->flag = YES;
 			pipe(data_pipe->pipefd);
+			process++;
 			exec_cmd(&t_tmp, env, envp, data_pipe);
-			dup2(data_pipe->pipefd[0], 0); 
+			if (data_pipe->flag == YES)
+				dup2(data_pipe->pipefd[0], 0); 
+			else
+			{
+				//dup2(data_pipe->og_stdin, 0);
+				//dup2(data_pipe->og_stdout, 1);
+			}
 			close(data_pipe->pipefd[0]);
 			close(data_pipe->pipefd[1]);
 			data_pipe->pipe_counter--;
 			free_tokens(&t_tmp);
-			ft_wait_child_process(t_current->str, exit_status);
+			//ft_wait_child_process(t_current->str, exit_status);
 		}
 		//ahora quiero iterar hasta que los nodos sean de otro comando, los diferencia el nodo pipe
 		while (t_current && !(t_current->type == PIPE))
@@ -311,8 +328,9 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 			ft_red_out_aux(data_redir, t_current, data_pipe);
 			ft_tokens_to_exec(&t_current, &t_tmp);	
 			exec_cmd(&t_tmp, env, envp, data_pipe);
+			process++;
 			free_tokens(&t_tmp);
-			ft_wait_child_process(t_current->str, exit_status);
+			ft_wait_child_process(t_current->str, exit_status, process);
 			ft_aux_close(data_pipe, data_redir);
 			return ;
 		}
