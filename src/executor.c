@@ -12,6 +12,31 @@
 
 #include "../inc/minishell.h"
 
+void ft_wait_child_process(char *cmd, int *exit_status, int process)
+{
+	int status;
+	while (process)
+	{
+		wait(&status);
+		if (WIFEXITED(status))
+			*exit_status = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status)) //esta opcion no sera funcional hasta implementar signals en procesos hijos
+		{
+			if (WTERMSIG(status) == SIGINT)
+				*exit_status = 130;
+			else if (WTERMSIG(status) == SIGQUIT)
+				*exit_status = 131;
+		}
+		if (*exit_status == 127)
+		{
+			ft_putstr_fd("minishell: ", 2);
+			ft_putstr_fd(cmd, 2);
+			ft_putendl_fd(": command not found", 2);
+		}
+		process--;
+	}
+}
+
 int	ft_aux_abs(char *str)
 {
 	int	i;

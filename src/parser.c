@@ -12,197 +12,8 @@
 
 #include "../inc/minishell.h"
 
-
-//Funcion que abre los fds en caso de redireccion input, el retorno se usa para iterar en el parser en base a los tokens
-int	ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
-{
-	t_token	*dir_doc;
-
-	dir_doc = t_current;
-	if (!data_redir->red_in_counter)
-		return (0);
-	while (dir_doc && dir_doc->type != RED_IN) //busca el token '<'. Puede salir con la direccion del token o NULL si no lo ha encontrado
-		dir_doc = dir_doc->next;
-	if (!dir_doc)
-		return (0);
-	data_redir->fd_infile = open(dir_doc->next->str, O_RDONLY);
-	data_redir->red_in_counter--;
-	dup2(data_redir->fd_infile, 0);
-	if (data_pipe->pipe_counter)
-	{
-		close(data_redir->fd_infile);
-		data_redir->fd_infile = -1;
-		return (1);
-	}
-	return (0);
-}
-int	ft_red_out_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
-{
-	t_token	*dir_doc;
-
-	dir_doc = t_current;
-	if (!data_redir->red_out_counter)
-		return (0);
-	while (dir_doc && dir_doc->type != RED_OUT) //busca el token '>'. Puede salir con la direccion del token o NULL si no lo ha encontrado
-		dir_doc = dir_doc->next;
-	if (!dir_doc)
-		return (0);
-	data_redir->red_out_counter--;
-	data_redir->fd_outfile = open(dir_doc->next->str, O_WRONLY | O_CREAT | O_TRUNC, 0666 );
-	dup2(data_redir->fd_outfile, 1);
-	if (data_pipe->pipe_counter)
-	{
-		close(data_redir->fd_outfile);
-		data_redir->fd_outfile = -1;
-		return (1);
-	}
-	return (0);
-}
-//Reestablece los fd originales, cierra el resto de fd y libera estructuras de pipes y redirs
-void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir)
-{
-	if (!data_pipe->pipe_counter)//pedniente modificar ya se hace dup2 de mas
-	{
-		dup2(data_pipe->og_stdin, 0);
-		dup2(data_pipe->og_stdout, 1);
-	}
-	close(data_redir->fd_infile);
-	close(data_redir->fd_outfile);
-	close(data_pipe->og_stdin);
-	close(data_pipe->og_stdout);
-	free(data_pipe);
-	free(data_redir);
-}
-//Muestra mensajes de error por el fd 2 y modifica el exit status
-int ft_error_syntax(int *exit_status, int name, t_token *t_current)
-{
-	char *tmp_abs_path;
-
-	if (name == PIPE)
-		ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `|'\x1b[0m\n", 2);
-	else if (name == RED_IN || name == RED_OUT)
-	{
-		if (t_current && (!ft_strncmp(t_current->str, "|", 1) || \
-		 !ft_strncmp(t_current->str, "<", 1) || !ft_strncmp(t_current->str, ">", 1) || \
-		 !ft_strncmp(t_current->str, ">>", 2) || !ft_strncmp(t_current->str, "<<", 1))) //si es algun meta caracter
-		{
-			ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `", 2);
-			if (!ft_strncmp(t_current->str, ">>", 2) || !ft_strncmp(t_current->str, "<<", 2))
-			{
-				ft_putchar_fd(t_current->str[0], 2);
-				ft_putchar_fd(t_current->str[1], 2);
-			}
-			else
-				ft_putchar_fd(t_current->str[0], 2);
-			ft_putstr_fd("'\x1b[0m\n", 2);
-		}
-		else if (t_current /* && (!t_current->next || t_current->next->type != PIPE)*/) //porque la ultima condicion??, suele entrar por error de apertura o < 
-		{
-			tmp_abs_path = getcwd(NULL, 0);
-			if (!tmp_abs_path)
-				exit (MALLOC_ERROR);
-			tmp_abs_path = ft_strjoin(tmp_abs_path, "/");
-			if (!tmp_abs_path)
-				exit(MALLOC_ERROR);
-			tmp_abs_path = ft_strjoin_s(tmp_abs_path, t_current->str);
-			if (!tmp_abs_path)
-				exit(MALLOC_ERROR);
-			//ft_putstr_fd(tmp_abs_path, 2); 4 debugg
-			if (access(tmp_abs_path, F_OK) != 0)
-			{
-				ft_putstr_fd("\033[31mminishell: ", 2);
-				ft_putstr_fd(t_current->str, 2);
-				ft_putstr_fd(": No such file or directory\x1b[0m\n", 2);
-			}
-			else
-			{
-				ft_putstr_fd("\033[31mminishell: ", 2);
-				ft_putstr_fd(t_current->str, 2);
-				ft_putstr_fd(": Permission denied\x1b[0m\n", 2);
-			}
-			free(tmp_abs_path);
-			*exit_status = 1;
-			return (*exit_status);
-		}
-		else
-			ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `newline'\x1b[0m\n", 2);
-	}
-	*exit_status = 258;
-	return (*exit_status);
-}
-//funcion que setea los tipos a todos los nodos de la lista
-int typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int *exit_status)
-{
-	while(t_current)
-	{	
-		if (!ft_strncmp(t_current->str, "|\0", 2)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
-		{
-			t_current->type = PIPE; //seteo type
-			data_pipe->pipe_counter++;
-			t_current = t_current->next;
-			if (!t_current)
-				return (ft_error_syntax(exit_status, PIPE, NULL));
-		}
-		else if (!ft_strncmp(t_current->str, "<\0", 2)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
-		{
-			t_current->type = RED_IN; //seteo type
-			t_current = t_current->next;
-			if (!t_current || (data_redir->fd_infile = open(t_current->str, O_RDONLY)) == -1)
-				return (ft_error_syntax(exit_status, RED_IN, t_current));
-			close(data_redir->fd_infile);
-			data_redir->fd_infile = -1;
-			t_current->type = DOC;
-			data_redir->red_in_counter++;
-			t_current = t_current->next;	
-		}
-		else if (!ft_strncmp(t_current->str, ">\0", 2))
-		{
-			t_current->type = RED_OUT; //seteo type
-			t_current = t_current->next;
-			//para checkear que esto funcione, en la segunda opcion del if, 
-			if (!t_current || (data_redir->fd_outfile = open(t_current->str, O_WRONLY | O_CREAT | O_TRUNC, 0666 )) == -1 ) 
-				return (ft_error_syntax(exit_status, RED_OUT, t_current));
-			close(data_redir->fd_outfile);
-			t_current->type = DOC;
-			data_redir->red_out_counter++;
-			t_current = t_current->next;	
-		}
-		else
-		{
-			t_current->type = WORD; //seteo type default
-			t_current = t_current->next;
-		}
-	}
-	return (0);
-}
-//Espera los procesos hijo y recoge los exit status, ademas muestra el error de comando no encontrado
-void ft_wait_child_process(char *cmd, int *exit_status, int process)
-{
-	int status;
-	while (process)
-	{
-		wait(&status);
-		if (WIFEXITED(status))
-			*exit_status = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status)) //esta opcion no sera funcional hasta implementar signals en procesos hijos
-		{
-			if (WTERMSIG(status) == SIGINT)
-				*exit_status = 130;
-			else if (WTERMSIG(status) == SIGQUIT)
-				*exit_status = 131;
-		}
-		if (*exit_status == 127)
-		{
-			ft_putstr_fd("minishell: ", 2);
-			ft_putstr_fd(cmd, 2);
-			ft_putendl_fd(": command not found", 2);
-		}
-		process--;
-	}
-}
-
 //funcion aux, crea un nuevo token copiando el que recibe por parametro
-t_token *ft_tokendup(t_token *token)
+static t_token *ft_tokendup(t_token *token)
 {
 	t_token *new_token;
 
@@ -217,7 +28,7 @@ t_token *ft_tokendup(t_token *token)
 	return (new_token);
 }
 //Crea una copia de los tokens a enviar al executor 
-void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
+static void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 {
 	t_token	*tmp = NULL;
 	t_token	*last = NULL;
@@ -307,8 +118,8 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 				dup2(data_pipe->pipefd[0], 0); 
 			else
 			{
-				//dup2(data_pipe->og_stdin, 0);
-				//dup2(data_pipe->og_stdout, 1);
+				dup2(data_pipe->og_stdin, 0);
+				dup2(data_pipe->og_stdout, 1);
 			}
 			close(data_pipe->pipefd[0]);
 			close(data_pipe->pipefd[1]);

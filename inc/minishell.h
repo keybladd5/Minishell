@@ -54,6 +54,7 @@ typedef struct s_pipe
 	int og_stdout;
 }	t_pipe;
 
+//STRUC PARA DATOS DE REDIRECCIONES
 typedef struct s_redir
 {
 	int fd_infile;
@@ -62,9 +63,46 @@ typedef struct s_redir
 	int red_out_counter;
 }	t_redir;
 
+//--------errors.c-----------
+
+int ft_error_syntax(int *exit_status, int name, t_token *t_current);
+
+//--------signs.c-----------
+
+void	ctrl_C(int *exit_status);
+
+void	sig_handler(int sig);
+
+void	process_sig_handler(int sig);
+
 void	sig_init(int i);
 
+int		g_signal;
+
+//--------redirs.c-------------
+
+int		ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe);
+
+int		ft_red_out_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe);
+
+void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir);
+
+//--------executor.c-------------
+
+int		ft_token_lst_size(t_token *lst);
+
+int		ft_aux_abs(char *str);
+
+void 	ft_wait_child_process(char *cmd, int *exit_status, int process);
+
 void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe);
+
+
+//--------typer.c-------------
+
+int 	typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int *exit_status);
+
+//---------PENDIENTE ORDENAR-----------
 
 int		ft_token_lst_size(t_token *lst);
 
@@ -90,6 +128,5 @@ int		ft_pwd(void);
 
 int		ft_env(t_env *env);
 
-int		g_signal;
 
 #endif
