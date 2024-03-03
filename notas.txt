@@ -18,8 +18,8 @@
 		- {cmd $AAA} -> ejecuta comando ✅
 		- {echo $AAA $HOME} -> ignora $AAA y ejecuta {echo $HOME} ✅
 	- '~' esto hay que expandirlo a la variable HOME ❌
-	- solo un comando com '$' -> Printea 'command not found', deberia ser 'is a directory' ❌
-	- '$$' se expande a username ❓❓❓
+	- solo un comando con '$' -> Printea 'command not found', deberia ser 'is a directory' ❌
+	- '$$' se expande a username ❓❓❓ -> Debe expandir a PID ❌
 - Implementar builtins
 	- echo (-n) ✅
 	- cd (relative/absolute path) ✅
