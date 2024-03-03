@@ -6,6 +6,9 @@
 	-RED_IN ✅
 		- En archivos sin permisos Permission denied no controlado ✅
 		- < test.c da SEGV EN exec_cmd ✅
+	-RED_OUT
+		-este caso cat test.c > te | cat test3 no funciona igual ❌
+		- cat test.c > te | cat este tampoco ❌
 -Heredoc ❌
 -Append ❌
 -[SOLVED✅]Invalid cmd
