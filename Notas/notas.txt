@@ -7,11 +7,11 @@
 		- En archivos sin permisos Permission denied no controlado ✅
 		- < test.c da SEGV EN exec_cmd ✅
 	-RED_OUT
-		-este caso cat tests/test.c > tet | cat tests/test3 no funciona igual ❌✅
+		-[SOLVED✅] este caso cat tests/test.c > tet | cat tests/test3 no funciona igual
 		- cat test.c > te | cat este tampoco ❌
-		-[SOLVED✅] cat > te | cat ❌
+		-[SOLVED✅] cat > te | cat 
 		-[SOLVED✅] < here.txt cat | wc > out.txt NO VA
-		- cat > tests/te | ca despues de interrupcion con ^C == exit_status 130, deberia ser 127
+		- cat > tests/te | ca despues de interrupcion con ^C == exit_status 130, deberia ser 127 ❌
 -Heredoc ❌
 -Append ❌
 -[SOLVED✅]Invalid cmd
@@ -28,13 +28,21 @@
 	- solo un comando con '$' -> Printea 'command not found', deberia ser 'is a directory' ❌
 	- '$$' se expande a username ❓❓❓ -> Debe expandir a PID ❌
 - Implementar builtins
-	- echo (-n) ✅
-	- cd (relative/absolute path) ✅
-	- pwd ✅
-	- export
-	- unset
-	- env ✅
-	- exit ✅
+	|-BUILTINS
+|     |-Echo (-n) ❌
+		- echo -nnnnnnn hola debe mostrar hola sin newline 
+		- echo -n -n -n -n -n hola debe mostrar hola sin newline 
+		- echo -nnnnn -n -n -n hola debe mostrar hola sin newline
+|     |-cd (relative/absolute path) ❌
+		- cd - debe llevarte a tu OLDPWD
+|	  |-pwd ✅
+|	  |-export
+|	  |-unset 
+|	  |-env ✅
+|	  |-exit ❌
+		- exit 12 debe hacer exit con el numero pasado por parametro
+		- exit 1234 24 no debe salir y muestra mensaje de error de "bash: exit: too many arguments" exit status en 1.
+		- exit 1243a si sale con el numero 255 y muestra el mensaje de error bash: exit: 1243a: numeric argument required
 - $? ✅
 - ctrl-C, ctrl-D, ctrl-\ [❌  Hace falta optimizar el codigo para simplificarlo] 
 	- ctrl-D dentro de child (cat) debe printear {Quit: 3} ❌ 
