@@ -95,6 +95,12 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			close(data_pipe->pipefd[1]); //cierra pipes
 			close(data_pipe->pipefd[0]);
 		}
+		else if (data_pipe->flag == NO && data_pipe->pipe_counter)
+		{
+			//dup2(data_pipe->og_stdout, 0); 
+			close(data_pipe->pipefd[1]); //cierra pipes
+			close(data_pipe->pipefd[0]);
+		}
 		if (ft_is_built_in(tokens))
 			exit(ft_exec_builtin(tokens, env));
 		if ((*tokens)->str[0] ==  '/')//en caso de ser posible ruta absoluta

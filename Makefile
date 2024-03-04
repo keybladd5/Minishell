@@ -64,7 +64,7 @@ $(NAME): $(OBJS)
 #NORMA PARA LIBFT
 makelibft:
 	@echo "${BLUE}Compiling Libft...${NC}"
-	@$(MAKE) -j 4 -C inc/libft/ & pid=$$!; \
+	@$(MAKE) -j -C inc/libft/ & pid=$$!; \
 	echo "."; \
 	while ps -p $$pid > /dev/null; do \
 		sleep 1; \
@@ -89,7 +89,7 @@ rdline:
 		sleep 1; \
 		echo "."; \
 	done;
-	@make -j 8 -C ./inc/readline/ &> /dev/null & pid=$$!; \
+	@make -j -C ./inc/readline/ &> /dev/null & pid=$$!; \
 	echo "."; \
 	while ps -p $$pid > /dev/null; do \
 		sleep 1; \

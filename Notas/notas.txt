@@ -7,10 +7,11 @@
 		- En archivos sin permisos Permission denied no controlado ✅
 		- < test.c da SEGV EN exec_cmd ✅
 	-RED_OUT
-		-este caso cat test.c > te | cat test3 no funciona igual ❌
+		-este caso cat tests/test.c > tet | cat tests/test3 no funciona igual ❌✅
 		- cat test.c > te | cat este tampoco ❌
-		- < here.txt cat | wc > out.txt NO VA COMO  ❌
-^C
+		-[SOLVED✅] cat > te | cat ❌
+		-[SOLVED✅] < here.txt cat | wc > out.txt NO VA
+		- cat > tests/te | ca despues de interrupcion con ^C == exit_status 130, deberia ser 127
 -Heredoc ❌
 -Append ❌
 -[SOLVED✅]Invalid cmd

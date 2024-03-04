@@ -43,7 +43,11 @@ int	ft_red_out_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
 	if (!data_redir->red_out_counter)
 		return (0);
 	while (dir_doc && dir_doc->type != RED_OUT) //busca el token '>'. Puede salir con la direccion del token o NULL si no lo ha encontrado
+	{	
+		if (dir_doc->type == PIPE)//esto es para que salga de la funcion y marcar los pipes como delimitadores 
+			return (0);
 		dir_doc = dir_doc->next;
+	}
 	if (!dir_doc)
 		return (0);
 	data_redir->red_out_counter--;
