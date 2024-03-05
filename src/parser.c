@@ -114,13 +114,10 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 			pipe(data_pipe->pipefd);
 			process++;
 			exec_cmd(&t_tmp, env, envp, data_pipe);
-			if (data_pipe->flag == YES)
-				dup2(data_pipe->pipefd[0], 0); 
-			else
-			{
-				dup2(data_pipe->og_stdin, 0);
-				dup2(data_pipe->og_stdout, 1);
-			}
+
+			//tiene que comunicar la tuberia contenga o no contenido siempre en la pipeline 
+			dup2(data_pipe->pipefd[0], 0); 
+			
 			close(data_pipe->pipefd[0]);
 			close(data_pipe->pipefd[1]);
 			data_pipe->pipe_counter--;
@@ -134,15 +131,17 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		if (t_current && (t_current->type == PIPE && !data_pipe->pipe_counter))
 		{
 			data_pipe->flag = NO;
+			dup2(data_pipe->og_stdout, 1); //esto ha hecho que funcione "cat tet1 > newfile | wc newfile" como debe
 			t_current = t_current->next;
 			ft_red_in_aux(data_redir, t_current, data_pipe);
 			ft_red_out_aux(data_redir, t_current, data_pipe);
-			ft_tokens_to_exec(&t_current, &t_tmp);	
+			ft_tokens_to_exec(&t_current, &t_tmp);
+
 			exec_cmd(&t_tmp, env, envp, data_pipe);
 			process++;
 			free_tokens(&t_tmp);
-			ft_wait_child_process(t_current->str, exit_status, process);
 			ft_aux_close(data_pipe, data_redir);
+			ft_wait_child_process(t_current->str, exit_status, process);
 			return ;
 		}
 		if (t_current)
