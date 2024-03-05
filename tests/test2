@@ -1,0 +1,21 @@
+test 2
+
+
+
+fin test 2
+
+
+
+
+cat <
+< cat 
+cat < noexist
+cat < noperm
+< noexiste cat
+< nopermis cat
+< noexiste 
+< nopermis 
+< noexiste |
+< nopermis |
+< noexiste >
+< nopermis >

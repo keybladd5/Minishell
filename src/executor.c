@@ -11,6 +11,32 @@
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
+
+void ft_wait_child_process(char *cmd, int *exit_status, int process)
+{
+	int status;
+	while (process)
+	{
+		wait(&status);
+		if (WIFEXITED(status))
+			*exit_status = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status)) //esta opcion no sera funcional hasta implementar signals en procesos hijos
+		{
+			if (WTERMSIG(status) == SIGINT)
+				*exit_status = 130;
+			else if (WTERMSIG(status) == SIGQUIT)
+				*exit_status = 131;
+		}
+		if (*exit_status == 127)
+		{
+			ft_putstr_fd("minishell: ", 2);
+			ft_putstr_fd(cmd, 2);
+			ft_putendl_fd(": command not found", 2);
+		}
+		process--;
+	}
+}
+
 int	ft_aux_abs(char *str)
 {
 	int	i;
@@ -37,85 +63,6 @@ int	ft_token_lst_size(t_token *lst)
 	return (i);
 }
 
-void	expansor(t_token **tokens, t_env **env, int exit_status)
-{
-	t_token *t_current; //token current
-	t_env	*e_current; //enviroment current
-	char	*tmp;
-	char	*str = NULL;
-	int		i;
-	int		x;
-
-	t_current = *tokens;
-	e_current = *env;
-	x = 0;
-
-	//hay que comprobar cuando hay caracteres de mas en la variable y los del principio del string
-	while (t_current)
-	{
-		i = 0;
-		tmp = t_current->str;
-		t_current->str = NULL;
-		while (tmp[i])
-		{
-			if (!ft_strncmp(tmp + i, "$", 1)) //si el primer caracter es un $ recorre el env hasta encontrar el contenido y sustituirlo
-			{
-				i++;
-				if (!tmp[i])
-					break;
-				x = i;
-				while(tmp[x] != '$' && !ft_isspace(tmp[x]) && tmp[x])
-					x++;
-				while (e_current)
-				{
-					if (!ft_strncmp(&(tmp[i]), e_current->key_name, x - i))
-					{
-						str = ft_strdup(e_current->value);
-						if (!str)
-							exit (MALLOC_ERROR);
-						i = x;
-						break ;
-					}
-					else if (!ft_strncmp(&(tmp[i]), "?", x - i))
-					{
-						str = ft_itoa(exit_status);
-						if (!str)
-							exit (MALLOC_ERROR);
-						i = x;
-						break ;
-					}
-					else
-						 e_current = e_current->next;
-				}
-				if (str && e_current)
-				{
-					t_current->str = ft_strjoin_f(t_current->str, str);
-					if (!t_current->str)
-						exit(MALLOC_ERROR);
-				}
-				else if (!e_current)
-					i = x;
-				e_current = *env;
-			}
-			else
-			{
-				i++;
-				if (tmp[i] == '$')
-				{
-					t_current->str = ft_substr(tmp, 0, i);
-					if (!t_current->str)
-						exit(MALLOC_ERROR);
-				}
-			}
-		}
-		if (!t_current->str)
-			t_current->str = tmp;
-		else
-			free (tmp);
-		t_current = t_current->next;
-	}
-}
-
 //fork, find the absolute path, get the argv to the comand (included comand name) check the acces and exec
 void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 {
@@ -127,7 +74,14 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 	char 	**cmd_argv = NULL;
 	t_env	*e_current = *env;
 
+	if (!*tokens)//proteccion para cuando no hay tokens que mandar
+		return ;
 	int pid = fork();
+	if (pid < 0)
+	{
+		perror("Fork error 😓");
+		exit(MALLOC_ERROR);
+	}
 	//dprintf(2, "%d\n", pid);
 	sig_init(0);//cambio anadido pendiente analizar🐸
 	if (pid == 0)
@@ -140,9 +94,15 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			dup2(data_pipe->pipefd[1], 1);//comunica la salida con la entrada del siguiente proceso
 			close(data_pipe->pipefd[1]); //cierra pipes
 			close(data_pipe->pipefd[0]);
-			if (ft_is_built_in(tokens))
-				exit(ft_exec_builtin(tokens, env));
 		}
+		else if (data_pipe->flag == NO && data_pipe->pipe_counter)
+		{
+			//dup2(data_pipe->og_stdout, 0); 
+			close(data_pipe->pipefd[1]); //cierra pipes
+			close(data_pipe->pipefd[0]);
+		}
+		if (ft_is_built_in(tokens))
+			exit(ft_exec_builtin(tokens, env));
 		if ((*tokens)->str[0] ==  '/')//en caso de ser posible ruta absoluta
 		{
 			flag_absoluthepath = 1; //flag activada
@@ -163,7 +123,7 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 		if (!cmd)
 			exit (MALLOC_ERROR);
 		//condicion temporal que acogera en una matriz todos los strings de la lista tokens
-		cmd_argv = (char **)malloc(sizeof(char * ) * ft_token_lst_size(*tokens) + 1); //crea la matriz a pasar al execve
+		cmd_argv = (char **)malloc(sizeof(char * ) * (ft_token_lst_size(*tokens) + 1)); //crea la matriz a pasar al execve
 		if (!cmd_argv)
 			exit(MALLOC_ERROR);
 		cmd_argv[ft_token_lst_size(*tokens)] = NULL;

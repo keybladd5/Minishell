@@ -1,0 +1,34 @@
+START
+|
+|-INIT ✅❓
+| |-Catch Environment ✅
+| |-Store stdin/out (dup) ❓
+| |-Store termios struct (tcgetattr(0, tc)) ❓
+|
+|-LOOP ⏳
+| |-Init Signals ✅
+| |-Read input (readline) ⏳
+| | |-Protection (if (!input)) ❗
+| | |-Add to history ✅❓
+| |   |-Only if(input[0]) ❓
+| |-Tokenizer/Lexer ⏳
+| |-Parser/Syntax ❗
+| |-Expander ❗
+| |-Executor ⏳
+|   |-BUILTINS
+|     |-Echo (-n) ❌
+		- echo -nnnnnnn hola debe mostrar hola sin newline 
+		- echo -n -n -n -n -n hola debe mostrar hola sin newline 
+		- echo -nnnnn -n -n -n hola debe mostrar hola sin newline
+|     |-cd (relative/absolute path) ❌
+		- cd - debe llevarte a tu OLDPWD
+|	  |-pwd ✅
+|	  |-export
+|	  |-unset 
+|	  |-env ✅
+|	  |-exit ❌
+		- exit 12 debe hacer exit con el numero pasado por parametro
+		- exit 1234 24 no debe salir y muestra mensaje de error de "bash: exit: too many arguments" exit status en 1.
+		- exit 1243a si sale con el numero 255 y muestra el mensaje de error bash: exit: 1243a: numeric argument required
+|
+|-CLEANUP ❓

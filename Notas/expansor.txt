@@ -1,0 +1,38 @@
+CASOS SIMPLES:
+- sitring smple -> no modificar
+- '$' -> o modificar
+- $VAR -> expandir a variable de entorno
+- $NOVAR -> ignorar variable inexistete
+- $$ -> expandir a PID
+- $? -> expandir a exit_status
+
+COMBOS:
+- string + $ -> mantener ambas
+- string + $VAR -> mantener string y expandir variable
+- string + $NOVAR -> mantener string y ignorar variable
+- string + $$ -> mantener string y expandir a PID
+- string + $? -> mantener string y expandir a exit_status
+
+- $ + string -> interpreta como variabble
+- $ + $ -> interpreta como $$
+- $ + $VAR/$NOVAR -> interpreta como $$+string -> expande a PID y matiene el string
+- $ + $$ -> interpreta como $$+$ -> expandir PID y mantener $
+- $ + $? -> innterpreta como $$+? -> expandir PID y mantener ?
+
+- $VAR + string -> interpreta como una unica variable
+- $VAR + $ -> expandir variable y mantener $
+- $VAR + $VAR/$$/$? -> expandir ambas
+- $VAR + $NOVAR -> expandir VAR y ignorar NOVAR
+
+- $NOVAR + string -> interpreta como una unica variable
+- $NOVAR + $ -> ignorar variable y mantener $
+- $NOVAR + $VAR/$$/$? -> ignorar NOVAR y expandir VAR/PID/exit_status
+- $NOVAR + $NOVAR -> ignorar ambas
+
+- $$ + string/$ -> expandir PID y mantener string/$
+- $$ + $VAR/$$/$? -> expandir ambas
+- $$ + $NOVAR -> expadndir PID e ignorar NOVAR
+
+- $? + string -> expandir exit_status y mantener string/$
+- $$ + $VAR/$$/$? -> expandir ambas
+- $$ + $NOVAR -> expadndir exit_status e ignorar NOVAR
