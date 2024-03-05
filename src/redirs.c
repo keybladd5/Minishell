@@ -52,7 +52,7 @@ int	ft_red_out_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
 		return (0);
 	data_redir->red_out_counter--;
 	data_redir->fd_outfile = open(dir_doc->next->str, O_WRONLY | O_CREAT | O_TRUNC, 0666 );
-	dup2(data_redir->fd_outfile, 1);
+	dup2(data_redir->fd_outfile, 1); // que pasa si movemos esto al proceso hijo?
 	if (data_pipe->pipe_counter)
 	{
 		close(data_redir->fd_outfile);
