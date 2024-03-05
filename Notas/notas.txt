@@ -8,7 +8,7 @@
 		- < test.c da SEGV EN exec_cmd ✅
 	-RED_OUT
 		-[SOLVED✅] este caso cat tests/test.c > tet | cat tests/test3 no funciona igual
-		- cat test.c > te | cat este tampoco ❌
+		-[SOLVED✅] cat test.c > te | cat este tampoco 
 		-[SOLVED✅] cat > te | cat 
 		-[SOLVED✅] < here.txt cat | wc > out.txt NO VA
 		- cat > tests/te | ca despues de interrupcion con ^C == exit_status 130, deberia ser 127 ❌
