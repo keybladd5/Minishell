@@ -40,6 +40,85 @@ void	ft_remove_token(t_token **tokens, t_token **t_current)
 	free (tmp_current);
 }
 
+void	ft_expand_variable(char **tmp, int *i, t_env **env, t_token **curr_token)
+{
+	int		x;
+	t_env	*curr_env;
+	char	*str;
+
+	x = *i;
+	curr_env = *env;
+	str = NULL;
+	while(*tmp[x] != '$' && !ft_isspace(*tmp[x]) && *tmp[x])
+		x++;
+	while (curr_env)
+	{
+		if (!ft_strncmp(&(tmp[*i]), curr_env->key_name, x - *i + 1))
+			;
+		else if (!ft_strncmp(&(tmp[*i]), "?", x - *i))
+			;
+		else
+			curr_env = curr_env->next;
+	}
+	if (str)
+		(*curr_token)->str = ft_strjoin_free((*curr_token)->str, str);
+	else
+		*i = x;
+}
+
+void	ft_expand_token(t_token **curr_token, char **tmp, t_env **env)
+{
+	int		i;
+
+	i = 0;
+	while (*tmp[i])
+	{
+		if (*tmp[i] == '$')
+		{
+			i++;
+			if (*tmp[i])
+				ft_expand_variable(tmp, &i, env, curr_token);
+		}
+		else
+		{
+			i++;
+			if (tmp[i] == '$')
+				{
+					(*curr_token)->str = ft_substr(tmp, 0, i);
+					if (!(*curr_token)->str)
+						exit(MALLOC_ERROR);
+				}
+		}
+	}
+}
+
+void	expansor(t_token **tokens, t_env **env, int exit_status)
+{
+	t_token	*curr_token;
+	char	*tmp;
+
+	curr_token = *tokens;
+	while (curr_token)
+	{
+		tmp = curr_token->str;
+		curr_token->str = NULL;
+		ft_expand_token(&curr_token, &tmp, env);
+		if (!curr_token->str && tmp[0] == '$' && tmp[1])
+		{
+			ft_remove_token(tokens, &curr_token);
+			free (tmp);
+		}
+		else
+		{
+			if (!curr_token->str)
+				curr_token->str = tmp;
+			else
+				free (tmp);
+			curr_token = curr_token->next;
+		}
+	}
+}
+
 void	expansor(t_token **tokens, t_env **env, int exit_status)
 {
 	t_token *t_current; //token current
@@ -71,7 +150,7 @@ void	expansor(t_token **tokens, t_env **env, int exit_status)
 					x++;
 				while (e_current)
 				{
-					if (!ft_strncmp(&(tmp[i]), e_current->key_name, x - i))
+					if (!ft_strncmp(&(tmp[i]), e_current->key_name, x - i + 1))
 					{
 						str = ft_strdup(e_current->value);
 						if (!str)
@@ -91,11 +170,7 @@ void	expansor(t_token **tokens, t_env **env, int exit_status)
 						 e_current = e_current->next;
 				}
 				if (str && e_current)
-				{
 					t_current->str = ft_strjoin_free(t_current->str, str);
-					if (!t_current->str)
-						exit(MALLOC_ERROR);
-				}
 				else
 					i = x;
 				e_current = *env;

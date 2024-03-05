@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../minishell.h"
 
 char	*ft_strjoin_free(char *s1, char *s2)
 {
@@ -22,14 +22,14 @@ char	*ft_strjoin_free(char *s1, char *s2)
 	{
 		rtrn = ft_strdup(s2);
 		if (!rtrn)
-			exit (1);
+			exit (MALLOC_ERROR);
 	}
 	else
 	{
 		i = ft_strlen(s1);
 		rtrn = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) +1));
 		if (!rtrn)
-			exit (1);
+			exit (MALLOC_ERROR);
 		rtrn = ft_memcpy(rtrn, s1, (int)i);
 		free(s1);
 		j = 0;

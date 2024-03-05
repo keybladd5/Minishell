@@ -17,17 +17,19 @@
 -[SOLVED✅]Invalid cmd
 -[SOLVED✅]rutas absolutas
 - ls -lR $HOME | wc PETA!!!! ❌
-- Env variables (Expansor) ✅
+- EXPANSOR ⏳
+	- Expandir variables de entorno
 	- El EXPANSOR no debe mantener strings como $varnoexist en la lista de tokens si no existen ❌ 
 		- {$AAA} -> newline ✅
 		- {$AAA cmd} -> ejecuta comando ✅
 		- {cmd $AAA} -> ejecuta comando ✅
 		- {echo $AAA $HOME} -> ignora $AAA y ejecuta {echo $HOME} ✅
 		- {echho $HOME$} -> expande $HOME y deja el ulltimo $
-	- '~' esto hay que expandirlo a la variable HOME ❌
 	- solo un comando con '$' -> Printea 'command not found', deberia ser 'is a directory' ❌
-	- '$$' se expande a username ❓❓❓ -> Debe expandir a PID ❌
-- Implementar builtins
+	- OTRAS EXPANSIONES (En otros proyectos no estan implementadas ❓❓❓)
+		- '$$' -> Debe expandir a PID ❌
+		- '~' esto hay que expandirlo a la variable HOME ❌
+- Implementar builtins ⏳
 	|-BUILTINS
 |     |-Echo (-n) ❌
 		- echo -nnnnnnn hola debe mostrar hola sin newline 
