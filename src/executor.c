@@ -95,9 +95,8 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			close(data_pipe->pipefd[1]); //cierra pipes
 			close(data_pipe->pipefd[0]);
 		}
-		else if (data_pipe->flag == NO && data_pipe->pipe_counter)
+		else if (data_pipe->flag == NO)
 		{
-			//dup2(data_pipe->og_stdout, 0); 
 			close(data_pipe->pipefd[1]); //cierra pipes
 			close(data_pipe->pipefd[0]);
 		}

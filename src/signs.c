@@ -17,7 +17,7 @@ void	ctrl_C(int *exit_status)
 {
 	if (g_signal == SIGINT)
 		*exit_status = EXIT_FAILURE;
-	//signal(SIGINT, SIG_IGN); //esta linea hace q no funcione CNTL_C para interrumpir comandos (cat)
+	signal(SIGINT, SIG_IGN);
 }
 
 //al recibir la señal SIGINT se ejecuta esta funcion, salta de linea y vuelve a mostrar el prompt
@@ -43,7 +43,7 @@ void	process_sig_handler(int sig)
 	}
 	else if (sig == SIGQUIT)
 	{
-		ft_putstr_fd("Quit: 3\n", 1);
+		ft_putstr_fd("^\\Quit: 3\n", 1);
 		g_signal = 131;
 	}
 }
