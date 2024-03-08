@@ -12,7 +12,7 @@
 
 #include "../inc/minishell.h"
 
-void ft_wait_child_process(char *cmd, int *exit_status, int process)
+void 	ft_wait_child_process(char *cmd, int *exit_status, int process)
 {
 	int status;
 	while (process)
@@ -37,7 +37,7 @@ void ft_wait_child_process(char *cmd, int *exit_status, int process)
 	}
 }
 
-int	ft_aux_abs(char *str)
+int		ft_aux_abs(char *str)
 {
 	int	i;
 
@@ -50,7 +50,7 @@ int	ft_aux_abs(char *str)
 }
 
 //aux to malloc size on the executor function
-int	ft_token_lst_size(t_token *lst)
+int		ft_token_lst_size(t_token *lst)
 {
 	int	i;
 
@@ -63,82 +63,71 @@ int	ft_token_lst_size(t_token *lst)
 	return (i);
 }
 
-//fork, find the absolute path, get the argv to the comand (included comand name) check the acces and exec
-void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
+void	ft_exec_absoluthe_path(t_token **tokens, char **envp)
 {
-	int 	i = 0;
-	int 	flag_absoluthepath = 0;
-	char 	**path = NULL;
-	char 	*cmd = NULL;
-	char 	*absolute_path = NULL;
-	char 	**cmd_argv = NULL;
-	t_env	*e_current = *env;
+	char 	**cmd_argv;
+	char	*absolute_path;
+	int 	i;
 
-	if (!*tokens)//proteccion para cuando no hay tokens que mandar
-		return ;
-	int pid = fork();
-	if (pid < 0)
+	i = 0;
+	absolute_path = (*tokens)->str; //setemos la variable directamente sin buscar en path
+	if (access(absolute_path, X_OK) != 0)
+		exit(127);
+	cmd_argv = (char **)malloc(sizeof(char * ) * (ft_token_lst_size(*tokens) + 1)); //crea la matriz a pasar al execve
+	if (!cmd_argv)
+		ft_error_system(MALLOC_ERROR);
+	cmd_argv[ft_token_lst_size(*tokens)] = NULL;
+	while (*tokens) //llena la matriz con todos los tokens PENDIENTE CAMBIAR
 	{
-		perror("Fork error 😓");
-		exit(MALLOC_ERROR);
+		if ((*tokens)->str[0] == '/')
+		{
+			cmd_argv[i] = ft_substr((*tokens)->str, ft_aux_abs((*tokens)->str), ft_strlen((*tokens)->str));
+			if (!cmd_argv[i])
+				ft_error_system(MALLOC_ERROR);
+			*tokens = (*tokens)->next;
+			if (!*tokens || (*tokens)->type != WORD)
+				break ;
+			i++;
+		}
+		cmd_argv[i] = ft_strdup((*tokens)->str);
+		if (!cmd_argv[i])
+			ft_error_system(MALLOC_ERROR);
+		*tokens = (*tokens)->next;
+		i++;
 	}
-	//dprintf(2, "%d\n", pid);
-	sig_init(0);//cambio anadido pendiente analizar🐸
-	if (pid == 0)
-	{
-		/*int loop = 1;
-		while (loop)
-		;*/
-		if (data_pipe->flag == YES && data_pipe->pipe_counter)
+	i = 0;
+	if (access(absolute_path, X_OK) == 0) //Checkea a validez de la ruta absoluta, si no lo es en el input es un NULL y no entra
+		execve(absolute_path, cmd_argv, envp);
+	exit(127);
+}
+
+void 	exec_cmd(t_token **tokens, t_env **env, char **envp)
+{
+	char 	**path;
+	char	**cmd_argv;
+	char 	*cmd;
+	char	*absolute_path;
+	int		i;
+
+	i = 0;
+	while (ft_strncmp("PATH", (*env)->key_name, 4) != 0) //LOCALIZA EL PATH si la flag no esta
 		{
-			dup2(data_pipe->pipefd[1], 1);//comunica la salida con la entrada del siguiente proceso
-			close(data_pipe->pipefd[1]); //cierra pipes
-			close(data_pipe->pipefd[0]);
-		}
-		else if (data_pipe->flag == NO)
-		{
-			close(data_pipe->pipefd[1]); //cierra pipes
-			close(data_pipe->pipefd[0]);
-		}
-		if (ft_is_built_in(tokens))
-			exit(ft_exec_builtin(tokens, env));
-		if ((*tokens)->str[0] ==  '/')//en caso de ser posible ruta absoluta
-		{
-			flag_absoluthepath = 1; //flag activada
-			absolute_path = (*tokens)->str; //setemos la variable directamente sin buscar en path
-			if (access(absolute_path, X_OK) != 0)
+			*env = (*env)->next;
+			if ((*env)->next == NULL)
 				exit(127);
 		}
-		while (ft_strncmp("PATH", e_current->key_name, 4) != 0 && !flag_absoluthepath) //LOCALIZA EL PATH si la flag no esta
-		{
-			e_current = e_current->next;
-			if (e_current->next == NULL)
-				exit(127);
-		}
-		path = ft_split(e_current->value, ':'); //lo splitea
-		if (!path)
-			exit (MALLOC_ERROR);
+		path = ft_split((*env)->value, ':'); //lo splitea
+		if (!path) 
+			ft_error_system(MALLOC_ERROR);
 		cmd = ft_strjoin("/", (*tokens)->str); //prepara el primer comando con el slash
 		if (!cmd)
-			exit (MALLOC_ERROR);
-		//condicion temporal que acogera en una matriz todos los strings de la lista tokens
+			ft_error_system(MALLOC_ERROR);
 		cmd_argv = (char **)malloc(sizeof(char * ) * (ft_token_lst_size(*tokens) + 1)); //crea la matriz a pasar al execve
 		if (!cmd_argv)
-			exit(MALLOC_ERROR);
+			ft_error_system(MALLOC_ERROR);
 		cmd_argv[ft_token_lst_size(*tokens)] = NULL;
-		while (*tokens) //llena la matriz con todos los tokens PENDIENTE CAMBIAR
+		while (*tokens)
 		{
-			if (flag_absoluthepath)
-			{
-				cmd_argv[i] = ft_substr((*tokens)->str, ft_aux_abs((*tokens)->str), ft_strlen((*tokens)->str));
-				if (!cmd_argv[i])
-					exit(MALLOC_ERROR);
-				*tokens = (*tokens)->next;
-				flag_absoluthepath = 0;
-				if (!*tokens || (*tokens)->type != WORD)
-					break ;
-				i++;
-			}
 			cmd_argv[i] = ft_strdup((*tokens)->str);
 			if (!cmd_argv[i])
 				exit(MALLOC_ERROR);
@@ -146,8 +135,6 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			i++;
 		}
 		i = 0;
-		if (access(absolute_path, X_OK) == 0) //Checkea a validez de la ruta absoluta, si no lo es en el input es un NULL y no entra
-				execve(absolute_path, cmd_argv, envp);
 		while (path[i]) //Checkea el access de ese primer token recibido 
 		{
 			absolute_path = ft_strjoin(path[i], cmd);
@@ -159,5 +146,42 @@ void	exec_cmd(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			i++;
 		}
 		exit(127);
+}
+
+//fork, find the absolute path, get the argv to the comand (included comand name) check the acces and exec
+void	executor(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
+{
+	int	pid;
+	
+	if (!*tokens)//proteccion para cuando no hay tokens que mandar
+		return ;
+	pid = fork();
+	dprintf(2, "%d\n", getpid());
+	if (pid < 0)
+		ft_error_system(FORK_ERROR);
+	sig_init(0);//cambio anadido pendiente analizar🐸
+	if (pid == 0)
+	{
+		int loop = 1;
+		while (loop)
+		;
+		if (data_pipe->flag == YES) //se elimina la ultima condicion ya que no entra por ahi
+		{
+			if (dup2(data_pipe->pipefd[1], 1) == -1)//comunica la salida con la entrada del siguiente proceso
+				ft_error_system(DUP2_ERROR);
+			close(data_pipe->pipefd[1]);
+			close(data_pipe->pipefd[0]);
+		}
+		else if (data_pipe->flag == NO)
+		{
+			close(data_pipe->pipefd[1]); //cierra pipes
+			close(data_pipe->pipefd[0]);
+		}
+		if (ft_is_built_in(tokens))
+			exit(ft_exec_builtin(tokens, env));
+		else if ((*tokens)->str[0] ==  '/')//en caso de ser posible ruta absoluta
+			ft_exec_absoluthe_path(tokens, envp);
+		else
+			exec_cmd(tokens, env, envp);
 	}
 }

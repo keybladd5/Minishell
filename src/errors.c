@@ -11,6 +11,20 @@
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
+void ft_error_system(int type)
+{
+	if (type == MALLOC_ERROR)
+		perror("system error -> malloc() error\n");
+	else if (type == DUP2_ERROR)
+		perror("system error -> dup2() error\n");
+	else if (type == DUP_ERROR)
+		perror("system error -> dup() error\n");
+	else if (type == FORK_ERROR)
+		perror("system error -> fork() error\n");
+	else if (type == CLOSE_ERROR)
+		perror("system error -> close() error\n");
+	exit(type);
+}
 
 //Muestra mensajes de error por el fd 2 y modifica el exit status
 int ft_error_syntax(int *exit_status, int name, t_token *t_current)
@@ -39,13 +53,13 @@ int ft_error_syntax(int *exit_status, int name, t_token *t_current)
 		{
 			tmp_abs_path = getcwd(NULL, 0);
 			if (!tmp_abs_path)
-				exit (MALLOC_ERROR);
+				ft_error_system(MALLOC_ERROR);
 			tmp_abs_path = ft_strjoin(tmp_abs_path, "/");
 			if (!tmp_abs_path)
-				exit(MALLOC_ERROR);
+				ft_error_system(MALLOC_ERROR);
 			tmp_abs_path = ft_strjoin_s(tmp_abs_path, t_current->str);
 			if (!tmp_abs_path)
-				exit(MALLOC_ERROR);
+				ft_error_system(MALLOC_ERROR);
 			//ft_putstr_fd(tmp_abs_path, 2); 4 debugg
 			if (access(tmp_abs_path, F_OK) != 0)
 			{

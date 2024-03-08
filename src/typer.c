@@ -14,6 +14,9 @@
 
 int typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int *exit_status)
 {
+	int first_token;
+
+	first_token = 1;
 	while(t_current)
 	{	
 		if (!ft_strncmp(t_current->str, "|\0", 2)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
@@ -21,7 +24,7 @@ int typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int
 			t_current->type = PIPE; //seteo type
 			data_pipe->pipe_counter++;
 			t_current = t_current->next;
-			if (!t_current)
+			if (!t_current || first_token) //variable anadida para el caso "| algo"
 				return (ft_error_syntax(exit_status, PIPE, NULL));
 		}
 		else if (!ft_strncmp(t_current->str, "<\0", 2)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
@@ -53,6 +56,7 @@ int typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int
 			t_current->type = WORD; //seteo type default
 			t_current = t_current->next;
 		}
+		first_token = 0;
 	}
 	return (0);
 }
