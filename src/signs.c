@@ -58,13 +58,16 @@ void	sig_init(int i)//cambio anadido pendiente analizar🐸
 	{
 		signal(SIGINT, sig_handler); //Init SIGINT (ctrl+C) para ejecutar sig_handler cuando la reciba
 		signal(SIGQUIT, SIG_IGN); //Init SIGQUIT (ctrl+\) para ignorarla
+		tcgetattr(0, &tc); //Guarda los atributos del FD 0 (STDIN) en la estructura
+		tc.c_lflag &= ~ECHOCTL; //Modifica la flag 'local mode' para desactivar el printeo de ctrl+(X) como ^(X)
+		tcsetattr(0, TCSANOW, &tc); //Devuelve los atributos modificados al FD 0 (STDIN)
 	}
 	else//cambio anadido pendiente analizar🐸
 	{
+		tcgetattr(0, &tc); //Guarda los atributos del FD 0 (STDIN) en la estructura
+		tc.c_lflag &= ~ECHOCTL; //Modifica la flag 'local mode' para desactivar el printeo de ctrl+(X) como ^(X)
+		tcsetattr(0, TCSANOW, &tc); //Devuelve los atributos modificados al FD 0 (STDIN)
 		signal(SIGINT, process_sig_handler);
 		signal(SIGQUIT, process_sig_handler);
 	}
-	tcgetattr(0, &tc); //Guarda los atributos del FD 0 (STDIN) en la estructura
-	tc.c_lflag &= ~ECHOCTL; //Modifica la flag 'local mode' para desactivar el printeo de ctrl+(X) como ^(X)
-	tcsetattr(0, TCSANOW, &tc); //Devuelve los atributos modificados al FD 0 (STDIN)
 }

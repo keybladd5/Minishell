@@ -26,7 +26,7 @@ int	ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
 		return (0);
 	data_redir->fd_infile = open(dir_doc->next->str, O_RDONLY);
 	data_redir->red_in_counter--;
-	if (dup2(data_redir->fd_infile, 0)== -1)
+	if (dup2(data_redir->fd_infile, 0) == -1)
 		ft_error_system(DUP2_ERROR);
 	if (data_pipe->pipe_counter)
 	{

@@ -85,12 +85,15 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		if (ft_is_built_in(&t_tmp))
 		{
 			*exit_status = ft_exec_builtin(&t_tmp, env);
+			free_tokens(&t_tmp);
+			free(data_pipe);
+			free(data_redir);
 			return ;
 		}
 		executor(&t_tmp, env, envp, data_pipe);
 		free_tokens(&t_tmp);
 		ft_wait_child_process(t_current->str, exit_status, 1);
-		//ft_aux_close(data_pipe, data_redir);
+		ft_aux_close(data_pipe, data_redir);
 		return ;
 	}
 	while(t_current)//PIPELINE
