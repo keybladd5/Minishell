@@ -156,15 +156,15 @@ void	executor(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 	if (!*tokens)//proteccion para cuando no hay tokens que mandar
 		return ;
 	pid = fork();
-	dprintf(2, "%d\n", getpid());
+	//dprintf(2, "%d\n", getpid());
 	if (pid < 0)
 		ft_error_system(FORK_ERROR);
 	sig_init(0);//cambio anadido pendiente analizar🐸
 	if (pid == 0)
 	{
-		int loop = 1;
+		/*int loop = 1;
 		while (loop)
-		;
+		;*/
 		if (data_pipe->flag == YES) //se elimina la ultima condicion ya que no entra por ahi
 		{
 			if (dup2(data_pipe->pipefd[1], 1) == -1)//comunica la salida con la entrada del siguiente proceso
@@ -172,11 +172,11 @@ void	executor(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			close(data_pipe->pipefd[1]);
 			close(data_pipe->pipefd[0]);
 		}
-		else if (data_pipe->flag == NO)
+		/*else if (data_pipe->flag == NO)
 		{
 			close(data_pipe->pipefd[1]); //cierra pipes
 			close(data_pipe->pipefd[0]);
-		}
+		}*/
 		if (ft_is_built_in(tokens))
 			exit(ft_exec_builtin(tokens, env));
 		else if ((*tokens)->str[0] ==  '/')//en caso de ser posible ruta absoluta
