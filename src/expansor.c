@@ -12,26 +12,26 @@
 
 #include "../inc/minishell.h"
 
-void	ft_remove_token(t_token **tokens, t_token **t_current)
+void	ft_remove_token(t_token **tokens, t_token **curr_token)
 {
 	t_token	*tmp_current;
 
 	tmp_current = NULL;
-	if (*tokens == *t_current)
+	if (*tokens == *curr_token)
 	{
-		*tokens = (*t_current)->next;
-		tmp_current = *t_current;
-		*t_current = (*t_current)->next;
+		*tokens = (*curr_token)->next;
+		tmp_current = *curr_token;
+		*curr_token = (*curr_token)->next;
 	}
 	else
 	{
 		while (*tokens)
 		{
-			if ((*tokens)->next == *t_current)
+			if ((*tokens)->next == *curr_token)
 			{
-				tmp_current = *t_current;
-				(*tokens)->next = (*t_current)->next;
-				*t_current = (*t_current)->next;
+				tmp_current = *curr_token;
+				(*tokens)->next = (*curr_token)->next;
+				*curr_token = (*curr_token)->next;
 				break ;
 			}
 			*tokens = (*tokens)->next;
@@ -40,7 +40,8 @@ void	ft_remove_token(t_token **tokens, t_token **t_current)
 	free (tmp_current);
 }
 
-void	ft_expand_variable(char **tmp, int *i, t_env **env, t_token **curr_token)
+void	ft_expand_variable(char **tmp, int *i, t_env **env, \
+t_token **curr_token)
 {
 	int		x;
 	t_env	*curr_env;
@@ -49,45 +50,62 @@ void	ft_expand_variable(char **tmp, int *i, t_env **env, t_token **curr_token)
 	x = *i;
 	curr_env = *env;
 	str = NULL;
-	while(*tmp[x] != '$' && !ft_isspace(*tmp[x]) && *tmp[x])
+	while (!ft_isalnum((*tmp)[x]) && !ft_isspace((*tmp)[x]) && (*tmp)[x])
 		x++;
 	while (curr_env)
 	{
-		if (!ft_strncmp(&(tmp[*i]), curr_env->key_name, x - *i + 1))
-			;
-		else if (!ft_strncmp(&(tmp[*i]), "?", x - *i))
-			;
+		if (!ft_strncmp(*tmp + *i, curr_env->key_name, x - *i))
+		{
+			str = ft_strdup(curr_env->value);
+			if (!str)
+				exit (MALLOC_ERROR);
+			break ;
+		}
 		else
 			curr_env = curr_env->next;
 	}
 	if (str)
 		(*curr_token)->str = ft_strjoin_free((*curr_token)->str, str);
-	else
-		*i = x;
+	*i = x;
 }
 
-void	ft_expand_token(t_token **curr_token, char **tmp, t_env **env)
+void	ft_expand_exitstatus(t_token **curr_token, int exit_status, int *i)
+{
+	char	*str;
+
+	str = ft_itoa(exit_status);
+	if (!str)
+		exit (MALLOC_ERROR);
+	(*curr_token)->str = ft_strjoin_free((*curr_token)->str, str);
+	(*i)++;
+}
+
+void	ft_expand_token(t_token **curr_token, char **tmp, t_env **env, \
+int exit_status)
 {
 	int		i;
 
 	i = 0;
-	while (*tmp[i])
+	while ((*tmp)[i])
 	{
-		if (*tmp[i] == '$')
+		if ((*tmp)[i] == '$')
 		{
-			i++;
-			if (*tmp[i])
+			if ((*tmp)[++i] == '?')
+				ft_expand_exitstatus(curr_token, exit_status, &i);
+			else if (ft_isalnum((*tmp)[i]))
 				ft_expand_variable(tmp, &i, env, curr_token);
+			else
+				(*curr_token)->str = ft_strjoin_free((*curr_token)->str, ft_strdup("$"));
 		}
 		else
 		{
 			i++;
-			if (tmp[i] == '$')
-				{
-					(*curr_token)->str = ft_substr(tmp, 0, i);
-					if (!(*curr_token)->str)
-						exit(MALLOC_ERROR);
-				}
+			if ((*tmp)[i] == '$' || !(*tmp)[i])
+			{
+				(*curr_token)->str = ft_strjoin_free((*curr_token)->str, ft_substr(*tmp, 0, i));
+				if (!(*curr_token)->str)
+					exit(MALLOC_ERROR);
+			}
 		}
 	}
 }
@@ -102,7 +120,7 @@ void	expansor(t_token **tokens, t_env **env, int exit_status)
 	{
 		tmp = curr_token->str;
 		curr_token->str = NULL;
-		ft_expand_token(&curr_token, &tmp, env);
+		ft_expand_token(&curr_token, &tmp, env, exit_status);
 		if (!curr_token->str && tmp[0] == '$' && tmp[1])
 		{
 			ft_remove_token(tokens, &curr_token);
@@ -118,7 +136,7 @@ void	expansor(t_token **tokens, t_env **env, int exit_status)
 		}
 	}
 }
-
+/*
 void	expansor(t_token **tokens, t_env **env, int exit_status)
 {
 	t_token *t_current; //token current
@@ -201,3 +219,4 @@ void	expansor(t_token **tokens, t_env **env, int exit_status)
 		}
 	}
 }
+*/

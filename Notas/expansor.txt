@@ -1,3 +1,8 @@
+REVIEW: 8/3
+
+/////ERRORES/////////
+- $VAR + metachar -> expande variable y concatena todo el string original. REvisar linea 105, substr no debe empezar en 0
+
 /////IMPLEMENTAR/////
 - echo $HOME> || echo $HOME<
 bash: syntax error near unexpected token `newline'
@@ -7,18 +12,18 @@ Heredoc
 
 /////SYNTAX/////
 CASOS SIMPLES:
-- sitring smple -> no modificar
+- sitring smple -> no modificar ✅
 - '~' -> expandir a $HOME ❓
-- '$' -> No modificar
-- $VAR -> expandir a variable de entorno
-- $NOVAR -> ignorar variable inexistete
+- '$' -> No modificar ✅
+- $VAR -> expandir a variable de entorno ✅
+- $NOVAR -> ignorar variable inexistete ✅
 - $$ -> expandir a PID ❓
-- $? -> expandir a exit_status
+- $? -> expandir a exit_status ✅
 
 COMBOS:
-- string + ~/$ -> mantener ambas
-- string + $VAR -> mantener string y expandir variable
-- string + $NOVAR -> mantener string y ignorar variable
+- string + ~/$ -> mantener ambas ✅
+- string + $VAR -> mantener string y expandir variable ✅
+- string + $NOVAR -> mantener string y ignorar variable ✅
 - string + $$ -> mantener string y expandir a PID ❓
 - string + $? -> mantener string y expandir a exit_status
 
