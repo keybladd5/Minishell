@@ -68,17 +68,31 @@ void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir)
 {
 	if (!data_pipe->pipe_counter)//pedniente modificar ya se hace dup2 de mas
 	{
-		//dup2(data_pipe->og_stdin, 0);
-		//dup2(data_pipe->og_stdout, 1);
 		if (dup2(data_pipe->og_stdin, 0) == -1)
 			ft_error_system(DUP2_ERROR);
 		if (dup2(data_pipe->og_stdout, 1) == -1)
 			ft_error_system(DUP2_ERROR);
 	}
-	close(data_redir->fd_infile);
-	close(data_redir->fd_outfile);
-	close(data_pipe->og_stdin);
-	close(data_pipe->og_stdout);
+	if (data_redir->fd_infile >= 0)
+	{
+		if (close(data_redir->fd_infile) == -1)
+			ft_error_system(CLOSE_ERROR);
+	}
+	if (data_redir->fd_outfile >= 0)
+	{
+		if (close(data_redir->fd_outfile) == -1)
+			ft_error_system(CLOSE_ERROR);
+	}
+	if (data_pipe->og_stdin >= 0)
+	{
+		if (close(data_pipe->og_stdin) == -1)
+			ft_error_system(CLOSE_ERROR);
+	}
+	if (data_pipe->og_stdout >= 0)
+	{
+		if (close(data_pipe->og_stdout) == -1)
+			ft_error_system(CLOSE_ERROR);
+	}
 	free(data_pipe);
 	free(data_redir);
 }

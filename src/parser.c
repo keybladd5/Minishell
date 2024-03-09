@@ -42,7 +42,10 @@ static void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 		if (!*new_tokens)
 			*new_tokens = tmp;
 		else
-			last->next = tmp;	
+		{
+			if (last)
+				last->next = tmp;
+		}	
 		last = tmp;
 		curr = curr->next;
 	}
@@ -73,8 +76,35 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	data_redir->fd_infile = -1;
 	data_redir->fd_outfile = -1;
 	t_current = *tokens;
-	if (typer_tokens(data_redir, t_current, data_pipe, exit_status))
-		return (ft_aux_close(data_pipe, data_redir));
+	if (typer_tokens(data_redir, &t_current, data_pipe, exit_status))
+	{
+		while(t_current && ft_strncmp(t_current->str, "|\0", 2))
+			t_current = t_current->next;
+		if (t_current && t_current->next)
+			t_current = t_current->next;
+		while(*tokens != t_current)
+		{
+			t_tmp = *tokens;
+			ft_remove_token(tokens, &t_tmp);
+			//free(t_tmp);
+		}
+		t_tmp = NULL;
+		/*if (*tokens && (*tokens)->next)
+			t_tmp = (*tokens)->next;
+		while (*tokens != t_current)
+		{
+			free((*tokens)->str);
+			free(*tokens);
+			*tokens = t_tmp;
+			if (*tokens && (*tokens)->next)
+				t_tmp = (*tokens)->next;
+		}
+		*tokens = t_current;*/
+		if (!t_current)
+			return (ft_aux_close(data_pipe, data_redir));
+		typer_tokens(data_redir, &t_current, data_pipe, exit_status);
+	
+	}
 	t_current = *tokens;
 	if (!data_pipe->pipe_counter && t_current)//SI SOLO HAY UN COMANDO 
 	{

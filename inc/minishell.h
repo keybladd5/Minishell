@@ -114,11 +114,11 @@ void	executor(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe);
 
 //--------typer.c-------------
 
-int 	typer_tokens(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe, int *exit_status);
+int 	typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, int *exit_status);
 
 //---------PENDIENTE ORDENAR-----------
 
-int		ft_token_lst_size(t_token *lst);
+void	ft_remove_token(t_token **tokens, t_token **t_current);
 
 void	expansor(t_token **tokens, t_env **env, int exit_status);
 

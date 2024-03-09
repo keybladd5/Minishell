@@ -54,7 +54,7 @@ int ft_error_syntax(int *exit_status, int name, t_token *t_current)
 			tmp_abs_path = getcwd(NULL, 0);
 			if (!tmp_abs_path)
 				ft_error_system(MALLOC_ERROR);
-			tmp_abs_path = ft_strjoin(tmp_abs_path, "/");
+			tmp_abs_path = ft_strjoin_s(tmp_abs_path, "/");
 			if (!tmp_abs_path)
 				ft_error_system(MALLOC_ERROR);
 			tmp_abs_path = ft_strjoin_s(tmp_abs_path, t_current->str);

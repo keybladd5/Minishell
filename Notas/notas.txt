@@ -6,7 +6,13 @@
 	-RED_IN ✅
 		- En archivos sin permisos Permission denied no controlado ✅
 		- < test.c da SEGV EN exec_cmd ✅
+		- < out cata | ls cuando si existe el DOC, DEBE DAR !MENSAJE DE ERROR! DE CATA Y NO DE LS  ❌ 
+	minishell: ls: command not found
+		- < ouat cata | ls cuando NO existe el DOC, debej ejecutar el segundo comando y no lo hace  ❌ 
 	-RED_OUT
+		- cat test > no_permission  | wc DEBE EJECUTAR SEGUNDO COMANDO Y NO LO HACE ❌ 
+		- cata > asd | ls DEBE DAR !MENSAJE DE ERROR! DE CATA Y NO DE LS  ❌ 
+minishell: ls: command not found
 		-[SOLVED✅] este caso cat tests/test.c > tet | cat tests/test3 no funciona igual
 		-[SOLVED✅] cat test.c > te | cat este tampoco 
 		-[SOLVED✅] cat > te | cat 

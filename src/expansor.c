@@ -37,6 +37,7 @@ void	ft_remove_token(t_token **tokens, t_token **t_current)
 			*tokens = (*tokens)->next;
 		}
 	}
+	free (tmp_current->str);
 	free (tmp_current);
 }
 
