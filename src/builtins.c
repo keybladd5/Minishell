@@ -6,26 +6,29 @@ int ft_is_built_in(t_token **tokens)
 {
 	if (!*tokens)
 		return (0);
-	if (!ft_strncmp("echo", (*tokens)->str, 4) || \
-	!ft_strncmp("cd", (*tokens)->str, 2) || \
-	!ft_strncmp("pwd", (*tokens)->str, 3) || \
-	!ft_strncmp("env", (*tokens)->str, 3) || \
-	!ft_strncmp("exit", (*tokens)->str, 4))
+	if (!ft_strncmp("echo\0", (*tokens)->str, 5) || \
+	!ft_strncmp("cd\0", (*tokens)->str, 3) || \
+	!ft_strncmp("pwd\0", (*tokens)->str, 4) || \
+	!ft_strncmp("env\0", (*tokens)->str, 4) || \
+	!ft_strncmp("export\0", (*tokens)->str, 7) || \
+	!ft_strncmp("exit\0", (*tokens)->str, 5))
 		return (1);
 	return (0);
 }
 
 int	ft_exec_builtin(t_token **tokens, t_env **env)
 {
-	if (!ft_strncmp("echo", (*tokens)->str, 4))
+	if (!ft_strncmp("echo\0", (*tokens)->str, 5))
 		return (ft_echo((*tokens)->next));
-	else if (!ft_strncmp("cd", (*tokens)->str, 2))
+	else if (!ft_strncmp("cd\0", (*tokens)->str, 3))
 		return (ft_cd((*tokens)->next, *env));
-	else if (!ft_strncmp("pwd", (*tokens)->str, 3))
+	else if (!ft_strncmp("pwd\0", (*tokens)->str, 4))
 		return (ft_pwd());
-	else if (!ft_strncmp("env", (*tokens)->str, 3))
+	else if (!ft_strncmp("env\0", (*tokens)->str, 4))
 		return (ft_env(*env));
-	else if (!ft_strncmp("exit", (*tokens)->str, 4))
+	else if (!ft_strncmp("export\0", (*tokens)->str, 7))
+		return (ft_export((*tokens)->next, *env));
+	else if (!ft_strncmp("exit\0", (*tokens)->str, 5))
 	{
 			ft_printf("exit\n");
 			exit(0);
@@ -150,4 +153,70 @@ int	ft_env(t_env *env)
 		env = env->next;
 	}
 	return (0);
+}
+
+//EXPORT
+//no args -> printea env list en formato {declare -x env->key_name="env->value"}
+//!!!{export A} -> segfault
+//!!!{export A=}
+static int	ft_isvalidkey(char *str)
+{
+	if (!(ft_isalpha(str[0]) || str[0] == '_'))
+		return 0;
+	while (*(++str) && *str != '=')
+	{
+		if (!(ft_isalnum(*str) || *str == '_'))
+			return 0;
+	}
+	return 1;
+}
+
+int	ft_export(t_token *tokens, t_env *env)
+{
+	t_env	*tmp;
+	t_env	*last;
+	char	*div;
+
+	if (!tokens)
+	{
+		while (env)
+		{
+			ft_putstr_fd("declare -x ", 1);
+			ft_putstr_fd(env->key_name, 1);
+			write(1, "=\"", 1);
+			ft_putstr_fd(env->value, 1);
+			ft_putendl_fd("\"", 1);
+			env = env->next;
+		}
+		return (1);
+	}
+	while (env->next)
+	{
+		last = env->next;
+		env = last;
+	}
+	while (tokens)
+	{
+		if (!ft_isvalidkey(tokens->str))
+		{
+			ft_putstr_fd("\033[31mminishell: export: `", 2);
+			ft_putstr_fd(tokens->str, 2);
+			ft_putstr_fd("': not a valid identifier\x1b[0m\n", 2);
+			return (0);
+		}
+		tmp = (t_env *)malloc(sizeof(t_env));
+		if (!tmp)
+			exit(MALLOC_ERROR);
+		div = ft_strchr(tokens->str, '=');
+		tmp->key_name = ft_substr(tokens->str, 0, (div - tokens->str));
+		if (!tmp->key_name)
+			exit (MALLOC_ERROR);
+		tmp->value = ft_substr(div+1, 0, ft_strlen(div));
+		if (!tmp->value)
+			exit (MALLOC_ERROR);
+		last->next = tmp;
+		last = tmp;
+		tokens = tokens->next;
+	}
+	return (1);
 }

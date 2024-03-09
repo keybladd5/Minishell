@@ -83,6 +83,9 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		if (ft_is_built_in(&t_tmp))
 		{
 			*exit_status = ft_exec_builtin(&t_tmp, env);
+			free_tokens(&t_tmp);
+			free(data_pipe);
+			free(data_redir);
 			return ;
 		}
 		exec_cmd(&t_tmp, env, envp, data_pipe);
@@ -147,6 +150,9 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		if (t_current)
 			t_current = t_current->next;
 	}
+	//SIN ESTO DA LEAKS CUANDO EL INPUT ESTA VACIO. COMPPROBAR QUE NO HAYA DOBLE FREE!!
+	free(data_pipe);
+	free(data_redir);
 }
 
 //El problema actual es que no se puede ejecutar el REDIR_IN en cualquier parte de la pipeline substituyendo los fds
