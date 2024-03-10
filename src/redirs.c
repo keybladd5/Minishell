@@ -28,7 +28,13 @@ int	ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
 	data_redir->red_in_counter--;
 	if (data_redir->fd_infile == -1)
 	{
+		if (t_current->type == WORD)
 		t_current->type = ERROR_WORD;
+		else if (t_current->type == RED_IN)
+		{
+			if (t_current && t_current->next && t_current->next->next)
+				t_current->next->next->type = ERROR_WORD;
+		}
 		return (1);
 	}
 	if (dup2(data_redir->fd_infile, 0) == -1)
