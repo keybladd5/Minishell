@@ -35,7 +35,11 @@ static void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 	t_token *curr = NULL;
 	curr = *og_tokens;
 	while (curr && curr->type != WORD)//para saltar casos como "< test cat" hasta la palabra necesaria para ejecutar como es el cat
+	{
+		if (curr->type == PIPE)
+			return ;
 		curr = curr->next;
+	}
 	while (curr && curr->type == WORD)
 	{
 		tmp = ft_tokendup(curr);
@@ -51,138 +55,133 @@ static void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 	}
 }
 
+void	ft_init_data_parser(t_parser *data, t_token **tokens, int *exit_status)
+{
+	data->process = 0;
+	data->t_tmp = NULL;
+	data->data_pipe = malloc(sizeof(t_pipe));
+	if (!data->data_pipe)
+		ft_error_system(MALLOC_ERROR);
+	data->data_redir = malloc(sizeof(t_redir));
+	if (!data->data_redir)
+		ft_error_system(MALLOC_ERROR);
+	data->data_redir->red_in_counter = 0;
+	data->data_redir->red_out_counter = 0;
+	data->data_pipe->og_stdin = dup(0);
+	data->data_pipe->og_stdout = dup(1);
+	if (data->data_pipe->og_stdin == -1 || data->data_pipe->og_stdout == -1)
+		ft_error_system(DUP_ERROR);
+	data->data_pipe->pipe_counter = 0;
+	data->data_redir->fd_infile = -1;
+	data->data_redir->fd_outfile = -1;
+	data->t_current = *tokens;
+	if (typer_tokens(data->data_redir, &data->t_current, data->data_pipe, exit_status))
+		data->t_current = NULL;
+	else
+		data->t_current = *tokens;
+}
 //Procesa los tokens de izquierda a derecha uno por uno.
 void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 {
-	t_token		*t_current;
-	t_token		*t_tmp = NULL;
+	/*t_token		*t_current;
+	t_token		*t_tmp;
 	t_pipe		*data_pipe;
 	t_redir		*data_redir;
-	int			process = 0;
+	int			process;*/
+	t_parser	*data;
 
-	data_pipe = malloc(sizeof(t_pipe));
-	if (!data_pipe)
+	data = malloc(sizeof(t_parser));
+	if (!data)
 		ft_error_system(MALLOC_ERROR);
-	data_redir = malloc(sizeof(t_redir));
-	if (!data_redir)
-		ft_error_system(MALLOC_ERROR);
-	data_redir->red_in_counter = 0;
-	data_redir->red_out_counter = 0;
-	data_pipe->og_stdin = dup(0);
-	data_pipe->og_stdout = dup(1);
-	if (data_pipe->og_stdin == -1 || data_pipe->og_stdout == -1)
-		ft_error_system(DUP_ERROR);
-	data_pipe->pipe_counter = 0;
-	data_redir->fd_infile = -1;
-	data_redir->fd_outfile = -1;
-	t_current = *tokens;
-	if (typer_tokens(data_redir, &t_current, data_pipe, exit_status))
+	ft_init_data_parser(data, tokens, exit_status);
+	/*data->t_current = *tokens;
+	typer_tokens(data->data_redir, &data->t_current, data->data_pipe, exit_status);
+	data->t_current = *tokens;*/
+	if (!data->data_pipe->pipe_counter && data->t_current)//SI SOLO HAY UN COMANDO 
 	{
-		while(t_current && ft_strncmp(t_current->str, "|\0", 2))
-			t_current = t_current->next;
-		if (t_current && t_current->next)
-			t_current = t_current->next;
-		while(*tokens != t_current)
+		ft_red_in_aux(data->data_redir, data->t_current,data->data_pipe);
+		ft_red_out_aux(data->data_redir, data->t_current, data->data_pipe);
+		data->data_pipe->flag = NO;
+		ft_tokens_to_exec(&data->t_current, &data->t_tmp);
+		if (ft_is_built_in(&data->t_tmp))
 		{
-			t_tmp = *tokens;
-			ft_remove_token(tokens, &t_tmp);
-			//free(t_tmp);
-		}
-		t_tmp = NULL;
-		/*if (*tokens && (*tokens)->next)
-			t_tmp = (*tokens)->next;
-		while (*tokens != t_current)
-		{
-			free((*tokens)->str);
-			free(*tokens);
-			*tokens = t_tmp;
-			if (*tokens && (*tokens)->next)
-				t_tmp = (*tokens)->next;
-		}
-		*tokens = t_current;*/
-		if (!t_current)
-			return (ft_aux_close(data_pipe, data_redir));
-		typer_tokens(data_redir, &t_current, data_pipe, exit_status);
-	
-	}
-	t_current = *tokens;
-	if (!data_pipe->pipe_counter && t_current)//SI SOLO HAY UN COMANDO 
-	{
-		ft_red_in_aux(data_redir, t_current, data_pipe);
-		ft_red_out_aux(data_redir, t_current, data_pipe);
-		data_pipe->flag = NO;
-		ft_tokens_to_exec(&t_current, &t_tmp);
-		if (ft_is_built_in(&t_tmp))
-		{
-			*exit_status = ft_exec_builtin(&t_tmp, env);
-			free_tokens(&t_tmp);
-			free(data_pipe);
-			free(data_redir);
+			*exit_status = ft_exec_builtin(&data->t_tmp, env);
+			free_tokens(&data->t_tmp);
+			free(data->data_pipe);
+			free(data->data_redir);
 			return ;
 		}
-		executor(&t_tmp, env, envp, data_pipe);
-		free_tokens(&t_tmp);
-		ft_wait_child_process(t_current->str, exit_status, 1);
-		ft_aux_close(data_pipe, data_redir);
+		executor(&data->t_tmp, env, envp, data->data_pipe);
+		free_tokens(&data->t_tmp);
+		ft_wait_child_process(data->t_current->str, exit_status, 1);
+		ft_aux_close(data->data_pipe, data->data_redir);
+		free(data);
 		return ;
 	}
-	while(t_current)//PIPELINE
+	while(data->t_current)//PIPELINE
 	{
-		while ((t_current && t_current->type != WORD) || (t_current->next && t_current->next->type == RED_IN ))//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
+		while ((data->t_current && data->t_current->type != WORD) || (data->t_current &&\
+		 data->t_current->next && data->t_current->next->type == RED_IN) )//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
 		{
-			if (ft_red_in_aux(data_redir, t_current, data_pipe))
+			if (ft_red_in_aux(data->data_redir, data->t_current, data->data_pipe))
+			{
+				data->data_pipe->flag = NO;
 				break ;
-			/*if (ft_red_out_aux(data_redir, t_current, data_pipe))
-				break ;*/
-			t_current = t_current->next;
+			}
+			//if (ft_red_out_aux(data_redir, t_current, data_pipe))
+				//break ;
+			data->t_current = data->t_current->next;
 		}
 		//entra aqui si hay pipes leidas, y ejecuta hasta nodos hasta la pipe(en el exec)
-		if (t_current && data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
+		if (data->t_current && data->data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
 		{
-			if (ft_red_out_aux(data_redir, t_current, data_pipe))
-				data_pipe->flag = NO;
+			/*if (ft_red_in_aux(data_redir, t_current, data_pipe))
+				data_pipe->flag = NO;*/
+			if (ft_red_out_aux(data->data_redir, data->t_current, data->data_pipe))
+				data->data_pipe->flag = NO;
 			else
-				data_pipe->flag = YES;
-			ft_tokens_to_exec(&t_current, &t_tmp);
-			pipe(data_pipe->pipefd);
-			process++;
-			executor(&t_tmp, env, envp, data_pipe);
-			if (dup2(data_pipe->pipefd[0], 0)== -1) //tiene que comunicar la tuberia contenga o no contenido siempre en la pipeline 
+				data->data_pipe->flag = YES;
+			ft_tokens_to_exec(&data->t_current, &data->t_tmp);
+			pipe(data->data_pipe->pipefd);
+			data->process++;
+			executor(&data->t_tmp, env, envp, data->data_pipe);
+			if (dup2(data->data_pipe->pipefd[0], 0)== -1) //tiene que comunicar la tuberia contenga o no contenido siempre en la pipeline 
 				ft_error_system(DUP2_ERROR);
-			close(data_pipe->pipefd[0]);
-			close(data_pipe->pipefd[1]);
-			data_pipe->pipe_counter--;
-			free_tokens(&t_tmp);
+			close(data->data_pipe->pipefd[0]);
+			close(data->data_pipe->pipefd[1]);
+			data->data_pipe->pipe_counter--;
+			free_tokens(&data->t_tmp);
 			
 		}
 		//ahora quiero iterar hasta que los nodos sean de otro comando, los diferencia el nodo pipe
-		while (t_current && !(t_current->type == PIPE))
-			t_current = t_current->next;
+		while (data->t_current && !(data->t_current->type == PIPE))
+			data->t_current = data->t_current->next;
 		//caso del ultimo comando a ejecutar, donde se recoge el exit status
-		if (t_current && (t_current->type == PIPE && !data_pipe->pipe_counter))
+		if (data->t_current && (data->t_current->type == PIPE && !data->data_pipe->pipe_counter))
 		{
-			data_pipe->flag = NO;
-			if (dup2(data_pipe->og_stdout, 1) == -1) //esto ha hecho que funcione "cat tet1 > newfile | wc newfile" como debe
+			data->data_pipe->flag = NO;
+			if (dup2(data->data_pipe->og_stdout, 1) == -1) //esto ha hecho que funcione "cat tet1 > newfile | wc newfile" como debe
 				ft_error_system(DUP2_ERROR);
-			t_current = t_current->next;
-			ft_red_in_aux(data_redir, t_current, data_pipe);
-			ft_red_out_aux(data_redir, t_current, data_pipe);
-			ft_tokens_to_exec(&t_current, &t_tmp);
-			executor(&t_tmp, env, envp, data_pipe);
-			process++;
-			free_tokens(&t_tmp);
-			if (dup2(data_pipe->og_stdin, 0) == -1) //esto ha hecho que funcione "cat tet1 > newfile | wc newfile" como debe
+			data->t_current = data->t_current->next;
+			ft_red_in_aux(data->data_redir, data->t_current, data->data_pipe);
+			ft_red_out_aux(data->data_redir, data->t_current, data->data_pipe);
+			ft_tokens_to_exec(&data->t_current, &data->t_tmp);
+			executor(&data->t_tmp, env, envp, data->data_pipe);
+			data->process++;
+			free_tokens(&data->t_tmp);
+			if (dup2(data->data_pipe->og_stdin, 0) == -1) //esto ha hecho que funcione "cat tet1 > newfile | wc newfile" como debe
 				ft_error_system(DUP2_ERROR);
-			ft_aux_close(data_pipe, data_redir);
-			ft_wait_child_process(t_current->str, exit_status, process);
-			return ;
+			ft_aux_close(data->data_pipe, data->data_redir);
+			ft_wait_child_process(data->t_current->str, exit_status, data->process);
+			return (free(data));
 		}
-		if (t_current)
-			t_current = t_current->next;
+		if (data->t_current)
+			data->t_current = data->t_current->next;
 	}
 	//SIN ESTO DA LEAKS CUANDO EL INPUT ESTA VACIO. COMPPROBAR QUE NO HAYA DOBLE FREE!!
-	free(data_pipe);
-	free(data_redir);
+	free(data->data_pipe);
+	free(data->data_redir);
+	free(data);
 }
 
 //El problema actual es que no se puede ejecutar el REDIR_IN en cualquier parte de la pipeline substituyendo los fds

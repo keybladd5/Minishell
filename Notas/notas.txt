@@ -8,10 +8,12 @@
 		- En archivos sin permisos Permission denied no controlado ✅
 		- < test.c da SEGV EN exec_cmd ✅
 		- < out cata | ls cuando si existe el DOC, DEBE DAR !MENSAJE DE ERROR! DE CATA Y NO DE LS  ❌ 
+		- cat < asd | cat Makefile | ls | cat < asd NO FUNVIONA igual ✅
+		- cat Makefile | cat < asd | ls ROMPE EL PROGRAMA ✅
 	minishell: ls: command not found
-		- < ouat cata | ls cuando NO existe el DOC, debej ejecutar el segundo comando y no lo hace  ❌ 
+		- < ouat cata | ls cuando NO existe el DOC, debej ejecutar el segundo comando y no lo hace  ✅
 	-RED_OUT
-		- cat test > no_permission  | wc DEBE EJECUTAR SEGUNDO COMANDO Y NO LO HACE ❌ 
+		- cat test > no_permission  | wc DEBE EJECUTAR SEGUNDO COMANDO Y NO LO HACE ✅
 		- cata > asd | ls DEBE DAR !MENSAJE DE ERROR! DE CATA Y NO DE LS  ❌ 
 minishell: ls: command not found
 		-[SOLVED✅] este caso cat tests/test.c > tet | cat tests/test3 no funciona igual
@@ -54,8 +56,8 @@ minishell: ls: command not found
 		- exit 1243a si sale con el numero 255 y muestra el mensaje de error bash: exit: 1243a: numeric argument required
 - $? ✅
 - ctrl-C, ctrl-D, ctrl-\ [❌  Hace falta optimizar el codigo para simplificarlo] 
-	- ctrl-D dentro de child (cat) debe printear {Quit: 3} ❌ 
-
+	- ctrl-D dentro de child (cat) debe printear {Quit: 3} ✅
+	- cat | cat | cat | cmd + ctrl-C -> pone exit_status en 130, deberia ser el return del ultimo cmd ❌
 
 gcc src/mminishell.c libft/libft.a -lreadline -ltermcap
 

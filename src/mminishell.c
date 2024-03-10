@@ -23,6 +23,12 @@
 		current = current->next;
 	}
 }*/
+int		ft_ismetachar(char c)
+{
+	if (c == '|' || c == '<' || c == '>')
+		return (1);
+	return (0);
+}
 //free the list do it by lexer
 void free_tokens(t_token **head)
 {
