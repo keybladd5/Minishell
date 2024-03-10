@@ -83,20 +83,12 @@ void	ft_init_data_parser(t_parser *data, t_token **tokens, int *exit_status)
 //Procesa los tokens de izquierda a derecha uno por uno.
 void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 {
-	/*t_token		*t_current;
-	t_token		*t_tmp;
-	t_pipe		*data_pipe;
-	t_redir		*data_redir;
-	int			process;*/
 	t_parser	*data;
 
 	data = malloc(sizeof(t_parser));
 	if (!data)
 		ft_error_system(MALLOC_ERROR);
 	ft_init_data_parser(data, tokens, exit_status);
-	/*data->t_current = *tokens;
-	typer_tokens(data->data_redir, &data->t_current, data->data_pipe, exit_status);
-	data->t_current = *tokens;*/
 	if (!data->data_pipe->pipe_counter && data->t_current)//SI SOLO HAY UN COMANDO 
 	{
 		ft_red_in_aux(data->data_redir, data->t_current,data->data_pipe);
@@ -128,15 +120,11 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 				data->data_pipe->flag = NO;
 				break ;
 			}
-			//if (ft_red_out_aux(data_redir, t_current, data_pipe))
-				//break ;
 			data->t_current = data->t_current->next;
 		}
 		//entra aqui si hay pipes leidas, y ejecuta hasta nodos hasta la pipe(en el exec)
 		if (data->t_current && data->data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
 		{
-			/*if (ft_red_in_aux(data_redir, t_current, data_pipe))
-				data_pipe->flag = NO;*/
 			if (ft_red_out_aux(data->data_redir, data->t_current, data->data_pipe))
 				data->data_pipe->flag = NO;
 			else
@@ -184,4 +172,3 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	free(data);
 }
 
-//El problema actual es que no se puede ejecutar el REDIR_IN en cualquier parte de la pipeline substituyendo los fds
