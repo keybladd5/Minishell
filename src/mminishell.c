@@ -68,14 +68,59 @@ void ft_catch_env(char **envp, t_env **head)
 	last->next = NULL;
 }
 //aux lexer
+
+int		ft_ismetachar(char c)
+{
+	if (c == '|' || c == '<' || c == '>')
+		return (1);
+	return (0);
+}
+///OLD VERSIOn///
 int		ft_tokenlen(char *input)
 {
 	int	len;
 
 	len = 0;
-	while (!ft_isspace(input[len]) && input[len]) // CAMBIO! ahora acepta cualquier tipo de caracter hasta espacio o  NULL como token
-		len++;
+	/////
+	
+	/////
+	if (ft_ismetachar(*input))
+		while (ft_ismetachar(input[len]) && input[len])
+			len++;
+	else
+		while (!ft_ismetachar(input[len]) && !ft_isspace(input[len]) && input[len]) // CAMBIO! ahora acepta cualquier tipo de caracter hasta espacio o  NULL como token
+			len++;
 	return (len);
+}
+///NOT FULLLY TESTED////
+void	ft_createtoken(t_token **curr_token, char *input, int *i)
+{
+	int	j;
+	
+	j = *i;
+	while (input[j] && !ft_isspace(input[j]))
+	{
+		if (input[j] == '"')
+		{
+			j++;
+			while (input[j] != '"')
+				j++;
+			(*curr_token)->str = ft_strjoin_free((*curr_token)->str, ft_substr(input, *i + 1, j - (*i + 1)));
+			(*curr_token)->type = WORD;
+			j++;
+		}
+		else 
+		{
+			if (ft_ismetachar(input[j]))
+				while (input[j] && ft_ismetachar(input[j]))
+					j++;
+			else
+				while (input[j] && !ft_ismetachar(input[j]) && !ft_isspace(input[j]))
+					j++;
+			(*curr_token)->str = ft_strjoin_free((*curr_token)->str, ft_substr(input, *i, j - *i));
+		}
+		*i = j;
+	}
 }
 
 //split all words by spaces in a linked list
@@ -95,13 +140,16 @@ void	lexer(t_token **tokens, char *input)
 			exit(MALLOC_ERROR);
 		tmp->str = NULL;
 		tmp->type = 0;
-		tmp->next = NULL; 
+		tmp->next = NULL;
+		ft_createtoken(&tmp, input, &i);
+		/*
 		tmp->str = ft_substr(input, i, ft_tokenlen(input + i));
 		if (!tmp->str)
 			exit (MALLOC_ERROR);
 		i += ft_tokenlen(input + i);
+		*/
 		if (!*tokens)
-				*tokens = tmp;
+			*tokens = tmp;
 		else
 			last->next = tmp;
 		last = tmp;
