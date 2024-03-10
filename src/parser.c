@@ -35,7 +35,11 @@ static void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 	t_token *curr = NULL;
 	curr = *og_tokens;
 	while (curr && curr->type != WORD)//para saltar casos como "< test cat" hasta la palabra necesaria para ejecutar como es el cat
+	{
+		if (curr->type == PIPE)
+			return ;
 		curr = curr->next;
+	}
 	while (curr && curr->type == WORD)
 	{
 		tmp = ft_tokendup(curr);
@@ -76,7 +80,8 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	data_redir->fd_infile = -1;
 	data_redir->fd_outfile = -1;
 	t_current = *tokens;
-	if (typer_tokens(data_redir, &t_current, data_pipe, exit_status))
+	typer_tokens(data_redir, &t_current, data_pipe, exit_status);
+	/*if (typer_tokens(data_redir, &t_current, data_pipe, exit_status))
 	{
 		while(t_current && ft_strncmp(t_current->str, "|\0", 2))
 			t_current = t_current->next;
@@ -89,22 +94,10 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 			//free(t_tmp);
 		}
 		t_tmp = NULL;
-		/*if (*tokens && (*tokens)->next)
-			t_tmp = (*tokens)->next;
-		while (*tokens != t_current)
-		{
-			free((*tokens)->str);
-			free(*tokens);
-			*tokens = t_tmp;
-			if (*tokens && (*tokens)->next)
-				t_tmp = (*tokens)->next;
-		}
-		*tokens = t_current;*/
 		if (!t_current)
 			return (ft_aux_close(data_pipe, data_redir));
 		typer_tokens(data_redir, &t_current, data_pipe, exit_status);
-	
-	}
+	}*/
 	t_current = *tokens;
 	if (!data_pipe->pipe_counter && t_current)//SI SOLO HAY UN COMANDO 
 	{
@@ -131,14 +124,19 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		while ((t_current && t_current->type != WORD) || (t_current->next && t_current->next->type == RED_IN ))//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
 		{
 			if (ft_red_in_aux(data_redir, t_current, data_pipe))
+			{
+				data_pipe->flag = NO;
 				break ;
-			/*if (ft_red_out_aux(data_redir, t_current, data_pipe))
-				break ;*/
+			}
+			//if (ft_red_out_aux(data_redir, t_current, data_pipe))
+				//break ;
 			t_current = t_current->next;
 		}
 		//entra aqui si hay pipes leidas, y ejecuta hasta nodos hasta la pipe(en el exec)
 		if (t_current && data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
 		{
+			/*if (ft_red_in_aux(data_redir, t_current, data_pipe))
+				data_pipe->flag = NO;*/
 			if (ft_red_out_aux(data_redir, t_current, data_pipe))
 				data_pipe->flag = NO;
 			else
