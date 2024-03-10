@@ -37,6 +37,7 @@
 # define RED_IN 6
 # define RED_OUT 7
 # define DOC 8
+# define ERROR_WORD 9
 
 //SIMPLE LINKED LIST PARA ENVIROMENT
 typedef struct s_env
@@ -75,7 +76,7 @@ typedef struct s_redir
 
 //--------errors.c-----------
 
-int 	ft_error_syntax(int *exit_status, int name, t_token *t_current);
+void 	ft_error_syntax(int *exit_status, int name, t_token *t_current);
 
 void 	ft_error_system(int type);
 
@@ -114,7 +115,7 @@ void	executor(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe);
 
 //--------typer.c-------------
 
-int 	typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, int *exit_status);
+void 	typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, int *exit_status);
 
 //---------PENDIENTE ORDENAR-----------
 
