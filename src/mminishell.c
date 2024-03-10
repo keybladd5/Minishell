@@ -96,8 +96,10 @@ int		ft_tokenlen(char *input)
 void	ft_createtoken(t_token **curr_token, char *input, int *i)
 {
 	int	j;
+	int	flag;
 	
 	j = *i;
+	flag = 0;
 	while (input[j] && !ft_isspace(input[j]))
 	{
 		if (input[j] == '"')
@@ -112,14 +114,24 @@ void	ft_createtoken(t_token **curr_token, char *input, int *i)
 		else 
 		{
 			if (ft_ismetachar(input[j]))
+			{
 				while (input[j] && ft_ismetachar(input[j]))
 					j++;
+				if (input[j])
+					flag = 1;
+			}
 			else
+			{
 				while (input[j] && !ft_ismetachar(input[j]) && !ft_isspace(input[j]) && input[j] != '"' /*&& input[j] != '\''*/)
 					j++;
+				if (input[j] && input[j] != '"' /*&& input[j] != '\''*/)
+					flag = 1;
+			}
 			(*curr_token)->str = ft_strjoin_free((*curr_token)->str, ft_substr(input, *i, j - *i));
 		}
 		*i = j;
+		if (flag)
+			break ;
 	}
 }
 
