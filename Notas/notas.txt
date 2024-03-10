@@ -1,7 +1,8 @@
 
 -Makefile ✅ [PENDIENTE TESTS DE RELINK]
 -Pipeline ✅ [Hace falta optimizar el codigo para simplificarlo]
--QUOTES ❌
+-QUOTES
+	- "$"AAA -> lo convierte a $AAA y intenta expandir la variable, se tiene que quedar como $AAA ❌
 -Redirections
 	-RED_IN ✅
 		- En archivos sin permisos Permission denied no controlado ✅

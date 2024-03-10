@@ -18,8 +18,10 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, in
 
 	first_token = 1;//variable anadida para el caso "| algo"
 	while(*t_current)
-	{	
-		if (!ft_strncmp((*t_current)->str, "|\0", 2)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
+	{
+		if ((*t_current)->type == WORD)
+			(*t_current) = (*t_current)->next;
+		else if (!ft_strncmp((*t_current)->str, "|\0", 2)) //si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
 		{
 			(*t_current)->type = PIPE; //seteo type
 			data_pipe->pipe_counter++;

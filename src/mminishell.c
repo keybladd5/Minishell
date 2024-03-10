@@ -115,7 +115,7 @@ void	ft_createtoken(t_token **curr_token, char *input, int *i)
 				while (input[j] && ft_ismetachar(input[j]))
 					j++;
 			else
-				while (input[j] && !ft_ismetachar(input[j]) && !ft_isspace(input[j]))
+				while (input[j] && !ft_ismetachar(input[j]) && !ft_isspace(input[j]) && input[j] != '"' /*&& input[j] != '\''*/)
 					j++;
 			(*curr_token)->str = ft_strjoin_free((*curr_token)->str, ft_substr(input, *i, j - *i));
 		}
