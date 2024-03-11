@@ -12,7 +12,7 @@
 
 #include "../inc/minishell.h"
 
-static void	ft_err_red_metachar(int *exit_status, int name, t_token *t_current)
+static void	ft_err_red_metachar(t_token *t_current)
 {
 	ft_putstr_fd("\033[31mminishell: syntax error near unexpected token `", 2);
 	if (!ft_strncmp(t_current->str, ">>", 2) \
@@ -26,7 +26,7 @@ static void	ft_err_red_metachar(int *exit_status, int name, t_token *t_current)
 	ft_putstr_fd("'\x1b[0m\n", 2);
 }
 
-static void	ft_err_red_errorfile(int *exit_status, int name, t_token *t_current)
+static void	ft_err_red_errorfile(int *exit_status, t_token *t_current)
 {
 	char	*tmp_abs_path;
 
@@ -69,10 +69,10 @@ void	ft_error_syntax(int *exit_status, int name, t_token *t_current)
 			|| !ft_strncmp(t_current->str, ">", 1) || \
 			!ft_strncmp(t_current->str, ">>", 2) || \
 			!ft_strncmp(t_current->str, "<<", 1))) //si es algun meta caracter
-			ft_err_red_metachar(exit_status, name, t_current);
+			ft_err_red_metachar(t_current);
 		else if (t_current)
 		{
-			ft_err_red_errorfile(exit_status, name, t_current);
+			ft_err_red_errorfile(exit_status, t_current);
 			return ;
 		}
 		else
