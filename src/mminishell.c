@@ -226,13 +226,13 @@ void 	input_loop(t_env **env, char **envp)
 	}
 }
 
-int main(int argc, char *argv[], char **envp)
+int	main(int argc, char *argv[], char **envp)
 {
-	t_env	*head = NULL;
+	t_env	*head;
 
+	head = NULL;
 	if (argc != 1 || !argv[0] || !envp[0])
 		return (1);
-
 	ft_catch_env(envp, &head);
 	input_loop(&head, envp);
 	return (0);

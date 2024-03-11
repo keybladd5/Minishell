@@ -14,7 +14,7 @@ NAME 		= Minishell
 
 SRCS 		=  src/mminishell.c src/builtins.c src/executor.c \
 			src/parser.c src/expansor.c src/redirs.c src/signs.c \
-			src/typer.c src/errors.c 
+			src/typer.c src/errors.c src/here_doc.c
 
 INCLUDES 	= inc/minishell.h
 
