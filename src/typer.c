@@ -91,7 +91,7 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 			}
 			else
 				data_heredoc->heredoc_counter++;
-			(*t_current)->type = DOC;
+			(*t_current)->type = LIMITER;
 			consecutive_metachar = 0;
 			*t_current = (*t_current)->next;
 		}

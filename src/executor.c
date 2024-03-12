@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Meritxu <Meritxu@student.42.fr>            +#+  +:+       +#+        */
+/*   By: polmarti <polmarti@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 10:36:31 by polmarti          #+#    #+#             */
 /*   Updated: 2024/02/11 19:02:45 by Meritxu          ###   ########.fr       */
@@ -12,9 +12,19 @@
 
 #include "../inc/minishell.h"
 
-void 	ft_wait_child_process(char *cmd, int *exit_status, int process)
+char *ft_get_cmd_failed(t_token **t_current)
 {
-	int status;
+	while(*t_current && (*t_current)->type != WORD)
+		*t_current = (*t_current)->next;
+	return ((*t_current)->str);
+}
+
+void 	ft_wait_child_process(char *cmd/*t_token *tokens*/, int *exit_status, int process)
+{
+	int 	status;
+	//t_token *t_current;
+
+	//t_current = tokens;
 	while (process)
 	{
 		wait(&status);
@@ -30,7 +40,7 @@ void 	ft_wait_child_process(char *cmd, int *exit_status, int process)
 		if (*exit_status == 127)
 		{
 			ft_putstr_fd("minishell: ", 2);
-			ft_putstr_fd(cmd, 2);
+			ft_putstr_fd(/*ft_get_cmd_failed(&t_current)*/cmd, 2); //hace falta obtener el dato de comando en concreto que falla 
 			ft_putendl_fd(": command not found", 2);
 		}
 		process--;

@@ -41,6 +41,7 @@
 # define DOC 8
 # define ERROR_WORD 9
 # define HERE_DOC 10
+# define LIMITER 15
 
 //SIMPLE LINKED LIST PARA ENVIROMENT
 typedef struct s_env
@@ -126,7 +127,7 @@ int		ft_token_lst_size(t_token *lst);
 
 int		ft_aux_abs(char *str);
 
-void 	ft_wait_child_process(char *cmd, int *exit_status, int process);
+void 	ft_wait_child_process(char *cmd /*t_token *tokens*/, int *exit_status, int process);
 
 void	ft_exec_absoluthe_path(t_token **tokens, char **envp);
 
