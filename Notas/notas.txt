@@ -21,7 +21,11 @@ minishell: ls: command not found
 		-[SOLVED✅] cat > te | cat 
 		-[SOLVED✅] < here.txt cat | wc > out.txt NO VA
 		- cat > tests/te | ca despues de interrupcion con ^C == exit_status 130, deberia ser 127 ❌
--Heredoc ❌
+-Heredoc
+	- cat < tests/test << eof DEBE DAR PRIORIDAD DE REDIRECCION DE INPUT AL ULTIMO METACHAR, ya sea red_in o here_doc
+-ft_wait_child_process
+	-hace falta añadir un iterador de el primer parametro para cada comando que se intenta ejecutar y falla, para que de el
+	mensaje de error correctamente
 -Append ❌
 -[SOLVED✅]Invalid cmd
 -[SOLVED✅]rutas absolutas
