@@ -82,7 +82,12 @@ void	ft_error_syntax(int *exit_status, int name, t_token *t_current)
 	*exit_status = 258;
 	return ;
 }
-
+void ft_error_cmd(char *cmd)
+{
+	ft_putstr_fd("\033[31mminishell: ", 2);
+	ft_putstr_fd(cmd, 2); 
+	ft_putstr_fd(": command not found\x1b[0m\n", 2);
+}
 void	ft_error_system(int type)
 {
 	if (type == MALLOC_ERROR)

@@ -12,19 +12,11 @@
 
 #include "../inc/minishell.h"
 
-char *ft_get_cmd_failed(t_token **t_current)
-{
-	while(*t_current && (*t_current)->type != WORD)
-		*t_current = (*t_current)->next;
-	return ((*t_current)->str);
-}
 
-void 	ft_wait_child_process(char *cmd/*t_token *tokens*/, int *exit_status, int process)
+void 	ft_wait_child_process(int *exit_status, int process)
 {
 	int 	status;
-	//t_token *t_current;
 
-	//t_current = tokens;
 	while (process)
 	{
 		wait(&status);
@@ -36,12 +28,6 @@ void 	ft_wait_child_process(char *cmd/*t_token *tokens*/, int *exit_status, int 
 				*exit_status = 130;
 			else if (WTERMSIG(status) == SIGQUIT)
 				*exit_status = 131;
-		}
-		if (*exit_status == 127)
-		{
-			ft_putstr_fd("minishell: ", 2);
-			ft_putstr_fd(/*ft_get_cmd_failed(&t_current)*/cmd, 2); //hace falta obtener el dato de comando en concreto que falla 
-			ft_putendl_fd(": command not found", 2);
 		}
 		process--;
 	}
@@ -108,6 +94,7 @@ void	ft_exec_absoluthe_path(t_token **tokens, char **envp)
 	i = 0;
 	if (access(absolute_path, X_OK) == 0) //Checkea a validez de la ruta absoluta, si no lo es en el input es un NULL y no entra
 		execve(absolute_path, cmd_argv, envp);
+	ft_error_cmd(cmd_argv[0]);
 	exit(127);
 }
 
@@ -155,6 +142,7 @@ void 	exec_cmd(t_token **tokens, t_env **env, char **envp)
 			free(absolute_path);
 			i++;
 		}
+		ft_error_cmd(cmd_argv[0]);
 		exit(127);
 }
 
@@ -166,7 +154,7 @@ void	executor(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 	if (!*tokens)//proteccion para cuando no hay tokens que mandar
 		return ;
 	pid = fork();
-	//dprintf(2, "%d\n", getpid());
+	//dprintf(2, "%d\n", pid);
 	if (pid < 0)
 		ft_error_system(FORK_ERROR);
 	sig_init(0);//cambio anadido pendiente analizar🐸
@@ -182,11 +170,6 @@ void	executor(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			close(data_pipe->pipefd[1]);
 			close(data_pipe->pipefd[0]);
 		}
-		/*else if (data_pipe->flag == NO)
-		{
-			close(data_pipe->pipefd[1]); //cierra pipes
-			close(data_pipe->pipefd[0]);
-		}*/
 		if (ft_is_built_in(tokens))
 			exit(ft_exec_builtin(tokens, env));
 		else if ((*tokens)->str[0] ==  '/')//en caso de ser posible ruta absoluta
