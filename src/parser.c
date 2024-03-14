@@ -12,6 +12,24 @@
 
 #include "../inc/minishell.h"
 
+int selector_input(t_parser *d)
+{
+	int i;
+	t_token *tmp;
+
+	tmp = d->t_current;
+	i = 0;
+	while (tmp  && tmp->type != PIPE)
+	{
+		if (tmp->type == HERE_DOC)
+			ft_here_doc(tmp, d->data_heredoc, d->data_pipe);
+		else if (tmp->type == RED_IN)
+			i = ft_red_in_aux(d->data_redir, tmp,d->data_pipe);
+		tmp = tmp->next;
+	}
+	return (i);
+}
+
 //funcion aux, crea un nuevo token copiando el que recibe por parametro
 static t_token *ft_tokendup(t_token *token)
 {
@@ -97,24 +115,24 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		ft_error_system(MALLOC_ERROR);
 	ft_init_data_parser(d, tokens, exit_status);
 	if (!d->data_pipe->pipe_counter && d->t_current)//SI SOLO HAY UN COMANDO 
-	{
-		ft_here_doc(d->t_current, d->data_heredoc); //here_doc y redir_in puden tener prioridades distinas
+	{	
+		selector_input(d);
+		//ft_here_doc(d->t_current, d->data_heredoc); //here_doc y redir_in puden tener prioridades distinas
 		//hace falta plantear una funcion que permita escoger que funcion ejecutar antes recorriendo los tokens
-		ft_red_in_aux(d->data_redir, d->t_current,d->data_pipe);
+		//ft_red_in_aux(d->data_redir, d->t_current,d->data_pipe);
 		ft_red_out_aux(d->data_redir, d->t_current, d->data_pipe);
 		d->data_pipe->flag = NO;
 		ft_tokens_to_exec(&d->t_current, &d->t_tmp);
 		if (ft_is_built_in(&d->t_tmp))
 		{
 			*exit_status = ft_exec_builtin(&d->t_tmp, env);
+			ft_aux_close(d->data_pipe, d->data_redir);
 			free_tokens(&d->t_tmp);
-			free(d->data_pipe);
-			free(d->data_redir);
 			return ;
 		}
 		executor(&d->t_tmp, env, envp, d->data_pipe);
 		free_tokens(&d->t_tmp);
-		ft_wait_child_process(d->t_current->str, exit_status, 1);
+		ft_wait_child_process(exit_status, 1);
 		ft_aux_close(d->data_pipe, d->data_redir);
 		free(d);
 		return ;
@@ -122,7 +140,7 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	while(d->t_current)//PIPELINE
 	{
 		while ((d->t_current && d->t_current->type != WORD) || (d->t_current &&\
-		 d->t_current->next && d->t_current->next->type == RED_IN) )//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
+		 d->t_current->next && (d->t_current->next->type == RED_IN || d->t_current->next->type == HERE_DOC )) )//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
 		{
 			if (ft_red_in_aux(d->data_redir, d->t_current, d->data_pipe))
 			{
@@ -160,7 +178,8 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 			if (dup2(d->data_pipe->og_stdout, 1) == -1) //esto ha hecho que funcione "cat tet1 > newfile | wc newfile" como debe
 				ft_error_system(DUP2_ERROR);
 			d->t_current = d->t_current->next;
-			ft_red_in_aux(d->data_redir, d->t_current, d->data_pipe);
+			//ft_red_in_aux(d->data_redir, d->t_current, d->data_pipe);
+			selector_input(d);
 			ft_red_out_aux(d->data_redir, d->t_current, d->data_pipe);
 			ft_tokens_to_exec(&d->t_current, &d->t_tmp);
 			executor(&d->t_tmp, env, envp, d->data_pipe);
@@ -169,7 +188,7 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 			if (dup2(d->data_pipe->og_stdin, 0) == -1) //esto ha hecho que funcione "cat tet1 > newfile | wc newfile" como debe
 				ft_error_system(DUP2_ERROR);
 			ft_aux_close(d->data_pipe, d->data_redir);
-			ft_wait_child_process(d->t_current->str, exit_status, d->process);
+			ft_wait_child_process(exit_status, d->process);
 			return (free(d));
 		}
 		if (d->t_current)
@@ -180,4 +199,3 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	free(d->data_redir);
 	free(d);
 }
-

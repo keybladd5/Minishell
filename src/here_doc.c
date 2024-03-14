@@ -23,7 +23,13 @@ static char *ft_get_limiter(t_token *token)
 		return (NULL);
 	return (t_current->str);
 }
-void ft_here_doc(t_token *token, t_heredoc *data_heredoc)
+
+void ft_protect_here_doc(t_pipe *data_pipe)
+{
+	if (dup2(data_pipe->og_stdin, 0) == -1)
+		ft_error_system(DUP2_ERROR);
+}
+void ft_here_doc(t_token *token, t_heredoc *data_heredoc, t_pipe *data_pipe)
 {
 	int		tmp_fd[2];
 	char	*tmp_input;
@@ -31,6 +37,7 @@ void ft_here_doc(t_token *token, t_heredoc *data_heredoc)
 
 	if (!data_heredoc->heredoc_counter)
 		return ;
+	ft_protect_here_doc(data_pipe);
 	limiter = ft_get_limiter(token);
 	if (!limiter)
 		return ;
