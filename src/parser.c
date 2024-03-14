@@ -117,9 +117,6 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	if (!d->data_pipe->pipe_counter && d->t_current)//SI SOLO HAY UN COMANDO 
 	{	
 		selector_input(d);
-		//ft_here_doc(d->t_current, d->data_heredoc); //here_doc y redir_in puden tener prioridades distinas
-		//hace falta plantear una funcion que permita escoger que funcion ejecutar antes recorriendo los tokens
-		//ft_red_in_aux(d->data_redir, d->t_current,d->data_pipe);
 		ft_red_out_aux(d->data_redir, d->t_current, d->data_pipe);
 		d->data_pipe->flag = NO;
 		ft_tokens_to_exec(&d->t_current, &d->t_tmp);

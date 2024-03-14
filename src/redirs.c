@@ -29,10 +29,10 @@ int	ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
 	if (data_redir->fd_infile == -1)
 	{
 		if (t_current->type == WORD)
-		t_current->type = ERROR_WORD;
+			t_current->type = ERROR_WORD; // < test/new << eof cat en este caso esta accion peta 
 		else if (t_current->type == RED_IN)
 		{
-			if (t_current && t_current->next && t_current->next->next)
+			if (t_current && t_current->next && t_current->next->next && t_current->next->next->type != HERE_DOC) //se especifica la ultima condicion para que funncione la combinacion de here_doc y redir_in con el comando al final
 				t_current->next->next->type = ERROR_WORD;
 		}
 		return (1);
