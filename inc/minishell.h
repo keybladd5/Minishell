@@ -101,6 +101,8 @@ void 	ft_error_syntax(int *exit_status, int name, t_token *t_current);
 
 void 	ft_error_system(int type);
 
+void 	ft_error_cmd(char *cmd);
+
 //--------signs.c-----------
 
 void	ctrl_C(int *exit_status);
@@ -127,7 +129,7 @@ int		ft_token_lst_size(t_token *lst);
 
 int		ft_aux_abs(char *str);
 
-void 	ft_wait_child_process(char *cmd /*t_token *tokens*/, int *exit_status, int process);
+void 	ft_wait_child_process(int *exit_status, int process);
 
 void	ft_exec_absoluthe_path(t_token **tokens, char **envp);
 
@@ -141,7 +143,7 @@ int 	typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t
 
 //--------here_doc.c-------------
 
-void 	ft_here_doc(t_token *token, t_heredoc *data_here_doc);
+void 	ft_here_doc(t_token *token, t_heredoc *data_here_doc, t_pipe *data_pipe);
 
 //---------PENDIENTE ORDENAR-----------
 
