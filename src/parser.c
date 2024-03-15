@@ -142,14 +142,14 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		if (ft_is_built_in(&d->t_tmp))
 		{
 			*exit_status = ft_exec_builtin(&d->t_tmp, env);
-			ft_aux_close(d->data_pipe, d->data_redir);
+			ft_aux_close(d->data_pipe, d->data_redir, d->data_heredoc);
 			free_tokens(&d->t_tmp);
 			return ;
 		}
 		executor(&d->t_tmp, env, envp, d->data_pipe);
 		free_tokens(&d->t_tmp);
 		ft_wait_child_process(exit_status, 1);
-		ft_aux_close(d->data_pipe, d->data_redir);
+		ft_aux_close(d->data_pipe, d->data_redir, d->data_heredoc);
 		free(d);
 		return ;
 	}
@@ -184,7 +184,6 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 			close(d->data_pipe->pipefd[1]);
 			d->data_pipe->pipe_counter--;
 			free_tokens(&d->t_tmp);
-			
 		}
 		//ahora quiero iterar hasta que los nodos sean de otro comando, los diferencia el nodo pipe
 		while (d->t_current && !(d->t_current->type == PIPE))
@@ -205,7 +204,7 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 			free_tokens(&d->t_tmp);
 			if (dup2(d->data_pipe->og_stdin, 0) == -1) //esto ha hecho que funcione "cat tet1 > newfile | wc newfile" como debe
 				ft_error_system(DUP2_ERROR);
-			ft_aux_close(d->data_pipe, d->data_redir);
+			ft_aux_close(d->data_pipe, d->data_redir, d->data_heredoc);
 			ft_wait_child_process(exit_status, d->process);
 			return (free(d));
 		}
@@ -215,5 +214,6 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	//SIN ESTO DA LEAKS CUANDO EL INPUT ESTA VACIO. COMPPROBAR QUE NO HAYA DOBLE FREE!!
 	free(d->data_pipe);
 	free(d->data_redir);
+	free(d->data_heredoc);
 	free(d);
 }

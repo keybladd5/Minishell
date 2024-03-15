@@ -47,7 +47,6 @@ void	process_sig_handler(int sig)
 		g_signal = 131;
 	}
 }
-
 //inicializa variable global y las señales. Variable tc y sus funciones usan la libreria termios.h para no escribir ^C
 void	sig_init(int i)//cambio anadido pendiente analizar🐸
 {
@@ -68,3 +67,4 @@ void	sig_init(int i)//cambio anadido pendiente analizar🐸
 	tc.c_lflag &= ~ECHOCTL; //Modifica la flag 'local mode' para desactivar el printeo de ctrl+(X) como ^(X)
 	tcsetattr(0, TCSANOW, &tc); //Devuelve los atributos modificados al FD 0 (STDIN)
 }
+

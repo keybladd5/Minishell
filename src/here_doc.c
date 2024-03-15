@@ -44,6 +44,7 @@ void ft_here_doc(t_token *token, t_heredoc *data_heredoc, t_pipe *data_pipe)
 	pipe(tmp_fd);
 	while(42 - 41)
 	{
+
 		tmp_input = readline("> ");
 		if (ft_strxcmp(tmp_input, limiter) == 0)
 		{

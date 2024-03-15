@@ -75,7 +75,7 @@ int	ft_red_out_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
 	return (0);
 }
 //Reestablece los fd originales, cierra el resto de fd y libera estructuras de pipes y redirs
-void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir)
+void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir, t_heredoc *data_heredoc)
 {
 	if (!data_pipe->pipe_counter)//pedniente modificar ya se hace dup2 de mas
 	{
@@ -106,4 +106,5 @@ void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir)
 	}
 	free(data_pipe);
 	free(data_redir);
+	free(data_heredoc);
 }
