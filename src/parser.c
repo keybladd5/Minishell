@@ -22,7 +22,10 @@ int selector_input(t_parser *d)
 	while (tmp  && tmp->type != PIPE)
 	{
 		if (tmp->type == HERE_DOC)
+		{
 			ft_here_doc(tmp, d->data_heredoc, d->data_pipe);
+			i = 0;
+		}
 		else if (tmp->type == RED_IN)
 			i = ft_red_in_aux(d->data_redir, tmp,d->data_pipe);
 		tmp = tmp->next;
@@ -52,7 +55,7 @@ static void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 	t_token	*last = NULL;
 	t_token *curr = NULL;
 	curr = *og_tokens;
-	while (curr && curr->type != WORD)//para saltar casos como "< test cat" hasta la palabra necesaria para ejecutar como es el cat
+	/*while (curr && curr->type != WORD)//para saltar casos como "< test cat" hasta la palabra necesaria para ejecutar como es el cat
 	{
 		if (curr->type == PIPE)
 			return ;
@@ -69,6 +72,22 @@ static void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 				last->next = tmp;
 		}	
 		last = tmp;
+		curr = curr->next;
+	}*/
+	while (curr && curr->type != PIPE)
+	{
+		if (curr->type == WORD)
+		{
+			tmp = ft_tokendup(curr);
+			if (!*new_tokens)
+				*new_tokens = tmp;
+			else
+			{
+				if (last)
+					last->next = tmp;
+			}	
+			last = tmp;
+		}
 		curr = curr->next;
 	}
 }
@@ -136,7 +155,7 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	}
 	while(d->t_current)//PIPELINE
 	{
-		while ((d->t_current && d->t_current->type != WORD) || (d->t_current &&\
+		/*while ((d->t_current && d->t_current->type != WORD) || (d->t_current &&\
 		 d->t_current->next && (d->t_current->next->type == RED_IN || d->t_current->next->type == HERE_DOC )) )//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
 		{
 			if (ft_red_in_aux(d->data_redir, d->t_current, d->data_pipe))
@@ -145,10 +164,12 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 				break ;
 			}
 			d->t_current = d->t_current->next;
-		}
+		}*/
 		//entra aqui si hay pipes leidas, y ejecuta hasta nodos hasta la pipe(en el exec)
 		if (d->t_current && d->data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
 		{
+			if (selector_input(d))
+				d->data_pipe->flag = NO;
 			if (ft_red_out_aux(d->data_redir, d->t_current, d->data_pipe))
 				d->data_pipe->flag = NO;
 			else
