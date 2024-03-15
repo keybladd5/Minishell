@@ -76,8 +76,10 @@ void	ft_error_syntax(int *exit_status, int name, t_token *t_current)
 			return ;
 		}
 		else
-			ft_putstr_fd("\033[31mminishell: syntax error near \
-			unexpected token `newline'\x1b[0m\n", 2);
+		{
+			ft_putstr_fd("\033[31mminishell: syntax error near",2);
+			ft_putstr_fd(" unexpected token `newline'\x1b[0m\n", 2);
+		}
 	}
 	*exit_status = 258;
 	return ;
