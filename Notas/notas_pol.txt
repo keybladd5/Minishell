@@ -9,32 +9,52 @@
 		- < test.c da SEGV EN exec_cmd ✅
 		- < out cata | ls cuando si existe el DOC, DEBE DAR !MENSAJE DE ERROR! DE CATA Y NO DE LS  ✅
 		- cat < asd | cat Makefile | ls | cat < asd NO FUNVIONA igual ❌
+
+			+ en caso de error de permisos falla, nuestra ejecucion da los dos mensajes
+			+ de error correspondientes, pero luego muestra el ls (que no deberia)
+			+ y deja el cat abierto
+
+			= Tratar de evitar la ejecucion del comando en caso de error con el archvio por permisos
+			= o q no exista
+
 		- cat Makefile | cat < asd | ls ROMPE EL PROGRAMA ✅
 		- cat < | queda el cat abierto ✅
 		- < ouat cata | ls cuando NO existe el DOC, debej ejecutar el segundo comando y no lo hace  ✅
 	-RED_OUT
+
 		- ⬇️ cat test > no_permission  | wc DEBE EJECUTAR SEGUNDO COMANDO Y NO LO HACE ❌ ⬇️
 
 			+ La salida del STD_OUT es incorrecta ya que el executor toma los dos tokens
 			+ de tipo WORD y los ejecuta, despues de redirigir la salida al archivo y fallar
-			+ open, deberia redirigir algo incorrecto al extremo de escritura en la tuberia?
+			+ el open, deberia redirigir algo incorrecto al extremo de escritura en la tuberia?
 
 
 		- cata > asd | ls DEBE DAR !MENSAJE DE ERROR! DE CATA Y NO DE LS  ✅
 		-[SOLVED✅] este caso cat tests/test.c > tet | cat tests/test3 no funciona igual
-		-[SOLVED✅] cat test.c > te | cat este tampoco 
-		- cat > te | cat NO DA EXIT STATUS CORRECTO, BASH DA 0 Y NOSOTROS 130 ❌
 		-[SOLVED✅] < here.txt cat | wc > out.txt NO VA
-		- cat > tests/te | ca despues de interrupcion con ^C == exit_status 130, deberia ser 127 ❌
+		-[SOLVED✅] cat test.c > te | cat este tampoco 
+		- ⬇️ cat > te | cat NO DA EXIT STATUS CORRECTO, BASH DA 0 Y NOSOTROS 130 ❌ ⬇️
+
+			+ basicamente toma la interrupcion con cntrl+c y la setea al codigo puesto,
+			+ deberia quedarse con 0 pero por que? es el primero comando o el segundo?
+
+		- ⬇️ cat > tests/te | ca despues de interrupcion con ^C == exit_status 130, deberia ser 127 ❌ ⬇️
+
+			+ pendiente de documentar el error
 - Heredoc
+
 	- [SOLVED✅]cat < tests/test << eof DEBE DAR PRIORIDAD DE REDIRECCION DE INPUT AL ULTIMO METACHAR, ya sea red_in o here_doc
+
+		+ la funcion selector_input(t_parser *d); se encarga de poner en el STD_IN la redir de INPUT
+		+ de mas a la derecha, ya sea here_doc o red_in
+
 	- ⬇️ cat | ls | cat << adios no mantiene abierto el cat ❌ ⬇️
 
 		+ ejecuta el cat, comunica tuberias, ejecuta ls, comunica tuberias y el here_doc 
 		+ reestablece el std_in al original para poder usar la readline correctamente.
 		+ deberia hacer "algo" para mantener abierto el cat?
 
-- Append ❌
+- Append ❌ (NO IMPLEMENTADO)
 - [SOLVED✅]Invalid cmd
 - [SOLVED✅]rutas absolutas
 - [SOLVED✅] ls -lR $HOME | wc 
