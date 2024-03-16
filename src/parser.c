@@ -12,6 +12,8 @@
 
 #include "../inc/minishell.h"
 
+//itera sin modificar los tokens para comprobar prioridad de input en el comando, en caso de error de archivo
+//por falta de permisos o inexistente, devuelve un 2 otorgado por ft_red_in_aux;
 int selector_input(t_parser *d)
 {
 	int i;
@@ -28,6 +30,8 @@ int selector_input(t_parser *d)
 		}
 		else if (tmp->type == RED_IN)
 			i = ft_red_in_aux(d->data_redir, tmp,d->data_pipe);
+		if (i == 2)
+			return (i);
 		tmp = tmp->next;
 	}
 	return (i);
@@ -48,32 +52,16 @@ static t_token *ft_tokendup(t_token *token)
 	new_token->next = NULL;
 	return (new_token);
 }
-//Crea una copia de los tokens a enviar al executor 
+//Crea una copia de los tokens a enviar al executor, SOLO DE LAS WORDS encontradas hasta la pipe
 static void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 {
-	t_token	*tmp = NULL;
-	t_token	*last = NULL;
-	t_token *curr = NULL;
+	t_token	*tmp;
+	t_token	*last;
+	t_token	*curr;
+
 	curr = *og_tokens;
-	/*while (curr && curr->type != WORD)//para saltar casos como "< test cat" hasta la palabra necesaria para ejecutar como es el cat
-	{
-		if (curr->type == PIPE)
-			return ;
-		curr = curr->next;
-	}
-	while (curr && curr->type == WORD)
-	{
-		tmp = ft_tokendup(curr);
-		if (!*new_tokens)
-			*new_tokens = tmp;
-		else
-		{
-			if (last)
-				last->next = tmp;
-		}	
-		last = tmp;
-		curr = curr->next;
-	}*/
+	last = NULL;
+	tmp = NULL;
 	while (curr && curr->type != PIPE)
 	{
 		if (curr->type == WORD)
@@ -91,7 +79,8 @@ static void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 		curr = curr->next;
 	}
 }
-
+//Inicializa los strucs contenidos en el struc del parser, y llama al typer para setear tipos a los tokens
+//en caso de error pasado por este, pone en NULL la lista de t_current para evitar la ejecucion
 void	ft_init_data_parser(t_parser *d, t_token **tokens,\
 		int *exit_status)
 {
@@ -124,10 +113,12 @@ void	ft_init_data_parser(t_parser *d, t_token **tokens,\
 	else
 		d->t_current = *tokens;
 }
-//Procesa los tokens de izquierda a derecha uno por uno.
+//Procesa los tokens de izquierda a derecha uno por uno. Contempla pipeline y no pipes, redirecciones
+//de input i de output, y here_doc.
 void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 {
 	t_parser	*d;
+	int			tmp;
 
 	d = malloc(sizeof(t_parser));
 	if (!d)
@@ -155,19 +146,11 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 	}
 	while(d->t_current)//PIPELINE
 	{
-		/*while ((d->t_current && d->t_current->type != WORD) || (d->t_current &&\
-		 d->t_current->next && (d->t_current->next->type == RED_IN || d->t_current->next->type == HERE_DOC )) )//en caso de orden de redireccion necesito colocarme en la palabra a ejecutar
-		{
-			if (ft_red_in_aux(d->data_redir, d->t_current, d->data_pipe))
-			{
-				d->data_pipe->flag = NO;
-				break ;
-			}
-			d->t_current = d->t_current->next;
-		}*/
-		//entra aqui si hay pipes leidas, y ejecuta hasta nodos hasta la pipe(en el exec)
 		if (d->t_current && d->data_pipe->pipe_counter)//si hay minimo 1 pipe leido PUEDE SER UN ELSE
 		{
+			//el selector puede devolver 2, en ese caso se debe encontrar la forma de saltar al siguiente comando porque
+			//no se debe ejecutar nada hasta la siguiente pipe
+			//se podria solucionar metiendo todo el bloque en una funcion y haciendo return en caso de 2
 			if (selector_input(d))
 				d->data_pipe->flag = NO;
 			if (ft_red_out_aux(d->data_redir, d->t_current, d->data_pipe))
@@ -211,7 +194,6 @@ void parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		if (d->t_current)
 			d->t_current = d->t_current->next;
 	}
-	//SIN ESTO DA LEAKS CUANDO EL INPUT ESTA VACIO. COMPPROBAR QUE NO HAYA DOBLE FREE!!
 	free(d->data_pipe);
 	free(d->data_redir);
 	free(d->data_heredoc);

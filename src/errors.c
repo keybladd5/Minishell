@@ -73,6 +73,7 @@ void	ft_error_syntax(int *exit_status, int name, t_token *t_current)
 		else if (t_current)
 		{
 			ft_err_red_errorfile(exit_status, t_current);
+			t_current->type = ERROR_FILE; //hace falta especificar este error para que salte al siguiente comando y no haga nada mas
 			return ;
 		}
 		else

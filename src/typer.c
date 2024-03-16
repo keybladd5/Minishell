@@ -40,7 +40,7 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 			if (!*t_current || (data_redir->fd_infile = open((*t_current)->str, O_RDONLY)) == -1)
 			{
 				ft_error_syntax(exit_status, RED_IN, *t_current);
-				if (!*t_current)
+				if (!*t_current || (*t_current)->str[0] == '|')
 					return (1);
 			}
 			data_redir->red_in_counter++;
