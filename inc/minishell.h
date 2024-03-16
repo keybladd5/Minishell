@@ -40,6 +40,7 @@
 # define RED_OUT 7
 # define DOC 8
 # define ERROR_WORD 9
+# define ERROR_FILE 16
 # define HERE_DOC 10
 # define LIMITER 15
 
@@ -121,7 +122,7 @@ int		ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe);
 
 int		ft_red_out_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe);
 
-void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir);
+void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir, t_heredoc *data_heredoc);
 
 //--------executor.c-------------
 
