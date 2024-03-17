@@ -34,8 +34,9 @@ minishell: ls: command not found
 		- {echho $HOME$} -> expande $HOME y deja el ulltimo $
 	- solo un comando con '$' -> Printea 'command not found', deberia ser 'is a directory' ❌
 	- OTRAS EXPANSIONES (En otros proyectos no estan implementadas ❓❓❓)
-		- '$$' -> Debe expandir a PID ❌
-		- '~' esto hay que expandirlo a la variable HOME ❌
+		- {$$} -> Debe expandir a PID ❌
+		- {~} esto hay que expandirlo a la variable HOME ❌
+		- {$"HOME"} 
 - Implementar builtins ⏳
 	|-BUILTINS
 |     |-Echo (-n) ❌
