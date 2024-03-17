@@ -50,7 +50,8 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 					ft_error_system(CLOSE_ERROR);
 			}
 			data_redir->fd_infile = -1;
-			(*t_current)->type = DOC;
+			if ((*t_current)->type == 0)
+				(*t_current)->type = DOC;
 			consecutive_metachar = 0;
 			*t_current = (*t_current)->next;	
 		}
@@ -66,14 +67,14 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 				if (!*t_current) //para que no pete en solo >
 					return (1); 
 			}
-			else
-				data_redir->red_out_counter++;
+			data_redir->red_out_counter++;
 			if (data_redir->fd_outfile >= 0)
 			{
 				if (close(data_redir->fd_outfile) == -1)
 					ft_error_system(CLOSE_ERROR);
 			}
-			(*t_current)->type = DOC;
+			if ((*t_current)->type == 0)
+				(*t_current)->type = DOC;
 			consecutive_metachar = 0;
 			*t_current = (*t_current)->next;	
 		}
@@ -107,3 +108,5 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 	}
 	return (0);
 }
+
+
