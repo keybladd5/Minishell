@@ -94,6 +94,8 @@ typedef struct s_parser
 	t_token	*t_current;
 	t_heredoc *data_heredoc;
 	int		process;
+	int		flag_input;
+	int		flag_output;
 }	t_parser;
 
 //--------errors.c-----------
@@ -145,6 +147,16 @@ int 	typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t
 //--------here_doc.c-------------
 
 void 	ft_here_doc(t_token *token, t_heredoc *data_here_doc, t_pipe *data_pipe);
+
+//--------parser_utils.c-------------
+
+t_token *ft_tokendup(t_token *token);
+
+void	l_red_out(t_parser *d, t_env **env, char **envp);
+
+void	ft_init_data_parser(t_parser *d, t_token **tokens, int *exit_status);
+
+int		selector_input(t_parser *d);
 
 //---------PENDIENTE ORDENAR-----------
 
