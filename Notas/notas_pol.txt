@@ -4,7 +4,7 @@
 - QUOTES
 	- "$"AAA -> lo convierte a $AAA y intenta expandir la variable, se tiene que quedar como $AAA ❌
 - Redirections
-	- "< new cat > no_permission" muestra el output del cat en pantalla y no deberia ❌ 
+	- "< new cat > no_permission" muestra el output del cat en pantalla y no deberia  ✅ 
 	-RED_IN ✅
 		- En archivos sin permisos Permission denied no controlado ✅
 		- < test.c da SEGV EN exec_cmd ✅
@@ -23,14 +23,14 @@
 		- < ouat cata | ls cuando NO existe el DOC, debej ejecutar el segundo comando y no lo hace  ✅
 	-RED_OUT
 
-		- ⬇️ cat test > no_permission  | wc DEBE EJECUTAR SEGUNDO COMANDO Y NO LO HACE ❌ ⬇️
+		- ⬇️ cat test > no_permission  | wc DEBE EJECUTAR SEGUNDO COMANDO Y NO LO HACE ✅ ⬇️
 
 			+ La salida del STD_OUT es incorrecta ya que el executor toma los dos tokens
 			+ de tipo WORD y los ejecuta, despues de redirigir la salida al archivo y fallar
 			+ el open, deberia redirigir algo incorrecto al extremo de escritura en la tuberia?
 
-		- "< no_permission < tests/new cat > new" da BAD FILE DESCRIPTOR  ❌
-		- "cat | ls | cat < no_permission > newfile" da BAD FILE DESCRIPTOR ❌
+		- "< no_permission < tests/new cat > new" da BAD FILE DESCRIPTOR  ✅
+		- "cat | ls | cat < no_permission > newfile" DEBE DEJAR EL CAT ABIERTO  ❌
 		- cata > asd | ls DEBE DAR !MENSAJE DE ERROR! DE CATA Y NO DE LS  ✅
 		-[SOLVED✅] este caso cat tests/test.c > tet | cat tests/test3 no funciona igual
 		-[SOLVED✅] < here.txt cat | wc > out.txt NO VA
