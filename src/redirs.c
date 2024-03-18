@@ -33,7 +33,7 @@ int	ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
 		else if (t_current->type == RED_IN)
 		{
 			if (t_current && t_current->next && t_current->next->next && t_current->next->next->type == WORD) //se especifica la ultima condicion para que funncione la combinacion de here_doc y redir_in con el comando al final
-				t_current->next->next->type = ERROR_WORD;
+				return (t_current->next->next->type = ERROR_WORD, 2);
 			else if (t_current->next->type == ERROR_FILE)
 				return (2);
 		}

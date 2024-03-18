@@ -28,6 +28,22 @@ t_token *ft_tokendup(t_token *token)
 	return (new_token);
 }
 
+//unefficient, but this is only works when in a pipeline, the actual cmd is
+//canceled by a no_permission doc, but the next cmd need a the read pipe
+//to work as bash
+void	l_red_out(t_parser *d, t_env **env, char **envp)
+{
+	pipe(d->data_pipe->pipefd);
+	d->process++;
+	d->data_pipe->flag = YES;
+	executor(NULL, env, envp, d->data_pipe);
+	if (dup2(d->data_pipe->pipefd[0], 0)== -1) //tiene que comunicar la tuberia contenga o no contenido siempre en la pipeline 
+		ft_error_system(DUP2_ERROR);
+	close(d->data_pipe->pipefd[0]);
+	close(d->data_pipe->pipefd[1]);
+	d->data_pipe->pipe_counter--;
+}
+
 // Inicializa los strucs contenidos en el struc del parser, y llama 
 //	al typer para setear tipos a los tokens
 //	en caso de error pasado por este, pone en NULL la lista de 

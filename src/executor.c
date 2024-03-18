@@ -151,8 +151,6 @@ void	executor(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 {
 	int	pid;
 	
-	if (!*tokens)//proteccion para cuando no hay tokens que mandar
-		return ;
 	pid = fork();
 	//dprintf(2, "%d\n", pid);
 	if (pid < 0)
@@ -170,6 +168,8 @@ void	executor(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 			close(data_pipe->pipefd[1]);
 			close(data_pipe->pipefd[0]);
 		}
+		if (!tokens || !*tokens)//proteccion para cuando no hay tokens que mandar
+			exit (1) ;
 		if (ft_is_built_in(tokens))
 			exit(ft_exec_builtin(tokens, env));
 		else if ((*tokens)->str[0] ==  '/')//en caso de ser posible ruta absoluta

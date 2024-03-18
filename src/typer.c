@@ -73,6 +73,7 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 				if (close(data_redir->fd_outfile) == -1)
 					ft_error_system(CLOSE_ERROR);
 			}
+			data_redir->fd_outfile = -1;
 			if ((*t_current)->type == 0)
 				(*t_current)->type = DOC;
 			consecutive_metachar = 0;

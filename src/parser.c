@@ -81,13 +81,13 @@ int parse_child_cmd(t_parser *d, t_env **env, char **envp)
 		{	
 			d->data_pipe->flag = NO;
 			if (d->flag_input == 2)
-				return (d->data_pipe->pipe_counter--, 0);
+				return (l_red_out(d, env, envp), 0);
 		}
 		d->flag_output = ft_red_out_aux(d->data_redir, d->t_current, d->data_pipe);
 		if (d->flag_output)
 		{	
 			if (d->flag_output == 2)
-				return (d->data_pipe->pipe_counter--, 0);
+				return (l_red_out(d, env, envp), 0);
 			d->data_pipe->flag = NO;
 		}
 		else
@@ -105,6 +105,7 @@ int parse_child_cmd(t_parser *d, t_env **env, char **envp)
 	}
 	return (0);
 }
+
 //caso del ultimo comando a ejecutar, donde se recoge el exit status
 int	parse_last_child(t_parser *d, t_env **env, char **envp, int *exit_status)
 {
