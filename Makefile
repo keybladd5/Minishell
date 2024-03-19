@@ -14,11 +14,11 @@ NAME 		= Minishell
 
 SRCS 		=  src/mminishell.c src/builtins.c src/executor.c \
 			src/parser.c src/parser_utils.c src/expansor.c src/redirs.c src/signs.c \
-			src/typer.c src/errors.c src/here_doc.c 
+			src/typer.c src/errors.c src/here_doc.c src/append.c
 
 INCLUDES 	= inc/minishell.h
 
-FLAGS 		= -Wall -Wextra -Werror -MMD -g -fsanitize=address
+FLAGS 		= -Wall -Wextra -Werror -MMD -g #-fsanitize=address
 
 FLAGS_LIB_SEARCH	:=	-lreadline -lhistory -ltermcap -lft
 

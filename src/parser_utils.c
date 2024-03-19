@@ -74,10 +74,12 @@ void	l_red_out(t_parser *d, t_env **env, char **envp)
 // Inicializa los strucs contenidos en el struc del parser
 void	ft_init_data_parser(t_parser *d, t_token **tokens)
 {
-	d->data_heredoc = malloc(sizeof(t_pipe));
-	if (!d->data_heredoc)
+	d->data_hd_append= malloc(sizeof(t_pipe));
+	if (!d->data_hd_append)
 		ft_error_system(MALLOC_ERROR);
-	d->data_heredoc->heredoc_counter = 0;
+	d->data_hd_append->heredoc_counter = 0;
+	d->data_hd_append->append_counter = 0;
+	d->data_hd_append->fd_append = -1;
 	d->process = 0;
 	d->t_tmp = NULL;
 	d->flag_input = 0;
@@ -114,11 +116,32 @@ int selector_input(t_parser *d)
 	{
 		if (tmp->type == HERE_DOC)
 		{
-			ft_here_doc(tmp, d->data_heredoc, d->data_pipe);
+			ft_here_doc(tmp, d->data_hd_append, d->data_pipe);
 			i = 0;
 		}
 		else if (tmp->type == RED_IN)
 			i = ft_red_in_aux(d->data_redir, tmp,d->data_pipe);
+		if (i == 2)
+			return (i);
+		tmp = tmp->next;
+	}
+	return (i);
+}
+//itera sin modificar los tokens para comprobar prioridad de output en el comando, en caso de error de archivo
+//por falta de permisos, devuelve un 2 otorgado por ft_red_out_aux o ft_append;
+int selector_output(t_parser *d)
+{
+	int i;
+	t_token *tmp;
+
+	tmp = d->t_current;
+	i = 0;
+	while (tmp  && tmp->type != PIPE)
+	{
+		if (tmp->type == APPEND)
+			i = ft_append(d->data_hd_append, tmp,d->data_pipe);
+		else if (tmp->type == RED_OUT)
+			i = ft_red_out_aux(d->data_redir, tmp,d->data_pipe);
 		if (i == 2)
 			return (i);
 		tmp = tmp->next;

@@ -59,10 +59,14 @@ static void	ft_err_red_errorfile(int *exit_status, t_token *t_current)
 void	ft_error_syntax(int *exit_status, int name, t_token *t_current)
 {
 	if (name == PIPE)
+	{
 		ft_putstr_fd \
 		("\033[31mminishell: syntax error near unexpected\
-		 token `|'\x1b[0m\n", 2);
-	else if (name == RED_IN || name == RED_OUT || name == HERE_DOC)
+		token `|'\x1b[0m\n", 2);
+		*exit_status = 2 ;
+		return ;
+	}
+	else if (name == RED_IN || name == RED_OUT || name == HERE_DOC || name == APPEND)
 	{
 		if (t_current && (!ft_strncmp(t_current->str, "|", 1) || \
 			!ft_strncmp(t_current->str, "<", 1) \
@@ -80,6 +84,8 @@ void	ft_error_syntax(int *exit_status, int name, t_token *t_current)
 		{
 			ft_putstr_fd("\033[31mminishell: syntax error near",2);
 			ft_putstr_fd(" unexpected token `newline'\x1b[0m\n", 2);
+			*exit_status = 2 ;
+			return ;
 		}
 	}
 	*exit_status = 258;

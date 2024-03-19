@@ -12,7 +12,7 @@
 
 #include "../inc/minishell.h"
 
-int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_heredoc *data_heredoc, int *exit_status) //se le da el tipo int para el caso "cat <"
+int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_hd_append *data_hd_append, int *exit_status) //se le da el tipo int para el caso "cat <"
 {
 	int first_token;
 	int consecutive_metachar;
@@ -61,7 +61,7 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 			consecutive_metachar++;
 			*t_current = (*t_current)->next;
 			//para checkear que esto funcione, en la segunda opcion del if, 
-			if (!*t_current || (data_redir->fd_outfile = open((*t_current)->str, O_WRONLY | O_CREAT | O_TRUNC, 0666 )) == -1 ) 
+			if (!*t_current || (data_redir->fd_outfile = open((*t_current)->str, O_WRONLY | O_CREAT | O_TRUNC, 0644 )) == -1 ) 
 			{
 				ft_error_syntax(exit_status, RED_OUT, *t_current);
 				if (!*t_current) //para que no pete en solo >
@@ -92,10 +92,34 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 					return (1); 
 			}
 			else
-				data_heredoc->heredoc_counter++;
+				data_hd_append->heredoc_counter++;
 			(*t_current)->type = LIMITER;
 			consecutive_metachar = 0;
 			*t_current = (*t_current)->next;
+		}
+		else if (!ft_strncmp((*t_current)->str, ">>\0", 2))
+		{
+			(*t_current)->type = APPEND;
+			consecutive_metachar++;
+			*t_current = (*t_current)->next;
+			//para checkear que esto funcione, en la segunda opcion del if, 
+			if (!*t_current || (data_hd_append->fd_append = open((*t_current)->str, O_WRONLY | O_CREAT | O_APPEND, 0644 )) == -1 ) 
+			{
+				ft_error_syntax(exit_status, APPEND, *t_current);
+				if (!*t_current) //para que no pete en solo >
+					return (1); 
+			}
+			data_hd_append->append_counter++;
+			if (data_hd_append->fd_append >= 0)
+			{
+				if (close(data_hd_append->fd_append) == -1)
+					ft_error_system(CLOSE_ERROR);
+			}
+			data_hd_append->fd_append = -1;
+			if ((*t_current)->type == 0)
+				(*t_current)->type = DOC;
+			consecutive_metachar = 0;
+			*t_current = (*t_current)->next;	
 		}
 		else
 		{
@@ -109,5 +133,6 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 	}
 	return (0);
 }
+
 
 

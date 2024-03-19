@@ -24,7 +24,7 @@ static int	selector_redirs_child(t_parser *d, t_env **env, char **envp)
 			return (l_red_out(d, env, envp), 0);
 	}
 	d->flag_output = \
-	ft_red_out_aux(d->data_redir, d->t_current, d->data_pipe);
+	selector_output(d); //selector_output
 	if (d->flag_output)
 	{
 		if (d->flag_output == 2)
@@ -47,22 +47,23 @@ int *exit_status)
 		d->flag_input = selector_input(d);
 		if (d->flag_input == 2)
 			return (ft_aux_close(d->data_pipe, d->data_redir, \
-			d->data_heredoc), 1);
-		if (ft_red_out_aux(d->data_redir, d->t_current, d->data_pipe) == 2)
+			d->data_hd_append), 1);
+		d->flag_output = selector_output(d);
+		if (d->flag_output == 2) //selector_output
 			return (ft_aux_close(d->data_pipe, d->data_redir, \
-			d->data_heredoc), 1);
+			d->data_hd_append), 1);
 		d->data_pipe->flag = NO;
 		ft_tokens_to_exec(&d->t_current, &d->t_tmp);
 		if (ft_is_built_in(&d->t_tmp))
 		{
 			*exit_status = ft_exec_builtin(&d->t_tmp, env);
-			ft_aux_close(d->data_pipe, d->data_redir, d->data_heredoc);
+			ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
 			return (free_tokens(&d->t_tmp), 1);
 		}
 		executor(&d->t_tmp, env, envp, d->data_pipe);
 		free_tokens(&d->t_tmp);
 		ft_wait_child_process(exit_status, 1);
-		ft_aux_close(d->data_pipe, d->data_redir, d->data_heredoc);
+		ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
 		return (1);
 	}
 	return (0);
@@ -105,20 +106,20 @@ int *exit_status)
 		d->flag_input = selector_input(d);
 		if (d->flag_input == 2)
 		{
-			ft_aux_close(d->data_pipe, d->data_redir, d->data_heredoc);
+			ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
 			return (ft_wait_child_process(exit_status, d->process), 1);
 		}
-		d->flag_output = ft_red_out_aux(d->data_redir, d->t_current, d->data_pipe);
+		d->flag_output = selector_output(d); //selector_output
 		if (d->flag_output == 2)
 		{
-			ft_aux_close(d->data_pipe, d->data_redir, d->data_heredoc);
+			ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
 			return (ft_wait_child_process(exit_status, d->process), 1);
 		}
 		ft_tokens_to_exec(&d->t_current, &d->t_tmp);
 		executor(&d->t_tmp, env, envp, d->data_pipe);
 		d->process++;
 		free_tokens(&d->t_tmp);
-		ft_aux_close(d->data_pipe, d->data_redir, d->data_heredoc);
+		ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
 		return (ft_wait_child_process(exit_status, d->process),1);
 	}
 	return (0);
@@ -139,7 +140,7 @@ void	parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		ft_error_system(MALLOC_ERROR);
 	ft_init_data_parser(d, tokens);
 	if (typer_tokens(d->data_redir, &d->t_current, d->data_pipe, \
-	d->data_heredoc, exit_status))
+	d->data_hd_append, exit_status))
 		d->t_current = NULL;
 	else
 		d->t_current = *tokens;
@@ -155,6 +156,6 @@ void	parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		if (d->t_current)
 			d->t_current = d->t_current->next;
 	}
-	return (ft_aux_close(d->data_pipe, d->data_redir, d->data_heredoc), \
+	return (ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append), \
 	free(d));
 }

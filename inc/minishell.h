@@ -42,6 +42,7 @@
 # define ERROR_WORD 9
 # define ERROR_FILE 16
 # define HERE_DOC 10
+# define APPEND 17
 # define LIMITER 15
 
 //SIMPLE LINKED LIST PARA ENVIROMENT
@@ -79,11 +80,13 @@ typedef struct s_redir
 	int red_out_counter;
 }	t_redir;
 
-typedef struct s_heredoc
+typedef struct s_hd_append
 {
 	int heredoc_counter;
+	int	append_counter;
+	int fd_append;
 }
- t_heredoc;
+ t_hd_append;
 
 //STRUC PARA STRUCS EN EL PARSER
 typedef struct s_parser
@@ -92,7 +95,7 @@ typedef struct s_parser
 	t_pipe	*data_pipe;
 	t_token	*t_tmp;
 	t_token	*t_current;
-	t_heredoc *data_heredoc;
+	t_hd_append *data_hd_append;
 	int		process;
 	int		flag_input;
 	int		flag_output;
@@ -124,7 +127,7 @@ int		ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe);
 
 int		ft_red_out_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe);
 
-void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir, t_heredoc *data_heredoc);
+void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir, t_hd_append *data_hd_append);
 
 //--------executor.c-------------
 
@@ -141,12 +144,16 @@ void	executor(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe);
 
 //--------typer.c-------------
 
-int 	typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_heredoc *data_heredoc, int *exit_status);
+int 	typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_hd_append *data_hd_append, int *exit_status);
 
 
 //--------here_doc.c-------------
 
-void 	ft_here_doc(t_token *token, t_heredoc *data_here_doc, t_pipe *data_pipe);
+void 	ft_here_doc(t_token *token, t_hd_append *data_here_doc, t_pipe *data_pipe);
+
+//--------append.c-------------
+
+int	ft_append (t_hd_append *data_hd_append, t_token *t_current, t_pipe *data_pipe);
 
 //--------parser_utils.c-------------
 
@@ -159,6 +166,8 @@ void	l_red_out(t_parser *d, t_env **env, char **envp);
 void	ft_init_data_parser(t_parser *d, t_token **tokens);
 
 int		selector_input(t_parser *d);
+
+int selector_output(t_parser *d);
 
 //---------PENDIENTE ORDENAR-----------
 
