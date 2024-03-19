@@ -28,6 +28,33 @@ t_token *ft_tokendup(t_token *token)
 	return (new_token);
 }
 
+//Crea una copia de los tokens a enviar al executor, SOLO DE LAS WORDS encontradas hasta la pipe
+void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
+{
+	t_token	*tmp;
+	t_token	*last;
+	t_token	*curr;
+
+	curr = *og_tokens;
+	last = NULL;
+	tmp = NULL;
+	while (curr && curr->type != PIPE)
+	{
+		if (curr->type == WORD)
+		{
+			tmp = ft_tokendup(curr);
+			if (!*new_tokens)
+				*new_tokens = tmp;
+			else
+			{
+				if (last)
+					last->next = tmp;
+			}	
+			last = tmp;
+		}
+		curr = curr->next;
+	}
+}
 //unefficient, but this is only works when in a pipeline, the actual cmd is
 //canceled by a no_permission doc, but the next cmd need a the read pipe
 //to work as bash
@@ -44,12 +71,8 @@ void	l_red_out(t_parser *d, t_env **env, char **envp)
 	d->data_pipe->pipe_counter--;
 }
 
-// Inicializa los strucs contenidos en el struc del parser, y llama 
-//	al typer para setear tipos a los tokens
-//	en caso de error pasado por este, pone en NULL la lista de 
-//	t_current para evitar la ejecucion
-void	ft_init_data_parser(t_parser *d, t_token **tokens,\
-		int *exit_status)
+// Inicializa los strucs contenidos en el struc del parser
+void	ft_init_data_parser(t_parser *d, t_token **tokens)
 {
 	d->data_heredoc = malloc(sizeof(t_pipe));
 	if (!d->data_heredoc)
@@ -76,11 +99,6 @@ void	ft_init_data_parser(t_parser *d, t_token **tokens,\
 	d->data_redir->fd_infile = -1;
 	d->data_redir->fd_outfile = -1;
 	d->t_current = *tokens;
-	if (typer_tokens(d->data_redir, &d->t_current, d->data_pipe,\
-	 d->data_heredoc, exit_status))
-		d->t_current = NULL;
-	else
-		d->t_current = *tokens;
 }
 
 //itera sin modificar los tokens para comprobar prioridad de input en el comando, en caso de error de archivo
