@@ -2,7 +2,9 @@
 -Makefile ✅ [PENDIENTE TESTS DE RELINK]
 -Pipeline ✅ [Hace falta optimizar el codigo para simplificarlo]
 -QUOTES
-	- "$"AAA -> lo convierte a $AAA y intenta expandir la variable, se tiene que quedar como $AAA ❌
+	-[SOLVED✅] "$"AAA -> lo convierte a $AAA y intenta expandir la variable, se tiene que quedar como $AAA 
+	- Ultimo test:
+		{echo "hola que tal"42$HOME$4$"HOME$HOME"'$HOME'">tst">tst|wc} -> crea el archivo tst, printea ahi todo el string, y printea 0 0 0 en el terminal (IGUAL QUE BASH)
 -Redirections
 	-RED_IN ✅
 		- En archivos sin permisos Permission denied no controlado ✅

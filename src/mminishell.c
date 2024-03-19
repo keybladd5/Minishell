@@ -68,103 +68,32 @@ void ft_catch_env(char **envp, t_env **head)
 	}
 	last->next = NULL;
 }
-//aux lexer
-
-int		ft_ismetachar(char c)
-{
-	if (c == '|' || c == '<' || c == '>')
-		return (1);
-	return (0);
-}
-
-///NOT FULLLY TESTED////
-void	ft_createtoken(t_token **curr_token, char *input, int *i, t_env **env, int exit_status)
-{
-	int		j;
-	int		flag;
-	char	*str;
-	
-	j = *i;
-	flag = 0;
-	while (input[j] && !ft_isspace(input[j]))
-	{
-		if (input[j] == '"')
-		{
-			j++;
-			while (input[j] != '"')
-				j++;
-			str = ft_substr(input, *i + 1, j - (*i + 1));
-			if (!str)
-				exit (MALLOC_ERROR);
-			expansor(&str, env, exit_status);
-			(*curr_token)->str = ft_strjoin_free((*curr_token)->str, str);
-			(*curr_token)->type = WORD;
-			j++;
-			if (input[j] && ft_ismetachar(input[j]))
-				flag = 1;
-		}
-		else 
-		{
-			if (ft_ismetachar(input[j]))
-			{
-				while (input[j] && ft_ismetachar(input[j]))
-					j++;
-				if (input[j])
-					flag = 1;
-			}
-			else
-			{
-				while (input[j] && !ft_ismetachar(input[j]) && !ft_isspace(input[j]) && input[j] != '"' /*&& input[j] != '\''*/)
-					j++;
-				if (input[j] && input[j] != '"' /*&& input[j] != '\''*/)
-					flag = 1;
-			}
-			str = ft_substr(input, *i, j - *i);
-			if (!str)
-				exit (MALLOC_ERROR);
-			expansor(&str, env, exit_status);
-			if (str)
-			{
-				if (!ft_strxcmp(str, "$") && input[j] == '"')
-				{
-					free (str);
-					str = NULL;
-				}
-				(*curr_token)->str = ft_strjoin_free((*curr_token)->str, str);
-			}
-		}
-		*i = j;
-		if (flag)
-			break ;
-	}
-}
 
 //split all words by spaces in a linked list
 void	lexer(t_token **tokens, char *input, t_env **env, int exit_status)
 {
-	t_token	*tmp;
+	t_token	*tmp_token;
 	t_token	*last;
-	int i = 0;
+	int		i;
+
+	i = 0;
 	while (input[i])
 	{
 		while (ft_isspace(input[i]))
 			i++;
-		if (!input[i]) //para no tomar los espacios como argumentos para crear un nodo
+		if (!input[i])
 			break ;
-		tmp = (t_token *)malloc(sizeof(t_token));
-		if (!tmp)
-			exit(MALLOC_ERROR);
-		tmp->str = NULL;
-		tmp->type = 0;
-		tmp->next = NULL;
-		ft_createtoken(&tmp, input, &i, env, exit_status);
-		if (tmp->str == NULL)
-			ft_remove_token(tokens, &tmp);
-		if (!*tokens)
-			*tokens = tmp;
+		tmp_token = ft_createtoken(input, &i, env, exit_status);
+		if (!tmp_token->str)
+			free(tmp_token);
 		else
-			last->next = tmp;
-		last = tmp;
+		{
+			if (!*tokens)
+				*tokens = tmp_token;
+			else
+				last->next = tmp_token;
+			last = tmp_token;
+		}
 	}
 }
 
