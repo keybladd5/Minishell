@@ -152,9 +152,11 @@ void 	ft_here_doc(t_token *token, t_heredoc *data_here_doc, t_pipe *data_pipe);
 
 t_token *ft_tokendup(t_token *token);
 
+void 	ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens);
+
 void	l_red_out(t_parser *d, t_env **env, char **envp);
 
-void	ft_init_data_parser(t_parser *d, t_token **tokens, int *exit_status);
+void	ft_init_data_parser(t_parser *d, t_token **tokens);
 
 int		selector_input(t_parser *d);
 
