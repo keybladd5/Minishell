@@ -37,6 +37,7 @@ void free_tokens(t_token **head)
 	}
 	*head = NULL;
 }
+
 //get env on a list
 void ft_catch_env(char **envp, t_env **head)
 {
@@ -67,104 +68,32 @@ void ft_catch_env(char **envp, t_env **head)
 	}
 	last->next = NULL;
 }
-//aux lexer
-
-int		ft_ismetachar(char c)
-{
-	if (c == '|' || c == '<' || c == '>')
-		return (1);
-	return (0);
-}
-///OLD VERSIOn///
-int		ft_tokenlen(char *input)
-{
-	int	len;
-
-	len = 0;
-	/////
-	
-	/////
-	if (ft_ismetachar(*input))
-		while (ft_ismetachar(input[len]) && input[len])
-			len++;
-	else
-		while (!ft_ismetachar(input[len]) && !ft_isspace(input[len]) && input[len]) // CAMBIO! ahora acepta cualquier tipo de caracter hasta espacio o  NULL como token
-			len++;
-	return (len);
-}
-///NOT FULLLY TESTED////
-void	ft_createtoken(t_token **curr_token, char *input, int *i)
-{
-	int	j;
-	int	flag;
-	
-	j = *i;
-	flag = 0;
-	while (input[j] && !ft_isspace(input[j]))
-	{
-		if (input[j] == '"')
-		{
-			j++;
-			while (input[j] != '"')
-				j++;
-			(*curr_token)->str = ft_strjoin_free((*curr_token)->str, ft_substr(input, *i + 1, j - (*i + 1)));
-			(*curr_token)->type = WORD;
-			j++;
-		}
-		else 
-		{
-			if (ft_ismetachar(input[j]))
-			{
-				while (input[j] && ft_ismetachar(input[j]))
-					j++;
-				if (input[j])
-					flag = 1;
-			}
-			else
-			{
-				while (input[j] && !ft_ismetachar(input[j]) && !ft_isspace(input[j]) && input[j] != '"' /*&& input[j] != '\''*/)
-					j++;
-				if (input[j] && input[j] != '"' /*&& input[j] != '\''*/)
-					flag = 1;
-			}
-			(*curr_token)->str = ft_strjoin_free((*curr_token)->str, ft_substr(input, *i, j - *i));
-		}
-		*i = j;
-		if (flag)
-			break ;
-	}
-}
 
 //split all words by spaces in a linked list
-void	lexer(t_token **tokens, char *input)
+void	lexer(t_token **tokens, char *input, t_env **env, int exit_status)
 {
-	t_token	*tmp;
+	t_token	*tmp_token;
 	t_token	*last;
-	int i = 0;
+	int		i;
+
+	i = 0;
 	while (input[i])
 	{
 		while (ft_isspace(input[i]))
 			i++;
-		if (!input[i]) //para no tomar los espacios como argumentos para crear un nodo
+		if (!input[i])
 			break ;
-		tmp = (t_token *)malloc(sizeof(t_token));
-		if (!tmp)
-			exit(MALLOC_ERROR);
-		tmp->str = NULL;
-		tmp->type = 0;
-		tmp->next = NULL;
-		ft_createtoken(&tmp, input, &i);
-		/*
-		tmp->str = ft_substr(input, i, ft_tokenlen(input + i));
-		if (!tmp->str)
-			exit (MALLOC_ERROR);
-		i += ft_tokenlen(input + i);
-		*/
-		if (!*tokens)
-			*tokens = tmp;
+		tmp_token = ft_createtoken(input, &i, env, exit_status);
+		if (!tmp_token->str)
+			free(tmp_token);
 		else
-			last->next = tmp;
-		last = tmp;
+		{
+			if (!*tokens)
+				*tokens = tmp_token;
+			else
+				last->next = tmp_token;
+			last = tmp_token;
+		}
 	}
 }
 
@@ -216,8 +145,7 @@ void 	input_loop(t_env **env, char **envp)
 			ft_printf("exit\n");
 			exit(EXIT_SUCCESS);
 		}
-		lexer(&tokens, input);
-		expansor(&tokens, env, exit_status);
+		lexer(&tokens, input, env, exit_status);
 		parser(&tokens, env, envp , &exit_status);
 		add_history(input);
 		free_tokens(&tokens);

@@ -72,7 +72,7 @@ typedef struct s_pipe
 }	t_pipe;
 
 //STRUC PARA DATOS DE REDIRECCIONES
-typedef struct s_redir
+typedef	struct s_redir
 {
 	int fd_infile;
 	int red_in_counter;
@@ -100,6 +100,15 @@ typedef struct s_parser
 	int		flag_input;
 	int		flag_output;
 }	t_parser;
+//STRUC PARA EL LEXER
+typedef	struct s_lexer
+{
+	char	*input;
+	char	*str;
+	int		start;
+	int		end;
+	int		flag;
+}	t_lexer;
 
 //--------errors.c-----------
 
@@ -175,7 +184,7 @@ int		ft_ismetachar(char c);
 
 void	ft_remove_token(t_token **tokens, t_token **t_current);
 
-void	expansor(t_token **tokens, t_env **env, int exit_status);
+void	expansor(char **str, t_env **env, int exit_status);
 
 void	parser(t_token **tokens, t_env **env, char **envp, int *exit_status);
 
@@ -201,5 +210,6 @@ int		ft_export(t_token *tokens, t_env *env);
 
 int		ft_export(t_token *tokens, t_env *env);
 
+t_token	*ft_createtoken(char *input, int *i, t_env **env, int exit_status);
 
 #endif
