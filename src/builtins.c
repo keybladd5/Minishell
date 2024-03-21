@@ -171,6 +171,7 @@ static int	ft_isvalidkey(char *str)
 	return 1;
 }
 
+//esta fallando en casos de NULL
 int	ft_export(t_token *tokens, t_env *env)
 {
 	t_env	*tmp;
@@ -182,7 +183,7 @@ int	ft_export(t_token *tokens, t_env *env)
 		while (env)
 		{
 			ft_putstr_fd("declare -x ", 1);
-			ft_putstr_fd(env->key_name, 1);
+			ft_putstr_fd(env->key_name, 1); //aqui peta
 			write(1, "=\"", 1);
 			ft_putstr_fd(env->value, 1);
 			ft_putendl_fd("\"", 1);
@@ -211,7 +212,7 @@ int	ft_export(t_token *tokens, t_env *env)
 		tmp->key_name = ft_substr(tokens->str, 0, (div - tokens->str));
 		if (!tmp->key_name)
 			exit (MALLOC_ERROR);
-		tmp->value = ft_substr(div+1, 0, ft_strlen(div));
+		tmp->value = ft_substr(div+1, 0, ft_strlen(div));//div+1 puede dar segfault
 		if (!tmp->value)
 			exit (MALLOC_ERROR);
 		last->next = tmp;

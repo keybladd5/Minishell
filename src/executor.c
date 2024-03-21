@@ -67,11 +67,14 @@ void	ft_exec_absoluthe_path(t_token **tokens, char **envp)
 
 	i = 0;
 	absolute_path = (*tokens)->str; //setemos la variable directamente sin buscar en path
-	if (access(absolute_path, X_OK) != 0)
-		exit(127);
 	cmd_argv = (char **)malloc(sizeof(char * ) * (ft_token_lst_size(*tokens) + 1)); //crea la matriz a pasar al execve
 	if (!cmd_argv)
 		ft_error_system(MALLOC_ERROR);
+	if (access(absolute_path, X_OK) != 0)
+	{
+		ft_error_cmd(cmd_argv[0]);
+		exit(127);
+	}
 	cmd_argv[ft_token_lst_size(*tokens)] = NULL;
 	while (*tokens) //llena la matriz con todos los tokens PENDIENTE CAMBIAR
 	{

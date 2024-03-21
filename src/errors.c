@@ -61,7 +61,7 @@ void	ft_error_syntax(int *exit_status, int name, t_token *t_current)
 	if (name == PIPE)
 	{
 		ft_putstr_fd \
-		("\033[31mminishell: syntax error near unexpected\
+		("\033[31mminishell: syntax error near unexpected \
 		token `|'\x1b[0m\n", 2);
 		*exit_status = 2 ;
 		return ;

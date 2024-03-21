@@ -3,6 +3,13 @@
 - Pipeline ✅ [Hace falta optimizar el codigo para simplificarlo]
 - QUOTES
 	- "$"AAA -> lo convierte a $AAA y intenta expandir la variable, se tiene que quedar como $AAA ❌
+
+
+parser:
+
+	- ls ><
+	- 'ls'|'wc'>><
+		sevfault!!! 
 - Redirections
 	- "< new cat > no_permission" muestra el output del cat en pantalla y no deberia  ✅ 
 	-RED_IN ✅
@@ -97,8 +104,88 @@ gcc src/mminishell.c libft/libft.a -lreadline -ltermcap
 
 -L ~/.brew/opt/readline/lib -I ~/.brew/opt/readline/include //sin esto no pilla rl_replace_line
 
+SEGMENTATION FAULTS!
 
 
+---------------------------------------------> test [237]
+|  CMD: ->test | ><-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (2)
+|
+|--- STDOUT:
+| -><-
+|
+|--- STDERR:
+| ->bash: line 1: syntax error near unexpected token `newline'$
+| bash: line 1: `test | >'$<-
+|
+|--- COMPARED STR:
+| ->syntax error near unexpected token <-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (134)
+|
+| AddressSanitizer:DEADLYSIGNAL
+| =================================================================
+| ==87098==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0x000103f18a2c bp 0x7ffeebcf5140 sp 0x7ffeebcf4b70 T0)
+| ==87098==The signal is caused by a READ memory access.
+| ==87098==Hint: address points to the zero page.
+|     #0 0x103f18a2c in typer_tokens typer.c:63
+|     #1 0x103f11d29 in parser parser.c:142
+|     #2 0x103f0e2b3 in input_loop mminishell.c:149
+|     #3 0x103f0e4a3 in main mminishell.c:165
+|     #4 0x7fff6c606cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)
+| 
+| ==87098==Register values:
+| rax = 0x0000000000000000  rbx = 0x00007ffeebcf52e0  rcx = 0x0000000000000000  rdx = 0x0000100000000000  
+| rdi = 0x0000100000000000  rsi = 0x0000100000000000  rbp = 0x00007ffeebcf5140  rsp = 0x00007ffeebcf4b70  
+|  r8 = 0x00007ffeebcf5200   r9 = 0x0000000000000000  r10 = 0x0000000000000003  r11 = 0x0000000000000246  
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000  
+| AddressSanitizer can not provide additional info.
+| SUMMARY: AddressSanitizer: SEGV typer.c:63 in typer_tokens
+| ==87098==ABORTING
+| mpanic.sh: line 164: 87098 Abort trap: 6           ./minishell
+|
+---------------------------------------------<
+
+---------------------------------------------> test [238]
+|  CMD: ->test | >><-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (2)
+|
+|--- STDOUT:
+| -><-
+|
+|--- STDERR:
+| ->bash: line 1: syntax error near unexpected token `newline'$
+| bash: line 1: `test | >>'$<-
+|
+|--- COMPARED STR:
+| ->syntax error near unexpected token <-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (134)
+|
+| AddressSanitizer:DEADLYSIGNAL
+| =================================================================
+| ==87163==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0x0001012b0a0f bp 0x7ffeee95e140 sp 0x7ffeee95db70 T0)
+| ==87163==The signal is caused by a READ memory access.
+| ==87163==Hint: address points to the zero page.
+|     #0 0x1012b0a0f in typer_tokens typer.c:107
+|     #1 0x1012a8d29 in parser parser.c:142
+|     #2 0x1012a52b3 in input_loop mminishell.c:149
+|     #3 0x1012a54a3 in main mminishell.c:165
+|     #4 0x7fff6c606cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)
+|
+| ==87163==Register values:
+| rax = 0x0000000000000000  rbx = 0x00007ffeee95e2e0  rcx = 0x0000000000000000  rdx = 0x0000100000000000
+| rdi = 0x0000100000000000  rsi = 0x0000100000000000  rbp = 0x00007ffeee95e140  rsp = 0x00007ffeee95db70
+|  r8 = 0x00007ffeee95e200   r9 = 0x0000000000000000  r10 = 0x0000000000000003  r11 = 0x0000000000000246
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000
+| AddressSanitizer can not provide additional info.
+| SUMMARY: AddressSanitizer: SEGV typer.c:107 in typer_tokens
+| ==87163==ABORTING
+| mpanic.sh: line 164: 87163 Abort trap: 6           ./minishell
+|
+---------------------------------------------<
 -----------------ACTUALIZAR READ_LINE----------------------
 
 https://github.com/tjensen42/42-minishell

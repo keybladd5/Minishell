@@ -50,7 +50,7 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 					ft_error_system(CLOSE_ERROR);
 			}
 			data_redir->fd_infile = -1;
-			if ((*t_current)->type == 0)
+			if ((*t_current)->type != ERROR_FILE)
 				(*t_current)->type = DOC;
 			consecutive_metachar = 0;
 			*t_current = (*t_current)->next;	
@@ -60,6 +60,8 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 			(*t_current)->type = RED_OUT; //seteo type
 			consecutive_metachar++;
 			*t_current = (*t_current)->next;
+			if (*t_current && ft_ismetachar((*t_current)->str[0]))
+				return (ft_error_syntax(exit_status, RED_OUT, *t_current), 1);
 			//para checkear que esto funcione, en la segunda opcion del if, 
 			if (!*t_current || (data_redir->fd_outfile = open((*t_current)->str, O_WRONLY | O_CREAT | O_TRUNC, 0644 )) == -1 ) 
 			{
@@ -74,7 +76,7 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 					ft_error_system(CLOSE_ERROR);
 			}
 			data_redir->fd_outfile = -1;
-			if ((*t_current)->type == 0)
+			if ((*t_current)->type != ERROR_FILE)
 				(*t_current)->type = DOC;
 			consecutive_metachar = 0;
 			*t_current = (*t_current)->next;	
@@ -102,6 +104,8 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 			(*t_current)->type = APPEND;
 			consecutive_metachar++;
 			*t_current = (*t_current)->next;
+			if (ft_ismetachar((*t_current)->str[0]))
+				return (ft_error_syntax(exit_status, RED_OUT, *t_current), 1);
 			//para checkear que esto funcione, en la segunda opcion del if, 
 			if (!*t_current || (data_hd_append->fd_append = open((*t_current)->str, O_WRONLY | O_CREAT | O_APPEND, 0644 )) == -1 ) 
 			{
@@ -116,7 +120,7 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 					ft_error_system(CLOSE_ERROR);
 			}
 			data_hd_append->fd_append = -1;
-			if ((*t_current)->type == 0)
+			if ((*t_current)->type != ERROR_FILE)
 				(*t_current)->type = DOC;
 			consecutive_metachar = 0;
 			*t_current = (*t_current)->next;	

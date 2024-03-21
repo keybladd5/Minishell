@@ -12,6 +12,7 @@
 
 #include "../inc/minishell.h"
 
+//retorna un 1 si es metachar, sino 0
 int	ft_ismetachar(char c)
 {
 	if (c == '|' || c == '<' || c == '>')
