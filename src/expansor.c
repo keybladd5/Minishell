@@ -124,6 +124,7 @@ void	expansor(char **str, t_env **env, int exit_status)
 			else
 				*str = ft_strjoin_s(*str, "$");
 		}
+		//else if (tmp[i] == '~')
 		else
 			ft_noexpansion(tmp, str, &i);
 	}

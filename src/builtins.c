@@ -51,10 +51,10 @@ int	ft_echo(t_token *tokens)
 	flag = 0;
 	if (!tokens)
 		return(ft_putstr_fd("\n", 1), 0);
-	if (!ft_strncmp("-n\0", t_current->str, 3)) //comprueba si el primer token es la flag "-n" (null terminated para evitar falsos positivos tipo -na)
+	while (t_current && !ft_strncmp("-n", t_current->str, 2) && !ft_strchr(t_current->str, ' ')) //comprueba si el primer token es la flag "-n" (null terminated para evitar falsos positivos tipo -na)
 	{
-		t_current = t_current->next;
 		flag = 1;
+		t_current = t_current->next;
 	}
 	while (t_current) //para cada token imprime su contenido y un espacio excepto para el ultimo (next = NULL)
 	{
@@ -176,8 +176,12 @@ int	ft_export(t_token *tokens, t_env *env)
 {
 	t_env	*tmp;
 	t_env	*last;
+	t_env	*curr_env;
 	char	*div;
+	char	*keyname;
+	int		var_flag;
 
+	curr_env = env;
 	if (!tokens)
 	{
 		while (env)
@@ -193,12 +197,12 @@ int	ft_export(t_token *tokens, t_env *env)
 			write(1, "\n", 1);
 			env = env->next;
 		}
-		return (1);
+		return (0);
 	}
-	while (env->next)
+	while (curr_env->next)
 	{
-		last = env->next;
-		env = last;
+		last = curr_env->next;
+		curr_env = last;
 	}
 	while (tokens)
 	{
@@ -207,27 +211,53 @@ int	ft_export(t_token *tokens, t_env *env)
 			ft_putstr_fd("\033[31mminishell: export: `", 2);
 			ft_putstr_fd(tokens->str, 2);
 			ft_putstr_fd("': not a valid identifier\x1b[0m\n", 2);
-			return (0);
+			return (1);
 		}
-		tmp = (t_env *)malloc(sizeof(t_env));
-		if (!tmp)
-			exit(MALLOC_ERROR);
+		var_flag = 0;
 		div = ft_strchr(tokens->str, '=');
-		tmp->key_name = ft_substr(tokens->str, 0, (div - tokens->str));
-		if (!tmp->key_name)
+		keyname = ft_substr(tokens->str, 0, (div - tokens->str));
+		if (!keyname)
 			exit (MALLOC_ERROR);
-		if (div)
+		while (env)
 		{
-			tmp->value = ft_substr(div+1, 0, ft_strlen(div));//div+1 puede dar segfault
-			if (!tmp->value)
-				exit (MALLOC_ERROR);
+			if (!ft_strxcmp(keyname, env->key_name))
+			{
+				var_flag = 1;
+				break ;
+			}
+			env = env->next;
+		}
+		if (var_flag)
+		{
+			if (div)
+			{
+				env->value = ft_substr(div+1, 0, ft_strlen(div));
+				if (!env->value)
+					exit (MALLOC_ERROR);
+			}
 		}
 		else
+		{
+			tmp = (t_env *)malloc(sizeof(t_env));
+			if (!tmp)
+				exit(MALLOC_ERROR);
+			tmp->key_name = NULL;
 			tmp->value = NULL;
-		last->next = tmp;
-		last = tmp;
+			tmp->next = NULL;
+			div = ft_strchr(tokens->str, '=');
+			tmp->key_name = ft_substr(tokens->str, 0, (div - tokens->str));
+			if (!tmp->key_name)
+				exit (MALLOC_ERROR);
+			if (div)
+			{
+				tmp->value = ft_substr(div+1, 0, ft_strlen(div));
+				if (!tmp->value)
+					exit (MALLOC_ERROR);
+			}
+			last->next = tmp;
+			last = tmp;
+		}
 		tokens = tokens->next;
 	}
-	return (1);
-	
+	return (0);
 }

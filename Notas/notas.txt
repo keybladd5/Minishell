@@ -47,10 +47,10 @@ minishell: ls: command not found
 		- {$"HOME"} 
 - Implementar builtins ⏳
 	|-BUILTINS
-|     |-Echo (-n) ❌
-		- echo -nnnnnnn hola debe mostrar hola sin newline 
-		- echo -n -n -n -n -n hola debe mostrar hola sin newline 
-		- echo -nnnnn -n -n -n hola debe mostrar hola sin newline
+|     |-Echo (-n) ✅
+		- [SOLVED✅]echo -nnnnnnn hola debe mostrar hola sin newline 
+		- [SOLVED✅]echo -n -n -n -n -n hola debe mostrar hola sin newline 
+		- [SOLVED✅]echo -nnnnn -n -n -n hola debe mostrar hola sin newline
 |     |-cd (relative/absolute path) ❌
 		- cd - debe llevarte a tu OLDPWD
 |	  |-pwd ✅
