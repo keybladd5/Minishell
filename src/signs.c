@@ -55,7 +55,7 @@ void	sig_init(int i)//cambio anadido pendiente analizar🐸
 	g_signal = 0;
 	if (i == 1)//cambio anadido pendiente analizar🐸
 	{
-		signal(SIGINT, sig_handler); //Init SIGINT (ctrl+C) para ejecutar sig_handler cuando la reciba
+		if (signal(SIGINT, sig_handler) == SIG_ERR)//Init SIGINT (ctrl+C) para ejecutar sig_handler cuando la reciba
 		signal(SIGQUIT, SIG_IGN); //Init SIGQUIT (ctrl+\) para ignorarla
 	}
 	else//cambio anadido pendiente analizar🐸

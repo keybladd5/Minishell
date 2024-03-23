@@ -104,7 +104,7 @@ int typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_
 			(*t_current)->type = APPEND;
 			consecutive_metachar++;
 			*t_current = (*t_current)->next;
-			if (ft_ismetachar((*t_current)->str[0]))
+			if (*t_current && ft_ismetachar((*t_current)->str[0]))
 				return (ft_error_syntax(exit_status, RED_OUT, *t_current), 1);
 			//para checkear que esto funcione, en la segunda opcion del if, 
 			if (!*t_current || (data_hd_append->fd_append = open((*t_current)->str, O_WRONLY | O_CREAT | O_APPEND, 0644 )) == -1 ) 
