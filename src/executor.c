@@ -32,6 +32,34 @@ void 	ft_wait_child_process(int *exit_status, int process)
 	}
 }
 
+//NO FUNCIONA !!!
+char **ft_copy_env(t_env **env)
+{
+	int i;
+	char **new_env;
+	t_env **ref;
+
+	i = 0;
+	ref = env;
+	while(*env)
+	{
+		*env = (*env)->next;
+		i++;
+	}
+	*env = *ref;
+	new_env = (char **)malloc(sizeof(char *) * (i + 1));
+	i = 0;
+	while(*env)
+	{
+		new_env[i] = ft_strdup((*env)->value);
+		if (!new_env[i])
+			ft_error_system(MALLOC_ERROR);
+		i++;
+	}
+	new_env[i] = NULL;
+	return (new_env);
+}
+
 int		ft_aux_abs(char *str)
 {
 	int	i;
@@ -152,30 +180,32 @@ void 	exec_cmd(t_token **tokens, t_env **env, char **envp)
 void	executor(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 {
 	int	pid;
+	char **new_envp;
 	
 	pid = fork();
+	new_envp = NULL;
 	//dprintf(2, "%d\n", pid);
 	if (pid < 0)
 		ft_error_system(FORK_ERROR);
-	sig_init(0);//cambio anadido pendiente analizar🐸 
+	sig_init(0);
 	if (pid == 0)
 	{
 		/*int loop = 1;
 		while (loop)
 		;*/
-		
-		if (data_pipe->flag == YES) //se elimina la ultima condicion ya que no entra por ahi
+		new_envp = ft_copy_env(env);// en FASE DE TESTEO
+		if (data_pipe->flag == YES) 
 		{
-			if (dup2(data_pipe->pipefd[1], 1) == -1)//comunica la salida con la entrada del siguiente proceso
+			if (dup2(data_pipe->pipefd[1], 1) == -1)
 				ft_error_system(DUP2_ERROR);
 			close(data_pipe->pipefd[1]);
 			close(data_pipe->pipefd[0]);
 		}
-		if (!tokens || !*tokens)//proteccion para cuando no hay tokens que mandar
+		if (!tokens || !*tokens)
 			exit (1) ;
 		if (ft_is_built_in(tokens))
 			exit(ft_exec_builtin(tokens, env));
-		else if ((*tokens)->str[0] ==  '/')//en caso de ser posible ruta absoluta
+		else if ((*tokens)->str[0] ==  '/')
 			ft_exec_absoluthe_path(tokens, envp);
 		else
 			exec_cmd(tokens, env, envp);

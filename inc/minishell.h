@@ -180,6 +180,8 @@ int selector_output(t_parser *d);
 
 //---------PENDIENTE ORDENAR-----------
 
+char	**ft_copy_env(t_env **env);
+
 int		ft_ismetachar(char c);
 
 void	ft_remove_token(t_token **tokens, t_token **t_current);
