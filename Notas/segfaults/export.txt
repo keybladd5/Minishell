@@ -1,0 +1,395 @@
+---------------------------------------------> test [25]
+|  CMD: ->export TEST=test
+| export | grep TEST<-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (0)
+|
+|--- STDOUT:
+| ->declare -x TEST="test"$<-
+|
+|--- STDERR:
+| -><-
+|
+|--- COMPARED STR:
+| -><-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (0)
+|
+|--- STDOUT:
+| ->declare -x TEST=test"$<-
+|
+|--- STDERR:
+| ->AddressSanitizer:DEADLYSIGNAL$
+| =================================================================$
+| ==28953==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x000101f126d7 bp 0x7ffeedcf1f00 sp 0x7ffeedcf1e10 T0)$
+| ==28953==The signal is caused by a READ memory access.$
+| ==28953==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.$
+|     #0 0x101f126d7 in ft_export builtins.c:186$
+|     #1 0x101f11d7c in ft_exec_builtin builtins.c:30$
+|     #2 0x101f14a4b in executor executor.c:178$
+|     #3 0x101f15ea5 in parse_child_cmd parser.c:86$
+|     #4 0x101f14e2e in parser parser.c:151$
+|     #5 0x101f11210 in input_loop mminishell.c:149$
+|     #6 0x101f11403 in main mminishell.c:165$
+|     #7 0x7fff6f3d9cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)$
+| $
+| ==28953==Register values:$
+| rax = 0xbebebebebebebebe  rbx = 0x00007ffeedcf2340  rcx = 0x17d7d7d7d7d7d7d7  rdx = 0x0000100000000000  $
+| rdi = 0x0000000101f52520  rsi = 0x0000000000000005  rbp = 0x00007ffeedcf1f00  rsp = 0x00007ffeedcf1e10  $
+|  r8 = 0x0000000000000007   r9 = 0xffffe3e9ffffffe4  r10 = 0x000000000000000b  r11 = 0x0000000000000246  $
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000  $
+| AddressSanitizer can not provide additional info.$
+| SUMMARY: AddressSanitizer: SEGV builtins.c:186 in ft_export$
+| ==28953==ABORTING$<-
+|
+---------------------------------------------<
+
+---------------------------------------------> test [26]
+|  CMD: ->export TEST=test TESTT=test2
+| export | grep TEST<-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (0)
+|
+|--- STDOUT:
+| ->declare -x TEST="test"$
+| declare -x TESTT="test2"$<-
+|
+|--- STDERR:
+| -><-
+|
+|--- COMPARED STR:
+| -><-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (0)
+|
+|--- STDOUT:
+| ->declare -x TEST=test"$
+| declare -x TESTT=test2"$<-
+|
+|--- STDERR:
+| ->AddressSanitizer:DEADLYSIGNAL$
+| =================================================================$
+| ==29008==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x00010b4126d7 bp 0x7ffee47f1f00 sp 0x7ffee47f1e10 T0)$
+| ==29008==The signal is caused by a READ memory access.$
+| ==29008==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.$
+|     #0 0x10b4126d7 in ft_export builtins.c:186$
+|     #1 0x10b411d7c in ft_exec_builtin builtins.c:30$
+|     #2 0x10b414a4b in executor executor.c:178$
+|     #3 0x10b415ea5 in parse_child_cmd parser.c:86$
+|     #4 0x10b414e2e in parser parser.c:151$
+|     #5 0x10b411210 in input_loop mminishell.c:149$
+|     #6 0x10b411403 in main mminishell.c:165$
+|     #7 0x7fff6f3d9cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)$
+| $
+| ==29008==Register values:$
+| rax = 0xbebebebebebebebe  rbx = 0x00007ffee47f2340  rcx = 0x17d7d7d7d7d7d7d7  rdx = 0x0000100000000000  $
+| rdi = 0x000000010b452520  rsi = 0x0000000000000005  rbp = 0x00007ffee47f1f00  rsp = 0x00007ffee47f1e10  $
+|  r8 = 0x0000000000000007   r9 = 0xffffe3e9ffffffe4  r10 = 0x000000000000000b  r11 = 0x0000000000000246  $
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000  $
+| AddressSanitizer can not provide additional info.$
+| SUMMARY: AddressSanitizer: SEGV builtins.c:186 in ft_export$
+| ==29008==ABORTING$<-
+|
+---------------------------------------------<
+
+---------------------------------------------> test [27]
+|  CMD: ->export TEST=test W:RON:G=wrong TESTT=test2
+| export | grep TEST wrong<-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (2)
+|
+|--- STDOUT:
+| -><-
+|
+|--- STDERR:
+| ->bash: line 1: export: `W:RON:G=wrong': not a valid identifier$
+| grep: wrong: No such file or directory$<-
+|
+|--- COMPARED STR:
+| ->export: `W:RON:G=wrong': not a valid identifier<-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (0)
+|
+|--- STDOUT:
+| -><-
+|
+|--- STDERR:
+| ->^[[31mminishell: export: `W:RON:G=wrong': not a valid identifier^[[0m$
+| AddressSanitizer:DEADLYSIGNAL$
+| =================================================================$
+| ==29063==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x00010b1fa6d7 bp 0x7ffee4a09f00 sp 0x7ffee4a09e10 T0)$
+| ==29063==The signal is caused by a READ memory access.$
+| ==29063==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.$
+| grep: wrong: No such file or directory$
+|     #0 0x10b1fa6d7 in ft_export builtins.c:186$
+|     #1 0x10b1f9d7c in ft_exec_builtin builtins.c:30$
+|     #2 0x10b1fca4b in executor executor.c:178$
+|     #3 0x10b1fdea5 in parse_child_cmd parser.c:86$
+|     #4 0x10b1fce2e in parser parser.c:151$
+|     #5 0x10b1f9210 in input_loop mminishell.c:149$
+|     #6 0x10b1f9403 in main mminishell.c:165$
+|     #7 0x7fff6f3d9cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)$
+| $
+| ==29063==Register values:$
+| rax = 0xbebebebebebebebe  rbx = 0x00007ffee4a0a340  rcx = 0x17d7d7d7d7d7d7d7  rdx = 0x0000100000000000  $
+| rdi = 0x000000010b23a520  rsi = 0x0000000000000005  rbp = 0x00007ffee4a09f00  rsp = 0x00007ffee4a09e10  $
+|  r8 = 0x0000000000000007   r9 = 0xffffe3e9ffffffe4  r10 = 0x000000000000000b  r11 = 0x0000000000000246  $
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000  $
+| AddressSanitizer can not provide additional info.$
+| SUMMARY: AddressSanitizer: SEGV builtins.c:186 in ft_export$
+| ==29063==ABORTING$<-
+|
+---------------------------------------------<
+
+---------------------------------------------> test [28]
+|  CMD: ->export EMPTY EMPTY_TOO= NOT_EMPTY=contnent
+| export | grep EMPTY<-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (0)
+|
+|--- STDOUT:
+| ->declare -x EMPTY$
+| declare -x EMPTY_TOO=""$
+| declare -x NOT_EMPTY="contnent"$<-
+|
+|--- STDERR:
+| -><-
+|
+|--- COMPARED STR:
+| -><-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (134)
+|
+| AddressSanitizer:DEADLYSIGNAL
+| =================================================================
+| ==29136==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000001 (pc 0x000107027125 bp 0x7ffee8c1add0 sp 0x7ffee8c1add0 T0)
+| ==29136==The signal is caused by a READ memory access.
+| ==29136==Hint: address points to the zero page.
+|     #0 0x107027125 in ft_strlen+0x35 (minishell:x86_64+0x100043125)
+|     #1 0x10702744b in ft_substr+0x3b (minishell:x86_64+0x10004344b)
+|     #2 0x106fe9b06 in ft_export builtins.c:215
+|     #3 0x106fe8d7c in ft_exec_builtin builtins.c:30
+|     #4 0x106fec873 in parse_one_cmd parser.c:59
+|     #5 0x106febdaa in parser parser.c:147
+|     #6 0x106fe8210 in input_loop mminishell.c:149
+|     #7 0x106fe8403 in main mminishell.c:165
+|     #8 0x7fff6f3d9cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)
+| 
+| ==29136==Register values:
+| rax = 0x0000000000000001  rbx = 0x00007ffee8c1b340  rcx = 0x0000000000000000  rdx = 0x0000000000000000  
+| rdi = 0x0000000000000001  rsi = 0x0000000000000000  rbp = 0x00007ffee8c1add0  rsp = 0x00007ffee8c1add0  
+|  r8 = 0x00000fffffffffff   r9 = 0x000000006b18bc79  r10 = 0x0000000000000050  r11 = 0x0000000000000000  
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000  
+| AddressSanitizer can not provide additional info.
+| SUMMARY: AddressSanitizer: SEGV (minishell:x86_64+0x100043125) in ft_strlen+0x35
+| ==29136==ABORTING
+| ./mpanic.sh: line 164: 29136 Abort trap: 6           ./minishell
+|
+---------------------------------------------<
+
+---------------------------------------------> test [29]
+|  CMD: ->export TEST=value TEST=value2
+| export | grep TEST<-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (0)
+|
+|--- STDOUT:
+| ->declare -x TEST="value2"$<-
+|
+|--- STDERR:
+| -><-
+|
+|--- COMPARED STR:
+| -><-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (0)
+|
+|--- STDOUT:
+| ->declare -x TEST=value"$
+| declare -x TEST=value2"$<-
+|
+|--- STDERR:
+| ->AddressSanitizer:DEADLYSIGNAL$
+| =================================================================$
+| ==29170==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x0001040816d7 bp 0x7ffeebb82f00 sp 0x7ffeebb82e10 T0)$
+| ==29170==The signal is caused by a READ memory access.$
+| ==29170==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.$
+|     #0 0x1040816d7 in ft_export builtins.c:186$
+|     #1 0x104080d7c in ft_exec_builtin builtins.c:30$
+|     #2 0x104083a4b in executor executor.c:178$
+|     #3 0x104084ea5 in parse_child_cmd parser.c:86$
+|     #4 0x104083e2e in parser parser.c:151$
+|     #5 0x104080210 in input_loop mminishell.c:149$
+|     #6 0x104080403 in main mminishell.c:165$
+|     #7 0x7fff6f3d9cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)$
+| $
+| ==29170==Register values:$
+| rax = 0xbebebebebebebebe  rbx = 0x00007ffeebb83340  rcx = 0x17d7d7d7d7d7d7d7  rdx = 0x0000100000000000  $
+| rdi = 0x00000001040c1520  rsi = 0x0000000000000005  rbp = 0x00007ffeebb82f00  rsp = 0x00007ffeebb82e10  $
+|  r8 = 0x0000000000000007   r9 = 0xffffe3e9ffffffe4  r10 = 0x000000000000000b  r11 = 0x0000000000000246  $
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000  $
+| AddressSanitizer can not provide additional info.$
+| SUMMARY: AddressSanitizer: SEGV builtins.c:186 in ft_export$
+| ==29170==ABORTING$<-
+|
+---------------------------------------------<
+
+---------------------------------------------> test [30]
+|  CMD: ->export TEST=value
+| export TEST+=" added value"
+| export | grep TEST<-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (0)
+|
+|--- STDOUT:
+| ->declare -x TEST="value added value"$<-
+|
+|--- STDERR:
+| -><-
+|
+|--- COMPARED STR:
+| -><-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (134)
+|
+| [94m/Users/polmarti/WorkExs/Minishell/mpanic[0m [92m⌁./MiniShell→[0m export TEST+=" added value"
+| AddressSanitizer:DEADLYSIGNAL
+| =================================================================
+| ==29244==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x00010ca797eb bp 0x7ffee318af20 sp 0x7ffee318ae30 T0)
+| ==29244==The signal is caused by a READ memory access.
+| ==29244==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.
+|     #0 0x10ca797eb in ft_export builtins.c:194
+|     #1 0x10ca78d7c in ft_exec_builtin builtins.c:30
+|     #2 0x10ca7c873 in parse_one_cmd parser.c:59
+|     #3 0x10ca7bdaa in parser parser.c:147
+|     #4 0x10ca78210 in input_loop mminishell.c:149
+|     #5 0x10ca78403 in main mminishell.c:165
+|     #6 0x7fff6f3d9cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)
+| 
+| ==29244==Register values:
+| rax = 0xbebebebebebebece  rbx = 0x00007ffee318b340  rcx = 0x17d7d7d7d7d7d7d9  rdx = 0x0000100000000000  
+| rdi = 0x0000603000002680  rsi = 0x0000603000001720  rbp = 0x00007ffee318af20  rsp = 0x00007ffee318ae30  
+|  r8 = 0x00000fffffffff00   r9 = 0x0000000000000000  r10 = 0xffffffffffffffff  r11 = 0x00000fffffffffff  
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000  
+| AddressSanitizer can not provide additional info.
+| SUMMARY: AddressSanitizer: SEGV builtins.c:194 in ft_export
+| ==29244==ABORTING
+| ./mpanic.sh: line 164: 29244 Abort trap: 6           ./minishell
+|
+---------------------------------------------<
+
+---------------------------------------------> test [31]
+|  CMD: ->export TEST=value
+| export | grep TEST<-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (0)
+|
+|--- STDOUT:
+| ->declare -x TEST="value"$<-
+|
+|--- STDERR:
+| -><-
+|
+|--- COMPARED STR:
+| -><-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (0)
+|
+|--- STDOUT:
+| ->declare -x TEST=value"$<-
+|
+|--- STDERR:
+| ->AddressSanitizer:DEADLYSIGNAL$
+| =================================================================$
+| ==29275==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x00010b9f16d7 bp 0x7ffee4212f00 sp 0x7ffee4212e10 T0)$
+| ==29275==The signal is caused by a READ memory access.$
+| ==29275==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.$
+|     #0 0x10b9f16d7 in ft_export builtins.c:186$
+|     #1 0x10b9f0d7c in ft_exec_builtin builtins.c:30$
+|     #2 0x10b9f3a4b in executor executor.c:178$
+|     #3 0x10b9f4ea5 in parse_child_cmd parser.c:86$
+|     #4 0x10b9f3e2e in parser parser.c:151$
+|     #5 0x10b9f0210 in input_loop mminishell.c:149$
+|     #6 0x10b9f0403 in main mminishell.c:165$
+|     #7 0x7fff6f3d9cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)$
+| $
+| ==29275==Register values:$
+| rax = 0xbebebebebebebebe  rbx = 0x00007ffee4213340  rcx = 0x17d7d7d7d7d7d7d7  rdx = 0x0000100000000000  $
+| rdi = 0x000000010ba31520  rsi = 0x0000000000000005  rbp = 0x00007ffee4212f00  rsp = 0x00007ffee4212e10  $
+|  r8 = 0x0000000000000007   r9 = 0xffffe3e9ffffffe4  r10 = 0x000000000000000b  r11 = 0x0000000000000246  $
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000  $
+| AddressSanitizer can not provide additional info.$
+| SUMMARY: AddressSanitizer: SEGV builtins.c:186 in ft_export$
+| ==29275==ABORTING$<-
+|
+---------------------------------------------<
+
+---------------------------------------------> test [32]
+|  CMD: ->export correct=correct wrong%=wrong
+| export | grep correct
+| export | grep wrong<-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (1)
+|
+|--- STDOUT:
+| ->declare -x correct="correct"$<-
+|
+|--- STDERR:
+| ->bash: line 1: export: `wrong%=wrong': not a valid identifier$<-
+|
+|--- COMPARED STR:
+| ->export: `wrong%=wrong': not a valid identifier<-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (0)
+|
+|--- STDOUT:
+| ->declare -x correct=correct"$<-
+|
+|--- STDERR:
+| ->^[[31mminishell: export: `wrong%=wrong': not a valid identifier^[[0m$
+| AddressSanitizer:DEADLYSIGNAL$
+| =================================================================$
+| ==29329==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x00010dfb36d7 bp 0x7ffee1c50f00 sp 0x7ffee1c50e10 T0)$
+| ==29329==The signal is caused by a READ memory access.$
+| ==29329==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.$
+|     #0 0x10dfb36d7 in ft_export builtins.c:186$
+|     #1 0x10dfb2d7c in ft_exec_builtin builtins.c:30$
+|     #2 0x10dfb5a4b in executor executor.c:178$
+|     #3 0x10dfb6ea5 in parse_child_cmd parser.c:86$
+|     #4 0x10dfb5e2e in parser parser.c:151$
+|     #5 0x10dfb2210 in input_loop mminishell.c:149$
+|     #6 0x10dfb2403 in main mminishell.c:165$
+|     #7 0x7fff6f3d9cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)$
+| $
+| ==29329==Register values:$
+| rax = 0xbebebebebebebebe  rbx = 0x00007ffee1c51340  rcx = 0x17d7d7d7d7d7d7d7  rdx = 0x0000100000000000  $
+| rdi = 0x000000010dff3520  rsi = 0x0000000000000005  rbp = 0x00007ffee1c50f00  rsp = 0x00007ffee1c50e10  $
+|  r8 = 0x0000000000000007   r9 = 0xffffe3e9ffffffe4  r10 = 0x000000000000000b  r11 = 0x0000000000000246  $
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000  $
+| AddressSanitizer can not provide additional info.$
+| SUMMARY: AddressSanitizer: SEGV builtins.c:186 in ft_export$
+| ==29329==ABORTING$
+| AddressSanitizer:DEADLYSIGNAL$
+| =================================================================$
+| ==29332==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x00010dfb36d7 bp 0x7ffee1c50f00 sp 0x7ffee1c50e10 T0)$
+| ==29332==The signal is caused by a READ memory access.$
+| ==29332==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.$
+|     #0 0x10dfb36d7 in ft_export builtins.c:186$
+|     #1 0x10dfb2d7c in ft_exec_builtin builtins.c:30$
+|     #2 0x10dfb5a4b in executor executor.c:178$
+|     #3 0x10dfb6ea5 in parse_child_cmd parser.c:86$
+|     #4 0x10dfb5e2e in parser parser.c:151$
+|     #5 0x10dfb2210 in input_loop mminishell.c:149$
+|     #6 0x10dfb2403 in main mminishell.c:165$
+|     #7 0x7fff6f3d9cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)$
+| $
+| ==29332==Register values:$
+| rax = 0xbebebebebebebebe  rbx = 0x00007ffee1c51340  rcx = 0x17d7d7d7d7d7d7d7  rdx = 0x0000100000000000  $
+| rdi = 0x000000010dff3520  rsi = 0x0000000000000005  rbp = 0x00007ffee1c50f00  rsp = 0x00007ffee1c50e10  $
+|  r8 = 0x0000000000000007   r9 = 0xffffe3e9ffffffe4  r10 = 0x000000000000000b  r11 = 0x0000000000000246  $
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000  $
+| AddressSanitizer can not provide additional info.$
+| SUMMARY: AddressSanitizer: SEGV builtins.c:186 in ft_export$
+| ==29332==ABORTING$<-
+|
+---------------------------------------------<

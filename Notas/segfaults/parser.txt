@@ -1,0 +1,119 @@
+---------------------------------------------> test [238]
+|  CMD: ->test | >><-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (2)
+|
+|--- STDOUT:
+| -><-
+|
+|--- STDERR:
+| ->bash: line 1: syntax error near unexpected token `newline'$
+| bash: line 1: `test | >>'$<-
+|
+|--- COMPARED STR:
+| ->syntax error near unexpected token <-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (134)
+|
+| AddressSanitizer:DEADLYSIGNAL
+| =================================================================
+| ==38133==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0x00010c9de9f6 bp 0x7ffee3230140 sp 0x7ffee322fb70 T0)
+| ==38133==The signal is caused by a READ memory access.
+| ==38133==Hint: address points to the zero page.
+|     #0 0x10c9de9f6 in typer_tokens typer.c:107
+|     #1 0x10c9d6cc9 in parser parser.c:142
+|     #2 0x10c9d3210 in input_loop mminishell.c:149
+|     #3 0x10c9d3403 in main mminishell.c:165
+|     #4 0x7fff6f3d9cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)
+| 
+| ==38133==Register values:
+| rax = 0x0000000000000000  rbx = 0x00007ffee32302e0  rcx = 0x0000000000000000  rdx = 0x0000100000000000  
+| rdi = 0x0000100000000000  rsi = 0x0000100000000000  rbp = 0x00007ffee3230140  rsp = 0x00007ffee322fb70  
+|  r8 = 0x00007ffee3230200   r9 = 0x0000000000000000  r10 = 0x0000000000000003  r11 = 0x0000000000000246  
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000  
+| AddressSanitizer can not provide additional info.
+| SUMMARY: AddressSanitizer: SEGV typer.c:107 in typer_tokens
+| ==38133==ABORTING
+| ./mpanic.sh: line 164: 38133 Abort trap: 6           ./minishell
+|
+---------------------------------------------<
+
+---------------------------------------------> test [247]
+|  CMD: ->echo >><-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (2)
+|
+|--- STDOUT:
+| -><-
+|
+|--- STDERR:
+| ->bash: line 1: syntax error near unexpected token `newline'$
+| bash: line 1: `echo >>'$<-
+|
+|--- COMPARED STR:
+| ->syntax error near unexpected token <-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (134)
+|
+| AddressSanitizer:DEADLYSIGNAL
+| =================================================================
+| ==38517==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0x00010d3759f6 bp 0x7ffee2899140 sp 0x7ffee2898b70 T0)
+| ==38517==The signal is caused by a READ memory access.
+| ==38517==Hint: address points to the zero page.
+|     #0 0x10d3759f6 in typer_tokens typer.c:107
+|     #1 0x10d36dcc9 in parser parser.c:142
+|     #2 0x10d36a210 in input_loop mminishell.c:149
+|     #3 0x10d36a403 in main mminishell.c:165
+|     #4 0x7fff6f3d9cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)
+|
+| ==38517==Register values:
+| rax = 0x0000000000000000  rbx = 0x00007ffee28992e0  rcx = 0x0000000000000000  rdx = 0x0000100000000000
+| rdi = 0x0000100000000000  rsi = 0x0000100000000000  rbp = 0x00007ffee2899140  rsp = 0x00007ffee2898b70
+|  r8 = 0x00007ffee28992c0   r9 = 0x0000000000000000  r10 = 0x0000000000000003  r11 = 0x0000000000000246
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000
+| AddressSanitizer can not provide additional info.
+| SUMMARY: AddressSanitizer: SEGV typer.c:107 in typer_tokens
+| ==38517==ABORTING
+| ./mpanic.sh: line 164: 38517 Abort trap: 6           ./minishell
+|
+---------------------------------------------<
+
+---------------------------------------------> test [249]
+|  CMD: ->echo >>><-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (2)
+|
+|--- STDOUT:
+| -><-
+|
+|--- STDERR:
+| ->bash: line 1: syntax error near unexpected token `>'$
+| bash: line 1: `echo >>>'$<-
+|
+|--- COMPARED STR:
+| ->syntax error near unexpected <-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (134)
+|
+| AddressSanitizer:DEADLYSIGNAL
+| =================================================================
+| ==38600==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0x00010c6919f6 bp 0x7ffee357d140 sp 0x7ffee357cb70 T0)
+| ==38600==The signal is caused by a READ memory access.
+| ==38600==Hint: address points to the zero page.
+|     #0 0x10c6919f6 in typer_tokens typer.c:107
+|     #1 0x10c689cc9 in parser parser.c:142
+|     #2 0x10c686210 in input_loop mminishell.c:149
+|     #3 0x10c686403 in main mminishell.c:165
+|     #4 0x7fff6f3d9cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)
+|
+| ==38600==Register values:
+| rax = 0x0000000000000000  rbx = 0x00007ffee357d2e0  rcx = 0x0000000000000000  rdx = 0x0000100000000000
+| rdi = 0x0000100000000000  rsi = 0x0000100000000000  rbp = 0x00007ffee357d140  rsp = 0x00007ffee357cb70
+|  r8 = 0x00007ffee357d2c0   r9 = 0x0000000000000000  r10 = 0x0000000000000003  r11 = 0x0000000000000246
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000
+| AddressSanitizer can not provide additional info.
+| SUMMARY: AddressSanitizer: SEGV typer.c:107 in typer_tokens
+| ==38600==ABORTING
+| ./mpanic.sh: line 164: 38600 Abort trap: 6           ./minishell
+|
+---------------------------------------------<

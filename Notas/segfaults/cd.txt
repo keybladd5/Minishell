@@ -1,0 +1,55 @@
+---------------------------------------------> test [385]
+|  CMD: ->env | grep PWD
+| cd testdirtest
+| env | grep PWD
+| export PWD=nosensedir
+| cd ..
+| env | grep PWD<-
+|--------------------------------
+|  EXPECTED (BASH OUTP)  |  exit status: (0)
+|
+|--- STDOUT:
+| ->PWD=/Users/polmarti/WorkExs/Minishell/mpanic$
+| PWD=/Users/polmarti/WorkExs/Minishell/mpanic/testdirtest$
+| OLDPWD=/Users/polmarti/WorkExs/Minishell/mpanic$
+| OLDPWD=nosensedir$
+| PWD=/Users/polmarti/WorkExs/Minishell/mpanic$<-
+|
+|--- STDERR:
+| -><-
+|
+|--- COMPARED STR:
+| -><-
+|--------------------------------
+|--->FOUND (MINISHELL OUTP)  |  exit status: (134)
+|
+| PWD=/Users/polmarti/WorkExs/Minishell/mpanic
+| [94m/Users/polmarti/WorkExs/Minishell/mpanic[0m [92m⌁./MiniShell→[0m cd testdirtest
+| [94m/Users/polmarti/WorkExs/Minishell/mpanic/testdirtest[0m [92m⌁./MiniShell→[0m env | grep PWD
+| PWD=/Users/polmarti/WorkExs/Minishell/mpanic/testdirtest
+| [94m/Users/polmarti/WorkExs/Minishell/mpanic/testdirtest[0m [92m⌁./MiniShell→[0m export PWD=nosensedir
+| [94m/Users/polmarti/WorkExs/Minishell/mpanic/testdirtest[0m [92m⌁./MiniShell→[0m cd ..
+| AddressSanitizer:DEADLYSIGNAL
+| =================================================================
+| ==47298==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x000106fc93b2 bp 0x7ffee8c3aec0 sp 0x7ffee8c3ae20 T0)
+| ==47298==The signal is caused by a READ memory access.
+| ==47298==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.
+|     #0 0x106fc93b2 in ft_cd builtins.c:117
+|     #1 0x106fc8a9d in ft_exec_builtin builtins.c:24
+|     #2 0x106fcc873 in parse_one_cmd parser.c:59
+|     #3 0x106fcbdaa in parser parser.c:147
+|     #4 0x106fc8210 in input_loop mminishell.c:149
+|     #5 0x106fc8403 in main mminishell.c:165
+|     #6 0x7fff6f3d9cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)
+| 
+| ==47298==Register values:
+| rax = 0xbebebebebebebebe  rbx = 0x00007ffee8c3b2e0  rcx = 0x17d7d7d7d7d7d7d7  rdx = 0x0000100000000000  
+| rdi = 0x00006020000039d0  rsi = 0x000000000000004f  rbp = 0x00007ffee8c3aec0  rsp = 0x00007ffee8c3ae20  
+|  r8 = 0x0000200000000000   r9 = 0x0000000000000000  r10 = 0x00007fff6f51c20a  r11 = 0x0000000000000246  
+| r12 = 0x0000000000000000  r13 = 0x0000000000000000  r14 = 0x0000000000000000  r15 = 0x0000000000000000  
+| AddressSanitizer can not provide additional info.
+| SUMMARY: AddressSanitizer: SEGV builtins.c:117 in ft_cd
+| ==47298==ABORTING
+| ./mpanic.sh: line 164: 47298 Abort trap: 6           ./minishell
+|
+---------------------------------------------<
