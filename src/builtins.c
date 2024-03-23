@@ -184,9 +184,13 @@ int	ft_export(t_token *tokens, t_env *env)
 		{
 			ft_putstr_fd("declare -x ", 1);
 			ft_putstr_fd(env->key_name, 1); //aqui peta
-			write(1, "=\"", 1);
-			ft_putstr_fd(env->value, 1);
-			ft_putendl_fd("\"", 1);
+			if (env->value)
+			{
+				write(1, "=\"", 2);
+				ft_putstr_fd(env->value, 1);
+				ft_putstr_fd("\"", 1);
+			}
+			write(1, "\n", 1);
 			env = env->next;
 		}
 		return (1);
@@ -212,12 +216,18 @@ int	ft_export(t_token *tokens, t_env *env)
 		tmp->key_name = ft_substr(tokens->str, 0, (div - tokens->str));
 		if (!tmp->key_name)
 			exit (MALLOC_ERROR);
-		tmp->value = ft_substr(div+1, 0, ft_strlen(div));//div+1 puede dar segfault
-		if (!tmp->value)
-			exit (MALLOC_ERROR);
+		if (div)
+		{
+			tmp->value = ft_substr(div+1, 0, ft_strlen(div));//div+1 puede dar segfault
+			if (!tmp->value)
+				exit (MALLOC_ERROR);
+		}
+		else
+			tmp->value = NULL;
 		last->next = tmp;
 		last = tmp;
 		tokens = tokens->next;
 	}
 	return (1);
+	
 }

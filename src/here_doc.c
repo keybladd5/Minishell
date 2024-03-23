@@ -29,6 +29,9 @@ void ft_protect_here_doc(t_pipe *data_pipe)
 	if (dup2(data_pipe->og_stdin, 0) == -1)
 		ft_error_system(DUP2_ERROR);
 }
+
+//en caso de control+d lanzar directamente el string LIMITER para inalizar!!!!!
+
 void ft_here_doc(t_token *token, t_hd_append *data_heredoc, t_pipe *data_pipe)
 {
 	int		tmp_fd[2];
