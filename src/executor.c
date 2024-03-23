@@ -12,7 +12,6 @@
 
 #include "../inc/minishell.h"
 
-
 void 	ft_wait_child_process(int *exit_status, int process)
 {
 	int 	status;
@@ -158,7 +157,7 @@ void	executor(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe)
 	//dprintf(2, "%d\n", pid);
 	if (pid < 0)
 		ft_error_system(FORK_ERROR);
-	//sig_init(0);//cambio anadido pendiente analizar🐸 
+	sig_init(0);//cambio anadido pendiente analizar🐸 
 	if (pid == 0)
 	{
 		/*int loop = 1;
