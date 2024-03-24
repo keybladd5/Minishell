@@ -100,6 +100,13 @@ parser:
 	- ctrl-D dentro de child (cat) debe printear {Quit: 3} ✅
 	- cat | cat | cat | cmd + ctrl-C -> pone exit_status en 130, deberia ser el return del ultimo cmd ❌
 
+ env -i ./Minishell
+NO ENTRA Y SI DEBERIA ❌
+
+unset SHLVL y despues ejecutar minishell debe crear la variable SHLVL y no la crea ❌
+
+unset HOME y despues CD  debe mostrar el error de "bash: cd: HOME not set"
+
 gcc src/mminishell.c libft/libft.a -lreadline -ltermcap
 
 -L ~/.brew/opt/readline/lib -I ~/.brew/opt/readline/include //sin esto no pilla rl_replace_line

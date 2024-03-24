@@ -138,7 +138,7 @@ void 	input_loop(t_env **env)
 	{
 		sig_init(1);
 		prompt = prompt_builder();
-		input = readline("Minishell: ");
+		input = readline(prompt);
 		ctrl_C(&exit_status);
 		if (!input)//cambio anadido pendiente analizar🐸
 		{
