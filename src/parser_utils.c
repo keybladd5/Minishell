@@ -58,12 +58,12 @@ void ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens)
 //unefficient, but this is only works when in a pipeline, the actual cmd is
 //canceled by a no_permission doc, but the next cmd need a the read pipe
 //to work as bash
-void	l_red_out(t_parser *d, t_env **env, char **envp)
+void	l_red_out(t_parser *d, t_env **env)
 {
 	pipe(d->data_pipe->pipefd);
 	d->process++;
 	d->data_pipe->flag = YES;
-	executor(NULL, env, envp, d->data_pipe);
+	executor(NULL, env, d->data_pipe);
 	if (dup2(d->data_pipe->pipefd[0], 0)== -1) //tiene que comunicar la tuberia contenga o no contenido siempre en la pipeline 
 		ft_error_system(DUP2_ERROR);
 	close(d->data_pipe->pipefd[0]);

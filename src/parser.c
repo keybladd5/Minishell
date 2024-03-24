@@ -14,21 +14,21 @@
 
 //aux function to select the redirs, return 1 if all docs works
 //else return 0 to leave the execution cmd line
-static int	selector_redirs_child(t_parser *d, t_env **env, char **envp)
+static int	selector_redirs_child(t_parser *d, t_env **env)
 {
 	d->flag_input = selector_input(d);
 	if (d->flag_input)
 	{
 		d->data_pipe->flag = NO;
 		if (d->flag_input == 2)
-			return (l_red_out(d, env, envp), 0);
+			return (l_red_out(d, env), 0);
 	}
 	d->flag_output = \
 	selector_output(d); //selector_output
 	if (d->flag_output)
 	{
 		if (d->flag_output == 2)
-			return (l_red_out(d, env, envp), 0);
+			return (l_red_out(d, env), 0);
 		d->data_pipe->flag = NO;
 	}
 	return (1);
@@ -39,7 +39,7 @@ static int	selector_redirs_child(t_parser *d, t_env **env, char **envp)
 // en caso de flag_input en 2 
 // (que significa que hay error en redir_in con el archivo)
 // no ejecuta nada y solo muestra en mensaje de error.
-static int	parse_one_cmd(t_parser *d, t_env **env, char **envp, \
+static int	parse_one_cmd(t_parser *d, t_env **env,\
 int *exit_status)
 {
 	if (!d->data_pipe->pipe_counter && d->t_current)
@@ -56,11 +56,11 @@ int *exit_status)
 		ft_tokens_to_exec(&d->t_current, &d->t_tmp);
 		if (ft_is_built_in(&d->t_tmp))
 		{
-			*exit_status = ft_exec_builtin(&d->t_tmp, env);
+			*exit_status = ft_exec_builtin(&d->t_tmp, env, exit_status);
 			ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
 			return (free_tokens(&d->t_tmp), 1);
 		}
-		executor(&d->t_tmp, env, envp, d->data_pipe);
+		executor(&d->t_tmp, env, d->data_pipe);
 		free_tokens(&d->t_tmp);
 		ft_wait_child_process(exit_status, 1);
 		ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
@@ -72,18 +72,18 @@ int *exit_status)
 // Procesa un solo comando en un proceso hijo, setea la flag
 // de pipe para la redireccion en el 
 // 	proceso hijo, cancela ejecucion en caso de red< in erronea
-static void	parse_child_cmd(t_parser *d, t_env **env, char **envp)
+static void	parse_child_cmd(t_parser *d, t_env **env)
 {
 	if (d->t_current && d->data_pipe->pipe_counter)
 	{
-		if (!selector_redirs_child(d, env, envp))
+		if (!selector_redirs_child(d, env))
 			return ;
 		else
 			d->data_pipe->flag = YES;
 		ft_tokens_to_exec(&d->t_current, &d->t_tmp);
 		pipe(d->data_pipe->pipefd);
 		d->process++;
-		executor(&d->t_tmp, env, envp, d->data_pipe);
+		executor(&d->t_tmp, env, d->data_pipe);
 		if (dup2(d->data_pipe->pipefd[0], 0) == -1)
 			ft_error_system(DUP2_ERROR);
 		close(d->data_pipe->pipefd[0]);
@@ -95,7 +95,7 @@ static void	parse_child_cmd(t_parser *d, t_env **env, char **envp)
 }
 
 //caso del ultimo comando a ejecutar, donde se recoge el exit status
-static int	parse_last_child(t_parser *d, t_env **env, char **envp, \
+static int	parse_last_child(t_parser *d, t_env **env, \
 int *exit_status)
 {
 	if (d->t_current && \
@@ -116,7 +116,7 @@ int *exit_status)
 			return (ft_wait_child_process(exit_status, d->process), 1);
 		}
 		ft_tokens_to_exec(&d->t_current, &d->t_tmp);
-		executor(&d->t_tmp, env, envp, d->data_pipe);
+		executor(&d->t_tmp, env, d->data_pipe);
 		d->process++;
 		free_tokens(&d->t_tmp);
 		ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
@@ -131,7 +131,7 @@ int *exit_status)
 //	t_current para evitar la ejecucion
 //	Contempla pipeline y no pipes, redireccionesde input i de output,
 // y here_doc.
-void	parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
+void	parser(t_token **tokens, t_env **env, int *exit_status)
 {
 	t_parser	*d;
 
@@ -144,14 +144,14 @@ void	parser(t_token **tokens, t_env **env, char **envp, int *exit_status)
 		d->t_current = NULL;
 	else
 		d->t_current = *tokens;
-	if (parse_one_cmd(d, env, envp, exit_status))
+	if (parse_one_cmd(d, env, exit_status))
 		return (free(d));
 	while (d->t_current)
 	{
-		parse_child_cmd(d, env, envp);
+		parse_child_cmd(d, env);
 		while (d->t_current && !(d->t_current->type == PIPE))
 			d->t_current = d->t_current->next;
-		if (parse_last_child(d, env, envp, exit_status))
+		if (parse_last_child(d, env, exit_status))
 			return (free(d));
 		if (d->t_current)
 			d->t_current = d->t_current->next;

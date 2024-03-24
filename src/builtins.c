@@ -16,7 +16,7 @@ int ft_is_built_in(t_token **tokens)
 	return (0);
 }
 
-int	ft_exec_builtin(t_token **tokens, t_env **env)
+int	ft_exec_builtin(t_token **tokens, t_env **env, int *exit_status)
 {
 	if (!ft_strncmp("echo\0", (*tokens)->str, 5))
 		return (ft_echo((*tokens)->next));
@@ -31,7 +31,7 @@ int	ft_exec_builtin(t_token **tokens, t_env **env)
 	else if (!ft_strncmp("exit\0", (*tokens)->str, 5))
 	{
 			ft_printf("exit\n");
-			exit(0);
+			exit(*exit_status);
 	}
 	return (0);
 }
@@ -96,9 +96,10 @@ int	ft_cd(t_token *tokens, t_env *env)
 		path = tokens->str;
 	if (chdir(path) != 0) //cambia el directrio actual al que le pasa y si falla (return -1) printea el error y sale
 	{
-		ft_putstr_fd("minishell: cd: ", 2);
-		ft_putstr_fd(path, 2);
-		ft_putendl_fd(": No such file or directory", 2);
+		// ft_putstr_fd("minishell: cd: ", 2);
+		// ft_putstr_fd(path, 2);
+		// ft_putendl_fd(": No such file or directory", 2);
+		perror(path);
 		return (1); //!!!Este 1 lo pasaria a ft_is_built_in, que lo pasaria a executor y petaria. REVISAR
 	}
 	while (tmp_env) //Busca en la env list el dato guardado en PWD, lo guarda en path y lo actualiza

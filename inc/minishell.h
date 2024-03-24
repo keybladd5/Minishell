@@ -116,7 +116,7 @@ void 	ft_error_syntax(int *exit_status, int name, t_token *t_current);
 
 void 	ft_error_system(int type);
 
-void 	ft_error_cmd(char *cmd);
+void 	ft_error_cmd(char *cmd, int type);
 
 //--------signs.c-----------
 
@@ -140,16 +140,23 @@ void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir, t_hd_append *data_hd_a
 
 //--------executor.c-------------
 
-int		ft_token_lst_size(t_token *lst);
-
-int		ft_aux_abs(char *str);
 
 void 	ft_wait_child_process(int *exit_status, int process);
 
 void	ft_exec_absoluthe_path(t_token **tokens, char **envp);
 
-void	executor(t_token **tokens, t_env **env, char **envp, t_pipe *data_pipe);
+void	executor(t_token **tokens, t_env **env, t_pipe *data_pipe);
 
+
+//--------executor_utils.c-------------
+
+int		ft_token_lst_size(t_token *lst);
+
+int		ft_aux_abs(char *str);
+
+int		ft_env_lst_size(t_env *lst);
+
+char **ft_copy_env(t_env **env);
 
 //--------typer.c-------------
 
@@ -170,7 +177,7 @@ t_token *ft_tokendup(t_token *token);
 
 void 	ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens);
 
-void	l_red_out(t_parser *d, t_env **env, char **envp);
+void	l_red_out(t_parser *d, t_env **env);
 
 void	ft_init_data_parser(t_parser *d, t_token **tokens);
 
@@ -188,7 +195,7 @@ void	ft_remove_token(t_token **tokens, t_token **t_current);
 
 void	expansor(char **str, t_env **env, int exit_status);
 
-void	parser(t_token **tokens, t_env **env, char **envp, int *exit_status);
+void	parser(t_token **tokens, t_env **env, int *exit_status);
 
 void	print_tokens(t_token **head);
 
@@ -198,7 +205,7 @@ void 	free_tokens(t_token **head);
 
 int 	ft_is_built_in(t_token **tokens);
 
-int		ft_exec_builtin(t_token **tokens, t_env **env);
+int		ft_exec_builtin(t_token **tokens, t_env **env, int *exit_status);
 
 int		ft_echo(t_token *tokens);
 

@@ -127,7 +127,7 @@ char	*prompt_builder(void)
 }
 
 //infinte loop to get the user_input and parse it
-void 	input_loop(t_env **env, char **envp)
+void 	input_loop(t_env **env)
 {
 	char	*input = NULL;
 	t_token	*tokens = NULL;
@@ -143,10 +143,10 @@ void 	input_loop(t_env **env, char **envp)
 		if (!input)//cambio anadido pendiente analizar🐸
 		{
 			ft_printf("exit\n");
-			exit(EXIT_SUCCESS);
+			exit(exit_status);
 		}
 		lexer(&tokens, input, env, exit_status);
-		parser(&tokens, env, envp , &exit_status);
+		parser(&tokens, env, &exit_status);
 		add_history(input);
 		free_tokens(&tokens);
 		free(input);
@@ -162,6 +162,6 @@ int	main(int argc, char *argv[], char **envp)
 	if (argc != 1 || !argv[0] || !envp[0])
 		return (1);
 	ft_catch_env(envp, &head);
-	input_loop(&head, envp);
+	input_loop(&head);
 	return (0);
 }
