@@ -52,13 +52,11 @@ void	here_doc_sig_handler(int sig)
 	g_signal = sig;
 	if (sig == SIGINT)
 	{
-		write(1, "^C\n", 3);//solo aparece asi en el proceso hijo
-		g_signal = 130;
-	}
-	else if (sig == SIGQUIT)
-	{
-		ft_putstr_fd("^\\Quit: 3\n", 1);
-		g_signal = 131;
+		write(1, "\n", 1);
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
+		exit(1);
 	}
 }
 //inicializa variable global y las señales. Variable tc y sus funciones usan la libreria termios.h para no escribir ^C

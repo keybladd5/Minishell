@@ -138,7 +138,7 @@ void 	input_loop(t_env **env)
 	{
 		sig_init(1);
 		prompt = prompt_builder();
-		input = readline("Minishell: ");
+		input = readline(prompt);
 		ctrl_C(&exit_status);
 		if (!input)//cambio anadido pendiente analizar🐸
 		{
@@ -159,8 +159,13 @@ int	main(int argc, char *argv[], char **envp)
 	t_env	*head;
 
 	head = NULL;
-	if (argc != 1 || !argv[0] || !envp[0])
+	if (argc != 1 || !argv[0])
 		return (1);
+	if (!*envp)
+	{
+		ft_putendl_fd("🥶 BROW WHAT ARE U TRYNG TO DO 🥶", 2);
+		return (1);
+	}
 	ft_catch_env(envp, &head);
 	input_loop(&head);
 	return (0);
