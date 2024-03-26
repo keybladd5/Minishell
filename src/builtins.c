@@ -148,9 +148,12 @@ int	ft_env(t_env *env)
 {
 	while (env)
 	{
-		ft_putstr_fd(env->key_name, 1);
-		write(1, "=", 1);
-		ft_putendl_fd(env->value, 1);
+		if (env->value)
+		{
+			ft_putstr_fd(env->key_name, 1);
+			write(1, "=", 1);
+			ft_putendl_fd(env->value, 1);
+		}
 		env = env->next;
 	}
 	return (0);
@@ -181,7 +184,9 @@ int	ft_export(t_token *tokens, t_env *env)
 	char	*div;
 	char	*keyname;
 	int		var_flag;
+	int		exit_status;
 
+	exit_status = 0;
 	curr_env = env;
 	if (!tokens)
 	{
@@ -207,34 +212,37 @@ int	ft_export(t_token *tokens, t_env *env)
 	}
 	while (tokens)
 	{
+		curr_env = env;
 		if (!ft_isvalidkey(tokens->str))
 		{
 			ft_putstr_fd("\033[31mminishell: export: `", 2);
 			ft_putstr_fd(tokens->str, 2);
 			ft_putstr_fd("': not a valid identifier\x1b[0m\n", 2);
-			return (1);
+			tokens = tokens->next;
+			exit_status = 1;
+			continue ;
 		}
 		var_flag = 0;
 		div = ft_strchr(tokens->str, '=');
 		keyname = ft_substr(tokens->str, 0, (div - tokens->str));
 		if (!keyname)
 			exit (MALLOC_ERROR);
-		while (env)
+		while (curr_env)
 		{
-			if (!ft_strxcmp(keyname, env->key_name))
+			if (!ft_strxcmp(keyname, curr_env->key_name))
 			{
 				var_flag = 1;
 				break ;
 			}
-			env = env->next;
+			curr_env = curr_env->next;
 		}
 		if (var_flag)
 		{
 			if (div)
 			{
-				free(env->value);
-				env->value = ft_substr(div+1, 0, ft_strlen(div));
-				if (!env->value)
+				free(curr_env->value);
+				curr_env->value = ft_substr(div+1, 0, ft_strlen(div));
+				if (!curr_env->value)
 					exit (MALLOC_ERROR);
 			}
 		}
@@ -246,7 +254,6 @@ int	ft_export(t_token *tokens, t_env *env)
 			tmp->key_name = NULL;
 			tmp->value = NULL;
 			tmp->next = NULL;
-			div = ft_strchr(tokens->str, '=');
 			tmp->key_name = ft_substr(tokens->str, 0, (div - tokens->str));
 			if (!tmp->key_name)
 				exit (MALLOC_ERROR);
@@ -259,8 +266,8 @@ int	ft_export(t_token *tokens, t_env *env)
 			last->next = tmp;
 			last = tmp;
 		}
+		free(keyname);
 		tokens = tokens->next;
 	}
-	free(keyname);
-	return (0);
+	return (exit_status);
 }
