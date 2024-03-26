@@ -232,6 +232,7 @@ int	ft_export(t_token *tokens, t_env *env)
 		{
 			if (div)
 			{
+				free(env->value);
 				env->value = ft_substr(div+1, 0, ft_strlen(div));
 				if (!env->value)
 					exit (MALLOC_ERROR);
@@ -260,5 +261,6 @@ int	ft_export(t_token *tokens, t_env *env)
 		}
 		tokens = tokens->next;
 	}
+	free(keyname);
 	return (0);
 }

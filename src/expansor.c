@@ -56,9 +56,19 @@ void	ft_checkvar(char *varname, char **varvalue, t_env *env)
 {
 	if (!ft_strxcmp(varname, env->key_name))
 	{
-		*varvalue = ft_strdup(env->value);
-		if (!*varvalue)
-			exit (MALLOC_ERROR);
+		if (env->value)
+		{
+			*varvalue = ft_strdup(env->value);
+			if (!*varvalue)
+				exit (MALLOC_ERROR);
+		}
+		else
+		{
+			*varvalue = ft_strdup("");
+			if (!*varvalue)
+				exit (MALLOC_ERROR);
+		}
+
 	}
 }
 

@@ -47,6 +47,20 @@ void	process_sig_handler(int sig)
 		g_signal = 131;
 	}
 }
+void	here_doc_sig_handler(int sig)
+{
+	g_signal = sig;
+	if (sig == SIGINT)
+	{
+		write(1, "^C\n", 3);//solo aparece asi en el proceso hijo
+		g_signal = 130;
+	}
+	else if (sig == SIGQUIT)
+	{
+		ft_putstr_fd("^\\Quit: 3\n", 1);
+		g_signal = 131;
+	}
+}
 //inicializa variable global y las señales. Variable tc y sus funciones usan la libreria termios.h para no escribir ^C
 void	sig_init(int i)//cambio anadido pendiente analizar🐸
 {
@@ -55,7 +69,12 @@ void	sig_init(int i)//cambio anadido pendiente analizar🐸
 	g_signal = 0;
 	if (i == 1)//cambio anadido pendiente analizar🐸
 	{
-		if (signal(SIGINT, sig_handler) == SIG_ERR)//Init SIGINT (ctrl+C) para ejecutar sig_handler cuando la reciba
+		signal(SIGINT, sig_handler);//Init SIGINT (ctrl+C) para ejecutar sig_handler cuando la reciba
+		signal(SIGQUIT, SIG_IGN); //Init SIGQUIT (ctrl+\) para ignorarla
+	}
+	else if (i == 2)//cambio anadido pendiente analizar🐸
+	{
+		signal(SIGINT,here_doc_sig_handler);//Init SIGINT (ctrl+C) para ejecutar sig_handler cuando la reciba
 		signal(SIGQUIT, SIG_IGN); //Init SIGQUIT (ctrl+\) para ignorarla
 	}
 	else//cambio anadido pendiente analizar🐸
