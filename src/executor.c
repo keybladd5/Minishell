@@ -87,7 +87,7 @@ void 	exec_cmd(t_token **tokens, t_env **env, char **envp)
 	while (ft_strncmp("PATH", (*env)->key_name, 4) != 0) //LOCALIZA EL PATH si la flag no esta
 	{
 		*env = (*env)->next;
-		if ((*env)->next == NULL)
+		if (!*env || (*env)->next == NULL)
 		{
 			ft_error_cmd((*tokens)->str, 1);
 			exit(127);

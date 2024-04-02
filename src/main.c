@@ -37,7 +37,23 @@ void free_tokens(t_token **head)
 	}
 	*head = NULL;
 }
-
+void	ft_aux_catch_env(t_env *tmp)
+{
+	if (ft_strxcmp(tmp->key_name, "SHLVL\0") == 0)
+	{
+		int shlvl = 0; //pasar esta variable a funcion de iterar shell level
+		shlvl = ft_atoi(tmp->value);
+		if (shlvl < 999 && shlvl >= 0)
+			shlvl++;
+		else
+			shlvl = 0;
+		free(tmp->value);
+		tmp->value = ft_itoa(shlvl);
+		if (!tmp->value)
+			ft_error_system(MALLOC_ERROR);
+	}
+	return ;
+}
 //get env on a list
 void ft_catch_env(char **envp, t_env **head)
 {
@@ -47,6 +63,7 @@ void ft_catch_env(char **envp, t_env **head)
 	t_env	*last;
 
 	x = 0;
+	last = NULL;
 	while (envp[x])
 	{
 		tmp = (t_env *)malloc(sizeof(t_env));
@@ -59,6 +76,7 @@ void ft_catch_env(char **envp, t_env **head)
 		tmp->value = ft_substr(div+1, 0, ft_strlen(div));
 		if (!tmp->value)
 			exit (MALLOC_ERROR);
+		ft_aux_catch_env(tmp);
 		if (!*head)
 			*head = tmp;
 		else
@@ -117,7 +135,7 @@ char	*prompt_builder(void)
 	cwd = ft_strjoin_free(cwd, aux); //unir dir+aux normal
 	if (!cwd)
 		exit (MALLOC_ERROR);
-	aux = ft_strdup("\x1b[92m⌁./MiniShell→\x1b[0m ");
+	aux = ft_strdup("\001\x1b[92m⌁./MiniShell→\x1b[0m\002 ");
 	if (!aux)
 		exit(MALLOC_ERROR);
 	cwd = ft_strjoin_free(cwd, aux);
@@ -160,10 +178,13 @@ int	main(int argc, char *argv[], char **envp)
 
 	head = NULL;
 	if (argc != 1 || !argv[0])
+	{
+		ft_putendl_fd("minishell: only one argument authorized ❌", 2);
 		return (1);
+	}
 	if (!*envp)
 	{
-		ft_putendl_fd("🥶 BROW WHAT ARE U TRYNG TO DO 🥶", 2);
+		ft_putendl_fd("minishell: enviroment required ❌", 2);
 		return (1);
 	}
 	ft_catch_env(envp, &head);

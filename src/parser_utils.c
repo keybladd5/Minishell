@@ -92,6 +92,7 @@ void	ft_init_data_parser(t_parser *d, t_token **tokens)
 		ft_error_system(MALLOC_ERROR);
 	d->data_redir->red_in_counter = 0;
 	d->data_redir->red_out_counter = 0;
+	d->data_redir->flag_to_close = 0;
 	d->data_pipe->og_stdin = dup(0);
 	d->data_pipe->og_stdout = dup(1);
 	if (d->data_pipe->og_stdin == -1 || d->data_pipe->og_stdout == -1)

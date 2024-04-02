@@ -14,6 +14,8 @@
 
 //aux function to select the redirs, return 1 if all docs works
 //else return 0 to leave the execution cmd line
+//flag to close is a flag to say in the las_cmd to execute que no pille 
+// el fd de outfile para sacar el output
 static int	selector_redirs_child(t_parser *d, t_env **env)
 {
 	d->flag_input = selector_input(d);
@@ -29,7 +31,8 @@ static int	selector_redirs_child(t_parser *d, t_env **env)
 	{
 		if (d->flag_output == 2)
 			return (l_red_out(d, env), 0);
-		d->data_pipe->flag = NO;
+		d->data_redir->flag_to_close = 1;
+		return (2);
 	}
 	return (1);
 }
@@ -74,10 +77,16 @@ int *exit_status)
 // 	proceso hijo, cancela ejecucion en caso de red< in erronea
 static void	parse_child_cmd(t_parser *d, t_env **env)
 {
+	int redir_flag;
+
+	redir_flag = -1;
 	if (d->t_current && d->data_pipe->pipe_counter)
 	{
-		if (!selector_redirs_child(d, env))
+		redir_flag = selector_redirs_child(d, env);
+		if (redir_flag == 0)
 			return ;
+		else if (redir_flag == 2)
+			d->data_pipe->flag = NO;
 		else
 			d->data_pipe->flag = YES;
 		ft_tokens_to_exec(&d->t_current, &d->t_tmp);
@@ -114,6 +123,12 @@ int *exit_status)
 		{
 			ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
 			return (ft_wait_child_process(exit_status, d->process), 1);
+		}
+		else if(d->data_redir->flag_to_close)
+		{
+			if (dup2(d->data_pipe->og_stdout, 1) == -1)
+				ft_error_system(DUP2_ERROR);
+			d->data_redir->flag_to_close = 0;
 		}
 		ft_tokens_to_exec(&d->t_current, &d->t_tmp);
 		executor(&d->t_tmp, env, d->data_pipe);

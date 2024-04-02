@@ -73,7 +73,7 @@ int	ft_red_out_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe)
 	if (data_pipe->pipe_counter)
 	{
 		close(data_redir->fd_outfile);
-		data_redir->fd_outfile = -1;
+		data_redir->fd_outfile = -1; //vale la pena probar a leer si el fd_outfile es positivo y aqui entonces restablecer el stdout al original
 		return (1);
 	}
 	return (0);
