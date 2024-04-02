@@ -19,7 +19,7 @@ SRCS 		=  src/main.c src/builtins.c src/executor.c \
 
 INCLUDES 	= inc/minishell.h
 
-FLAGS 		= -Wall -Wextra -Werror -MMD -g #-fsanitize=address
+FLAGS 		= -Wall -Wextra -Werror -MMD -g -fsanitize=address
 
 FLAGS_LIB_SEARCH	:=	-lreadline -lhistory -ltermcap -lft
 

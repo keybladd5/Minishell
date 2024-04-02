@@ -78,6 +78,7 @@ typedef	struct s_redir
 	int red_in_counter;
 	int fd_outfile;
 	int red_out_counter;
+	int flag_to_close;
 }	t_redir;
 
 typedef struct s_hd_append
