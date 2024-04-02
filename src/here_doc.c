@@ -49,7 +49,7 @@ void ft_here_doc(t_token *token, t_hd_append *data_heredoc, t_pipe *data_pipe)
 	{
 
 		tmp_input = readline("> ");
-		if (tmp_input && limiter && ft_strxcmp(tmp_input, limiter) == 0)
+		if (!tmp_input || (tmp_input && limiter && ft_strxcmp(tmp_input, limiter) == 0))
 		{
 			free(tmp_input);
 			break ;
