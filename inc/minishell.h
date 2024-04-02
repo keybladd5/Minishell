@@ -185,6 +185,24 @@ int		selector_input(t_parser *d);
 
 int selector_output(t_parser *d);
 
+//---------BUILTINS--------------------
+
+int 	ft_is_built_in(t_token **tokens);
+
+int		ft_exec_builtin(t_token **tokens, t_env **env, int *exit_status);
+
+int		ft_echo(t_token *tokens);
+
+int		ft_cd(t_token *tokens, t_env *env);
+
+int		ft_pwd(void);
+
+int		ft_env(t_env *env);
+
+int		ft_export(t_token *tokens, t_env *env);
+
+int		ft_exit(t_token *tokens, int *exit_status);
+
 //---------PENDIENTE ORDENAR-----------
 
 char	**ft_copy_env(t_env **env);
@@ -202,22 +220,6 @@ void	print_tokens(t_token **head);
 int		ft_token_lst_size(t_token *lst);
 
 void 	free_tokens(t_token **head);
-
-int 	ft_is_built_in(t_token **tokens);
-
-int		ft_exec_builtin(t_token **tokens, t_env **env, int *exit_status);
-
-int		ft_echo(t_token *tokens);
-
-int		ft_cd(t_token *tokens, t_env *env);
-
-int		ft_pwd(void);
-
-int		ft_env(t_env *env);
-
-int		ft_export(t_token *tokens, t_env *env);
-
-int		ft_export(t_token *tokens, t_env *env);
 
 t_token	*ft_createtoken(char *input, int *i, t_env **env, int exit_status);
 
