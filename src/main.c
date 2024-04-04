@@ -37,55 +37,6 @@ void free_tokens(t_token **head)
 	}
 	*head = NULL;
 }
-void	ft_aux_catch_env(t_env *tmp)
-{
-	if (ft_strxcmp(tmp->key_name, "SHLVL\0") == 0)
-	{
-		int shlvl = 0; //pasar esta variable a funcion de iterar shell level
-		shlvl = ft_atoi(tmp->value);
-		if (shlvl < 999 && shlvl >= 0)
-			shlvl++;
-		else
-			shlvl = 0;
-		free(tmp->value);
-		tmp->value = ft_itoa(shlvl);
-		if (!tmp->value)
-			ft_error_system(MALLOC_ERROR);
-	}
-	return ;
-}
-//get env on a list
-void ft_catch_env(char **envp, t_env **head)
-{
-	int	x;
-	char	*div;
-	t_env	*tmp;
-	t_env	*last;
-
-	x = 0;
-	last = NULL;
-	while (envp[x])
-	{
-		tmp = (t_env *)malloc(sizeof(t_env));
-		if (!tmp)
-			exit(MALLOC_ERROR);
-		div = ft_strchr(envp[x], '=');
-		tmp->key_name = ft_substr(envp[x], 0, (div - envp[x]));
-		if (!tmp->key_name)
-			exit (MALLOC_ERROR);
-		tmp->value = ft_substr(div+1, 0, ft_strlen(div));
-		if (!tmp->value)
-			exit (MALLOC_ERROR);
-		ft_aux_catch_env(tmp);
-		if (!*head)
-			*head = tmp;
-		else
-			last->next = tmp;
-		last = tmp;
-		x++;
-	}
-	last->next = NULL;
-}
 
 //split all words by spaces in a linked list
 void	lexer(t_token **tokens, char *input, t_env **env, int exit_status)
@@ -158,7 +109,7 @@ void 	input_loop(t_env **env)
 		prompt = prompt_builder();
 		input = readline(prompt);
 		ctrl_C(&exit_status);
-		if (!input)//cambio anadido pendiente analizar🐸
+		if (!input)
 		{
 			ft_printf("exit\n");
 			exit(exit_status);
