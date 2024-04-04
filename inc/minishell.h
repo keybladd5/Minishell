@@ -206,6 +206,10 @@ int		ft_exit(t_token *tokens, int *exit_status);
 
 //---------PENDIENTE ORDENAR-----------
 
+void	ft_aux_catch_env(t_env *tmp, int *shlvl_flag);
+
+void ft_catch_env(char **envp, t_env **head);
+
 char	**ft_copy_env(t_env **env);
 
 int		ft_ismetachar(char c);
