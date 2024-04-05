@@ -1,0 +1,38 @@
+TESTS ARREGLAR/IGNORAR
+
+ECHO 
+- T16: ~ no implementado [IGNORAR]
+- T18: unset no implementado [ARREGLAR]
+
+EXPORT 
+- T12: export VAR+=value no implementado [IGNORAR]
+
+ENV
+- ALL TESTS PASSED ✅
+
+EXIT
+- T2: 
+
+DIRECTORY
+
+DOLLARS
+
+QUOTES
+
+SPACES
+
+TILDE
+
+SYNTAX_ERROR
+
+PIPE
+
+REDIRECTION
+
+STATUS
+
+SHLVL
+
+PANIC MANDATORY
+
+YOUR
