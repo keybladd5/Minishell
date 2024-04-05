@@ -196,7 +196,7 @@ int		ft_echo(t_token *tokens);
 
 int		ft_cd(t_token *tokens, t_env *env);
 
-int		ft_pwd(void);
+int		ft_pwd(t_env *env);
 
 int		ft_env(t_env *env);
 

@@ -12,6 +12,31 @@
 
 #include "../../inc/minishell.h"
 
+int	ft_atoi(const char *str)
+{
+	int	output;
+	int	sign;
+
+	output = 0;
+	sign = 1;
+	while (*str && (ft_strchr("\n\t\v\f\r ", *str)) != NULL)
+		str++;
+	if (*str == '+')
+		str++;
+	else if (*str == '-')
+	{
+		str++;
+		sign = -1;
+	}
+	while (*str && (ft_strchr("0123456789", *str)) != NULL)
+	{
+		output = (output * 10) + (*str - '0');
+		str++;
+	}
+	return (output * sign);
+}
+
+
 int	ft_print_exit_argerr(char *arg)
 {
 	ft_putstr_fd("Minishell: exit: ", 2);
@@ -64,6 +89,8 @@ int	ft_exit(t_token *tokens, int *exit_status)
 		"9223372036854775807", 19) > 0)) || (sign == '-' && \
 		(ft_strncmp(tokens->str + (i - len), "9223372036854775808", 19) > 0))))
 			exit(ft_print_exit_argerr(tokens->str));
+		if (!exit_status)
+			exit (0);
 		*exit_status = ft_atoi(tokens->str);
 		if (tokens->next)
 			return (ft_putendl_fd("Minishell: exit: too many arguments", 2), 1);

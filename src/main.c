@@ -66,14 +66,24 @@ void	lexer(t_token **tokens, char *input, t_env **env, int exit_status)
 	}
 }
 
-char	*prompt_builder(void)
+char	*prompt_builder(t_env *env)
 {
 	char	*cwd;
 	char	*aux;
 
 	cwd = getcwd(NULL, 0); //direccion
 	if (!cwd)
-		exit (MALLOC_ERROR);
+	{
+		while (env)
+		{
+			if (!ft_strncmp(env->key_name, "PWD", 3))
+			{
+				cwd = ft_strdup(env->value);
+				break ;
+			}
+			env = env->next;
+		}
+	}
 	aux = ft_strdup("\x1b[94m"); //aux 1
 	if (!aux)
 		exit (MALLOC_ERROR);
@@ -106,8 +116,8 @@ void 	input_loop(t_env **env)
 	while(42)
 	{
 		sig_init(1);
-		prompt = prompt_builder();
-		input = readline(prompt);
+		prompt = prompt_builder(*env);
+		input = readline("Minishell$ ");
 		ctrl_C(&exit_status);
 		if (!input)
 		{

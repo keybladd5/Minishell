@@ -50,6 +50,8 @@ int	ft_cd(t_token *tokens, t_env *env)
 		{
 			path = tmp_env->value;
 			tmp_env->value = getcwd(NULL, 0);
+			if (!tmp_env->value)
+				tmp_env->value = path;
 			tmp_env = env;
 			break ;
 		}
