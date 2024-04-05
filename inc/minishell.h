@@ -101,6 +101,15 @@ typedef struct s_parser
 	int		flag_input;
 	int		flag_output;
 }	t_parser;
+
+//STRUC PARA EL TYPER
+typedef struct s_typer
+{
+	int first_token;
+	int consecutive_metachar;
+	int cntrl;
+}	t_typer;
+
 //STRUC PARA EL LEXER
 typedef	struct s_lexer
 {
@@ -161,7 +170,7 @@ char **ft_copy_env(t_env **env);
 
 //--------typer.c-------------
 
-int 	typer_tokens(t_redir *data_redir, t_token **t_current, t_pipe *data_pipe, t_hd_append *data_hd_append, int *exit_status);
+int 	typer_tokens(t_parser *d, t_token **t_current,  int *exit_status);
 
 
 //--------here_doc.c-------------
