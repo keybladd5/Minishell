@@ -15,13 +15,23 @@
 //PWD
 //Con getcwd se hace malloc del string y guarda el path actual
 //Imprime el path seguido de \n y libera el string
-int	ft_pwd(void)
+int	ft_pwd(t_env *env)
 {
 	char	*cwd;
 
 	cwd = getcwd(NULL, 0);
 	if (!cwd)
-		exit (MALLOC_ERROR);
+	{
+		while (env)
+		{
+			if (!ft_strncmp(env->key_name, "PWD", 3))
+			{
+				cwd = ft_strdup(env->value);
+				break ;
+			}
+			env = env->next;
+		}
+	}
 	ft_putstr_fd(cwd, 1);
 	write(1, "\n", 1);
 	free (cwd);

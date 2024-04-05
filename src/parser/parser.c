@@ -118,7 +118,7 @@ int *exit_status)
 			ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
 			return (ft_wait_child_process(exit_status, d->process), 1);
 		}
-		d->flag_output = selector_output(d); //selector_output
+		d->flag_output = selector_output(d); 
 		if (d->flag_output == 2)
 		{
 			ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
@@ -154,8 +154,7 @@ void	parser(t_token **tokens, t_env **env, int *exit_status)
 	if (!d)
 		ft_error_system(MALLOC_ERROR);
 	ft_init_data_parser(d, tokens);
-	if (typer_tokens(d->data_redir, &d->t_current, d->data_pipe, \
-	d->data_hd_append, exit_status))
+	if (typer_tokens(d, &d->t_current, exit_status))
 		d->t_current = NULL;
 	else
 		d->t_current = *tokens;

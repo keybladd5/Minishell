@@ -34,7 +34,7 @@ int	ft_exec_builtin(t_token **tokens, t_env **env, int *exit_status)
 	else if (!ft_strxcmp("cd", (*tokens)->str))
 		return (ft_cd((*tokens)->next, *env));
 	else if (!ft_strxcmp("pwd", (*tokens)->str))
-		return (ft_pwd());
+		return (ft_pwd(*env));
 	else if (!ft_strxcmp("env", (*tokens)->str))
 		return (ft_env(*env));
 	else if (!ft_strxcmp("export\0", (*tokens)->str))

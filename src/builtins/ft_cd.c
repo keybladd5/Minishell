@@ -49,7 +49,9 @@ int	ft_cd(t_token *tokens, t_env *env)
 		if (!ft_strncmp(tmp_env->key_name, "PWD", 3))
 		{
 			path = tmp_env->value;
-			tmp_env->value = getcwd(NULL, 0);//aqui puede devolver null la funcion 
+			tmp_env->value = getcwd(NULL, 0);
+			if (!tmp_env->value)
+				tmp_env->value = path;
 			tmp_env = env;
 			break ;
 		}
