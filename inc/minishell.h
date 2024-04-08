@@ -86,6 +86,8 @@ typedef struct s_hd_append
 	int heredoc_counter;
 	int	append_counter;
 	int fd_append;
+	char *tmp_input;
+	char *limiter;
 }
  t_hd_append;
 
@@ -106,7 +108,7 @@ typedef struct s_parser
 typedef struct s_typer
 {
 	int first_token;
-	int consecutive_metachar;
+	int c_m;
 	int cntrl;
 }	t_typer;
 
@@ -130,7 +132,7 @@ void 	ft_error_cmd(char *cmd, int type);
 
 //--------signs.c-----------
 
-void	ctrl_C(int *exit_status);
+void	ctrl_c(int *exit_status);
 
 void	sig_handler(int sig);
 
@@ -172,6 +174,18 @@ char **ft_copy_env(t_env **env);
 
 int 	typer_tokens(t_parser *d, t_token **t_current,  int *exit_status);
 
+void	typer_word(t_token **curr_token, int *consecutive_metachar, int mode);
+
+int	typer_pipe(t_token **curr_token, t_parser *d, t_typer *t, int *exit_status);
+
+int	typer_red_in(t_token **curr_token, t_parser *d, int *consecutive_metachar, int *exit_status);
+
+int  typer_red_out(t_token **curr_token, t_parser *d, int *consecutive_metachar, int *exit_status);
+
+int	typer_here_doc(t_token **curr_token, t_parser *d, int *consecutive_metachar, int *exit_status);
+
+int typer_append(t_token **curr_token, t_parser *d, int *consecutive_metachar, int *exit_status);
+
 
 //--------here_doc.c-------------
 
@@ -195,6 +209,8 @@ int		selector_input(t_parser *d);
 
 int selector_output(t_parser *d);
 
+int	aux_parse_last_child(t_parser *d, int *exit_status);
+
 //---------BUILTINS--------------------
 
 int 	ft_is_built_in(t_token **tokens);
@@ -215,9 +231,19 @@ int		ft_exit(t_token *tokens, int *exit_status);
 
 //---------PENDIENTE ORDENAR-----------
 
+void	ft_close(int fd);
+
+int		ft_close_v2(int *fd);
+
+void	ft_close2(int fd1, int fd2);
+
+void	ft_dup2(int fd1, int fd2);
+
+void	ft_remove_token(t_token **tokens, t_token **curr_token);
+
 void	ft_aux_catch_env(t_env *tmp, int *shlvl_flag);
 
-void ft_catch_env(char **envp, t_env **head);
+void	ft_catch_env(char **envp, t_env **head);
 
 char	**ft_copy_env(t_env **env);
 
