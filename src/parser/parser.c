@@ -26,7 +26,7 @@ static int	selector_redirs_child(t_parser *d, t_env **env)
 			return (l_red_out(d, env), 0);
 	}
 	d->flag_output = \
-	selector_output(d); //selector_output
+	selector_output(d);
 	if (d->flag_output)
 	{
 		if (d->flag_output == 2)
@@ -42,7 +42,7 @@ static int	selector_redirs_child(t_parser *d, t_env **env)
 // en caso de flag_input en 2 
 // (que significa que hay error en redir_in con el archivo)
 // no ejecuta nada y solo muestra en mensaje de error.
-static int	parse_one_cmd(t_parser *d, t_env **env,\
+static int	parse_one_cmd(t_parser *d, t_env **env, \
 int *exit_status)
 {
 	if (!d->data_pipe->pipe_counter && d->t_current)
@@ -52,7 +52,7 @@ int *exit_status)
 			return (ft_aux_close(d->data_pipe, d->data_redir, \
 			d->data_hd_append), 1);
 		d->flag_output = selector_output(d);
-		if (d->flag_output == 2) //selector_output
+		if (d->flag_output == 2)
 			return (ft_aux_close(d->data_pipe, d->data_redir, \
 			d->data_hd_append), 1);
 		d->data_pipe->flag = NO;
@@ -77,7 +77,7 @@ int *exit_status)
 // 	proceso hijo, cancela ejecucion en caso de red< in erronea
 static void	parse_child_cmd(t_parser *d, t_env **env)
 {
-	int redir_flag;
+	int	redir_flag;
 
 	redir_flag = -1;
 	if (d->t_current && d->data_pipe->pipe_counter)
@@ -113,29 +113,14 @@ int *exit_status)
 		d->data_pipe->flag = NO;
 		d->t_current = d->t_current->next;
 		d->flag_input = selector_input(d);
-		if (d->flag_input == 2)
-		{
-			ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
-			return (ft_wait_child_process(exit_status, d->process), 1);
-		}
-		d->flag_output = selector_output(d); 
-		if (d->flag_output == 2)
-		{
-			ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
-			return (ft_wait_child_process(exit_status, d->process), 1);
-		}
-		else if(d->data_redir->flag_to_close)
-		{
-			if (dup2(d->data_pipe->og_stdout, 1) == -1)
-				ft_error_system(DUP2_ERROR);
-			d->data_redir->flag_to_close = 0;
-		}
+		if (aux_parse_last_child(d, exit_status))
+			return (1);
 		ft_tokens_to_exec(&d->t_current, &d->t_tmp);
 		executor(&d->t_tmp, env, d->data_pipe);
 		d->process++;
 		free_tokens(&d->t_tmp);
 		ft_aux_close(d->data_pipe, d->data_redir, d->data_hd_append);
-		return (ft_wait_child_process(exit_status, d->process),1);
+		return (ft_wait_child_process(exit_status, d->process), 1);
 	}
 	return (0);
 }

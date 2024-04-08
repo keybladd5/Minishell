@@ -24,7 +24,8 @@ int	ft_ismetachar(char c)
 ///ALL NEW FUNCTIONS NOT FULLLY TESTED////
 //////////////////////////////////////////
 
-//Pendiente cambiar exit(1) por mensaje de syntax error cuando no se cierran las quotes
+//Pendiente cambiar exit(1) por mensaje de syntax 
+//error cuando no se cierran las quotes
 void	handle_quotes(t_token **tmp_token, t_lexer **aux, t_env **env, \
 	int exit_status)
 {

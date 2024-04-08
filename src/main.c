@@ -12,32 +12,6 @@
 
 #include "../inc/minishell.h"
 
-//debug function
-/*void	print_tokens(t_token **head)
-{
-	t_token	*current = *head;
-
-	while (current)
-	{
-		dprintf(0, "stack = %s\n", current->str);
-		current = current->next;
-	}
-}*/
-//free the list do it by lexer
-void free_tokens(t_token **head)
-{
-	t_token	*current;
-
-	while (*head)
-	{
-		current = (*head)->next;
-		free((*head)->str);
-		free(*head);
-		*head = current;
-	}
-	*head = NULL;
-}
-
 //split all words by spaces in a linked list
 void	lexer(t_token **tokens, char *input, t_env **env, int exit_status)
 {
@@ -66,12 +40,11 @@ void	lexer(t_token **tokens, char *input, t_env **env, int exit_status)
 	}
 }
 
-char	*prompt_builder(t_env *env)
+char	*prompt_builder_aux(t_env *env)
 {
 	char	*cwd;
-	char	*aux;
 
-	cwd = getcwd(NULL, 0); //direccion
+	cwd = getcwd(NULL, 0);
 	if (!cwd)
 	{
 		while (env)
@@ -84,16 +57,25 @@ char	*prompt_builder(t_env *env)
 			env = env->next;
 		}
 	}
-	aux = ft_strdup("\x1b[94m"); //aux 1
+	return (cwd);
+}
+
+char	*prompt_builder(t_env *env)
+{
+	char	*cwd;
+	char	*aux;
+
+	cwd = prompt_builder_aux(env);
+	aux = ft_strdup("\x1b[94m");
 	if (!aux)
 		exit (MALLOC_ERROR);
-	cwd = ft_strjoin_free(aux, cwd); //unir aux+dir
+	cwd = ft_strjoin_free(aux, cwd);
 	if (!cwd)
 		exit (MALLOC_ERROR);
-	aux = ft_strdup("\x1b[0m "); //aux normal
+	aux = ft_strdup("\x1b[0m ");
 	if (!aux)
 		exit (MALLOC_ERROR);
-	cwd = ft_strjoin_free(cwd, aux); //unir dir+aux normal
+	cwd = ft_strjoin_free(cwd, aux);
 	if (!cwd)
 		exit (MALLOC_ERROR);
 	aux = ft_strdup("\001\x1b[92m⌁./MiniShell→\x1b[0m\002 ");
@@ -106,19 +88,20 @@ char	*prompt_builder(t_env *env)
 }
 
 //infinte loop to get the user_input and parse it
-void 	input_loop(t_env **env)
+void	input_loop(t_env **env, t_token	*tokens)
 {
-	char	*input = NULL;
-	t_token	*tokens = NULL;
-	int		exit_status = 0;
+	char	*input;
+	int		exit_status;
 	char	*prompt;
 
-	while(42)
+	input = NULL;
+	exit_status = 0;
+	while (42)
 	{
 		sig_init(1);
 		prompt = prompt_builder(*env);
 		input = readline("Minishell$ ");
-		ctrl_C(&exit_status);
+		ctrl_c(&exit_status);
 		if (!input)
 		{
 			ft_printf("exit\n");
@@ -136,8 +119,10 @@ void 	input_loop(t_env **env)
 int	main(int argc, char *argv[], char **envp)
 {
 	t_env	*head;
+	t_token	*tokens;
 
 	head = NULL;
+	tokens = NULL;
 	if (argc != 1 || !argv[0])
 	{
 		ft_putendl_fd("minishell: only one argument authorized ❌", 2);
@@ -149,6 +134,6 @@ int	main(int argc, char *argv[], char **envp)
 		return (1);
 	}
 	ft_catch_env(envp, &head);
-	input_loop(&head);
+	input_loop(&head, tokens);
 	return (0);
 }

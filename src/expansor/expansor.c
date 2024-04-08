@@ -12,35 +12,6 @@
 
 #include "../../inc/minishell.h"
 
-void	ft_remove_token(t_token **tokens, t_token **curr_token)
-{
-	t_token	*tmp_current;
-
-	tmp_current = NULL;
-	if (*tokens == *curr_token)
-	{
-		*tokens = (*curr_token)->next;
-		tmp_current = *curr_token;
-		*curr_token = (*curr_token)->next;
-	}
-	else
-	{
-		while (*tokens)
-		{
-			if ((*tokens)->next == *curr_token)
-			{
-				tmp_current = *curr_token;
-				(*tokens)->next = (*curr_token)->next;
-				*curr_token = (*curr_token)->next;
-				break ;
-			}
-			*tokens = (*tokens)->next;
-		}
-	}
-	free (tmp_current->str);
-	free (tmp_current);
-}
-
 void	ft_expand_exitstatus(char **str, int exit_status, int *i)
 {
 	char	*status;
@@ -68,7 +39,6 @@ void	ft_checkvar(char *varname, char **varvalue, t_env *env)
 			if (!*varvalue)
 				exit (MALLOC_ERROR);
 		}
-
 	}
 }
 
@@ -134,7 +104,6 @@ void	expansor(char **str, t_env **env, int exit_status)
 			else
 				*str = ft_strjoin_s(*str, "$");
 		}
-		//else if (tmp[i] == '~')
 		else
 			ft_noexpansion(tmp, str, &i);
 	}

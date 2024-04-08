@@ -12,9 +12,9 @@
 
 #include "../../inc/minishell.h"
 
-static char *ft_get_limiter(t_token *token)
+static char	*ft_get_limiter(t_token *token)
 {
-	t_token *t_current;
+	t_token	*t_current;
 
 	t_current = token;
 	while (t_current && t_current->type != LIMITER)
@@ -24,91 +24,32 @@ static char *ft_get_limiter(t_token *token)
 	return (t_current->str);
 }
 
-void ft_protect_here_doc(t_pipe *data_pipe)
-{
-	if (dup2(data_pipe->og_stdin, 0) == -1)
-		ft_error_system(DUP2_ERROR);
-}
-
 //en caso de control+d lanzar directamente el string LIMITER para inalizar!!!!!
-
-void ft_here_doc(t_token *token, t_hd_append *data_heredoc, t_pipe *data_pipe)
+void	ft_here_doc(t_token *token, t_hd_append *d_hd, t_pipe *data_pipe)
 {
 	int		tmp_fd[2];
-	char	*tmp_input;
-	char	*limiter;
 
-	if (!data_heredoc->heredoc_counter)
+	if (!d_hd->heredoc_counter)
 		return ;
-	ft_protect_here_doc(data_pipe);
-	limiter = ft_get_limiter(token);
-	if (!limiter)
+	ft_dup2(data_pipe->og_stdin, 0);
+	d_hd->limiter = ft_get_limiter(token);
+	if (!d_hd->limiter)
 		return ;
 	pipe(tmp_fd);
-	while(42 - 41)
+	while (42 - 41)
 	{
-
-		tmp_input = readline("> ");
-		if (!tmp_input || (tmp_input && limiter && ft_strxcmp(tmp_input, limiter) == 0))
+		d_hd->tmp_input = readline("> ");
+		if (!d_hd->tmp_input || (d_hd->tmp_input \
+		&& d_hd->limiter && ft_strxcmp(d_hd->tmp_input, d_hd->limiter) == 0))
 		{
-			free(tmp_input);
+			free(d_hd->tmp_input);
 			break ;
 		}
-		if (tmp_input)
-			ft_putendl_fd(tmp_input, tmp_fd[1]);
-		free(tmp_input);
+		if (d_hd->tmp_input)
+			ft_putendl_fd(d_hd->tmp_input, tmp_fd[1]);
+		free(d_hd->tmp_input);
 	}
-	if (close(tmp_fd[1]) == -1)
-		ft_error_system(CLOSE_ERROR);
-	if (dup2(tmp_fd[0], 0) == -1)
-		ft_error_system(DUP2_ERROR);
-	if (close(tmp_fd[0]) == -1)
-		ft_error_system(CLOSE_ERROR);
-	data_heredoc->heredoc_counter--;	
+	ft_dup2(tmp_fd[0], 0);
+	ft_close2(tmp_fd[0], tmp_fd[1]);
+	d_hd->heredoc_counter--;
 }
-/*void ft_here_doc(t_token *token, t_hd_append *data_heredoc, t_pipe *data_pipe)
-{
-	int		tmp_fd[2];
-	char	*tmp_input;
-	char	*limiter;
-	int 	pid;
-
-	if (!data_heredoc->heredoc_counter)
-		return ;
-	pid = fork();
-	if (pid == 0)
-	{
-		sig_init(2);
-		ft_protect_here_doc(data_pipe);
-		limiter = ft_get_limiter(token);
-		if (!limiter)
-			return ;
-		pipe(tmp_fd);
-		while(42 - 41)
-		{
-
-			tmp_input = readline("> ");
-			if (tmp_input && limiter && ft_strxcmp(tmp_input, limiter) == 0)
-			{
-				free(tmp_input);
-				break ;
-			}
-			if (tmp_input)
-				ft_putendl_fd(tmp_input, tmp_fd[1]);
-			free(tmp_input);
-		}
-		if (close(tmp_fd[1]) == -1)
-			ft_error_system(CLOSE_ERROR);
-		if (dup2(tmp_fd[0], 0) == -1)
-			ft_error_system(DUP2_ERROR);
-		if (close(tmp_fd[0]) == -1)
-			ft_error_system(CLOSE_ERROR);
-		exit(0);
-	}
-	else
-	{
-		waitpid(pid, NULL, 0);
-		data_heredoc->heredoc_counter--;
-		return ;
-	}
-}*/

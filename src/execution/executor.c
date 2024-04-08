@@ -13,16 +13,16 @@
 #include "../../inc/minishell.h"
 
 //wait the end of all the child process, and set the exit_status value
-void 	ft_wait_child_process(int *exit_status, int process)
+void	ft_wait_child_process(int *exit_status, int process)
 {
-	int 	status;
+	int	status;
 
 	while (process)
 	{
 		wait(&status);
 		if (WIFEXITED(status))
 			*exit_status = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status)) //esta opcion no sera funcional hasta implementar signals en procesos hijos
+		else if (WIFSIGNALED(status))
 		{
 			if (WTERMSIG(status) == SIGINT)
 				*exit_status = 130;
@@ -126,12 +126,13 @@ void 	exec_cmd(t_token **tokens, t_env **env, char **envp)
 	exit(127);
 }
 
-//fork, find the absolute path, get the argv to the comand (included comand name) check the acces and exec
+//fork, find the absolute path, get the argv to the comand 
+//(included comand name) check the acces and exec
 void	executor(t_token **tokens, t_env **env, t_pipe *data_pipe)
 {
-	int	pid;
-	char **new_envp;
-	
+	int		pid;
+	char	**new_envp;
+
 	pid = fork();
 	new_envp = NULL;
 	if (pid < 0)
@@ -139,19 +140,21 @@ void	executor(t_token **tokens, t_env **env, t_pipe *data_pipe)
 	sig_init(0);
 	if (pid == 0)
 	{
-		new_envp = ft_copy_env(env);// en FASE DE TESTEO
-		if (data_pipe->flag == YES) 
+		new_envp = ft_copy_env(env);
+		if (data_pipe->flag == YES)
 		{
-			if (dup2(data_pipe->pipefd[1], 1) == -1)
+			ft_dup2(data_pipe->pipefd[1], 1);
+			ft_close2(data_pipe->pipefd[1], data_pipe->pipefd[0]);
+			/*if (dup2(data_pipe->pipefd[1], 1) == -1)
 				ft_error_system(DUP2_ERROR);
 			close(data_pipe->pipefd[1]);
-			close(data_pipe->pipefd[0]);
+			close(data_pipe->pipefd[0]);*/
 		}
 		if (!tokens || !*tokens)
 			exit (1) ;
 		if (ft_is_built_in(tokens))
 			exit(ft_exec_builtin(tokens, env, NULL));
-		else if ((*tokens)->str[0] ==  '/')
+		else if ((*tokens)->str[0] == '/')
 			ft_exec_absoluthe_path(tokens, new_envp);
 		else
 			exec_cmd(tokens, env, new_envp);
