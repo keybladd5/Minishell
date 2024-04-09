@@ -90,7 +90,7 @@ void	ft_error_syntax(int *exit_status, int name, t_token *t_current)
 		*exit_status = 2 ;
 		return ;
 	}
-	else if (name == RED_IN || name == RED_OUT ||\
+	else if (name == RED_IN || name == RED_OUT || \
 	name == HERE_DOC || name == APPEND)
 	{
 		if (ft_error_syntax_aux(exit_status, t_current))

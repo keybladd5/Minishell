@@ -13,7 +13,7 @@
 NAME 		= Minishell
 
 SRCS 		=  src/main.c src/utils/utils.c src/parser/parser.c src/parser/parser_aux.c src/execution/executor.c  \
-			src/quotes/quotes.c src/enviroment/enviroment.c src/execution/executor_utils.c \
+			src/quotes/quotes.c src/enviroment/enviroment.c src/execution/executor_utils.c src/execution/executor_aux.c\
 			src/expansor/expansor.c src/expansor/expansor_utils.c src/redirections/redirs.c src/signs/signs.c \
 			src/typer/typer.c src/typer/typer_aux.c src/errors/errors.c src/errors/errors_syntax.c src/redirections/here_doc.c \
 			src/redirections/append.c src/parser/parser_utils.c \
@@ -24,7 +24,7 @@ SRCS 		=  src/main.c src/utils/utils.c src/parser/parser.c src/parser/parser_aux
 
 INCLUDES 	= inc/minishell.h
 
-FLAGS 		= -Wall -Wextra -Werror -MMD -g -fsanitize=address
+FLAGS 		= -Wall -Wextra -Werror -MMD -g #-fsanitize=address
 
 FLAGS_LIB_SEARCH	:=	-lreadline -lhistory -ltermcap -lft
 

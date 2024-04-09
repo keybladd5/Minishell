@@ -12,7 +12,6 @@
 
 #include "../../inc/minishell.h"
 
-//read c_m as consecutive_metachar
 int	typer_pipe(t_token **curr_token, t_parser *d, t_typer *t, int *exit_status)
 {
 	(*curr_token)->type = PIPE;
@@ -33,14 +32,6 @@ void	typer_word(t_token **curr_token, int *consecutive_metachar, int mode)
 	*curr_token = (*curr_token)->next;
 }
 
-//hay que empezar a splitear el codigo en una funcion
-// por cada metacarcter encontrado hasta pode reducir-lo
-//se le da el tipo int para el caso "cat <"
-//else if (!ft_strncmp((*curr_token)->str, "|\0", 2)) 
-//si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
-//else if (!ft_strncmp((*curr_token)->str, "<\0", 2)) 
-//si encuentras pipe //!!!que pasa si el string tiene mas caracteres???
-//read c_m as consecutive_metachar
 int	typer_tokens(t_parser *d, t_token **curr_token, int *exit_status)
 {
 	t_typer	t;

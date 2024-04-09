@@ -12,79 +12,9 @@
 
 #include "../../inc/minishell.h"
 
-//wait the end of all the child process, and set the exit_status value
-void	ft_wait_child_process(int *exit_status, int process)
+void	ft_path_finder(t_env **env, t_token **tokens, t_executor **d_exec)
 {
-	int	status;
-
-	while (process)
-	{
-		wait(&status);
-		if (WIFEXITED(status))
-			*exit_status = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status))
-		{
-			if (WTERMSIG(status) == SIGINT)
-				*exit_status = 130;
-			else if (WTERMSIG(status) == SIGQUIT)
-				*exit_status = 131;
-		}
-		process--;
-	}
-}
-
-void	ft_exec_absoluthe_path(t_token **tokens, char **envp)
-{
-	char 	**cmd_argv;
-	char	*absolute_path;
-	int 	i;
-
-	i = 0;
-	absolute_path = (*tokens)->str; //setemos la variable directamente sin buscar en path
-	cmd_argv = (char **)malloc(sizeof(char * ) * (ft_token_lst_size(*tokens) + 1)); //crea la matriz a pasar al execve
-	if (!cmd_argv)
-		ft_error_system(MALLOC_ERROR);
-	if (access(absolute_path, X_OK) != 0)
-	{
-		ft_error_cmd(absolute_path, 2);
-		exit(127);
-	}
-	cmd_argv[ft_token_lst_size(*tokens)] = NULL;
-	while (*tokens) //llena la matriz con todos los tokens PENDIENTE CAMBIAR
-	{
-		if ((*tokens)->str[0] == '/')
-		{
-			cmd_argv[i] = ft_substr((*tokens)->str, ft_aux_abs((*tokens)->str), ft_strlen((*tokens)->str));
-			if (!cmd_argv[i])
-				ft_error_system(MALLOC_ERROR);
-			*tokens = (*tokens)->next;
-			if (!*tokens || (*tokens)->type != WORD)
-				break ;
-			i++;
-		}
-		cmd_argv[i] = ft_strdup((*tokens)->str);
-		if (!cmd_argv[i])
-			ft_error_system(MALLOC_ERROR);
-		*tokens = (*tokens)->next;
-		i++;
-	}
-	i = 0;
-	if (access(absolute_path, X_OK) == 0) //Checkea a validez de la ruta absoluta, si no lo es en el input es un NULL y no entra
-		execve(absolute_path, cmd_argv, envp);
-	ft_error_cmd(cmd_argv[0], 1);
-	exit(127);
-}
-
-void 	exec_cmd(t_token **tokens, t_env **env, char **envp)
-{
-	char 	**path;
-	char	**cmd_argv;
-	char 	*cmd;
-	char	*absolute_path;
-	int		i;
-
-	i = 0;
-	while (ft_strncmp("PATH", (*env)->key_name, 4) != 0) //LOCALIZA EL PATH si la flag no esta
+	while (ft_strncmp("PATH", (*env)->key_name, 4) != 0)
 	{
 		*env = (*env)->next;
 		if (!*env || (*env)->next == NULL)
@@ -93,70 +23,92 @@ void 	exec_cmd(t_token **tokens, t_env **env, char **envp)
 			exit(127);
 		}
 	}
-	path = ft_split((*env)->value, ':'); //lo splitea
-	if (!path) 
+	(*d_exec)->path = ft_split((*env)->value, ':');
+	if (!(*d_exec)->path)
 		ft_error_system(MALLOC_ERROR);
-	cmd = ft_strjoin("/", (*tokens)->str); //prepara el primer comando con el slash
-	if (!cmd)
+	(*d_exec)->cmd = ft_strjoin("/", (*tokens)->str);
+	if (!(*d_exec)->cmd)
 		ft_error_system(MALLOC_ERROR);
-	cmd_argv = (char **)malloc(sizeof(char * ) * (ft_token_lst_size(*tokens) + 1)); //crea la matriz a pasar al execve
-	if (!cmd_argv)
+}
+
+int	ft_exec_cmd_aux(t_executor **d_exec)
+{
+	int	i;
+
+	i = 0;
+	while ((*d_exec)->path[i])
+	{
+		(*d_exec)->absolute_path = ft_strjoin((*d_exec)->path[i], \
+		(*d_exec)->cmd);
+		if (!(*d_exec)->absolute_path)
+			exit(MALLOC_ERROR);
+		if (access((*d_exec)->absolute_path, X_OK) == 0)
+			return (1);
+		free((*d_exec)->absolute_path);
+		i++;
+	}
+	ft_error_cmd((*d_exec)->cmd_argv[0], 1);
+	return (0);
+}
+
+void	exec_cmd(t_token **tokens, t_env **env, t_executor *d_exec)
+{
+	int		i;
+
+	i = 0;
+	ft_path_finder(env, tokens, &d_exec);
+	d_exec->cmd_argv = (char **)malloc(sizeof(char *) * \
+	(ft_token_lst_size(*tokens) + 1));
+	if (!d_exec->cmd_argv)
 		ft_error_system(MALLOC_ERROR);
-	cmd_argv[ft_token_lst_size(*tokens)] = NULL;
+	d_exec->cmd_argv[ft_token_lst_size(*tokens)] = NULL;
 	while (*tokens)
 	{
-		cmd_argv[i] = ft_strdup((*tokens)->str);
-		if (!cmd_argv[i])
+		d_exec->cmd_argv[i] = ft_strdup((*tokens)->str);
+		if (!d_exec->cmd_argv[i])
 			exit(MALLOC_ERROR);
 		*tokens = (*tokens)->next;
 		i++;
 	}
-	i = 0;
-	while (path[i]) //Checkea el access de ese primer token recibido 
-	{
-		absolute_path = ft_strjoin(path[i], cmd);
-		if (!absolute_path)
-			exit(MALLOC_ERROR);
-		if (access(absolute_path, X_OK) == 0) //Checkea a validez de la ruta absoluta
-			execve(absolute_path, cmd_argv, envp);
-		free(absolute_path);
-		i++;
-	}
-	ft_error_cmd(cmd_argv[0], 1);
+	if (ft_exec_cmd_aux(&d_exec))
+		execve(d_exec->absolute_path, d_exec->cmd_argv, d_exec->new_envp);
 	exit(127);
+}
+
+void	ft_child_process(t_executor *d_exec, t_pipe *data_pipe, \
+t_token **tokens, t_env **env)
+{
+	if (d_exec->pid == 0)
+	{
+		d_exec->new_envp = ft_copy_env(env);
+		if (data_pipe->flag == YES)
+		{
+			ft_dup2(data_pipe->pipefd[1], 1);
+			ft_close2(data_pipe->pipefd[1], data_pipe->pipefd[0]);
+		}
+		if (!tokens || !*tokens)
+			exit (1);
+		if (ft_is_built_in(tokens))
+			exit(ft_exec_builtin(tokens, env, NULL));
+		else if ((*tokens)->str[0] == '/')
+			ft_exec_absoluthe_path(tokens, d_exec);
+		else
+			exec_cmd(tokens, env, d_exec);
+	}
 }
 
 //fork, find the absolute path, get the argv to the comand 
 //(included comand name) check the acces and exec
 void	executor(t_token **tokens, t_env **env, t_pipe *data_pipe)
 {
-	int		pid;
-	char	**new_envp;
+	t_executor	*d_exec;
 
-	pid = fork();
-	new_envp = NULL;
-	if (pid < 0)
+	d_exec = malloc(sizeof(t_executor));
+	ft_memset(d_exec, 0, sizeof(t_executor));
+	d_exec->pid = fork();
+	if (d_exec->pid < 0)
 		ft_error_system(FORK_ERROR);
 	sig_init(0);
-	if (pid == 0)
-	{
-		new_envp = ft_copy_env(env);
-		if (data_pipe->flag == YES)
-		{
-			ft_dup2(data_pipe->pipefd[1], 1);
-			ft_close2(data_pipe->pipefd[1], data_pipe->pipefd[0]);
-			/*if (dup2(data_pipe->pipefd[1], 1) == -1)
-				ft_error_system(DUP2_ERROR);
-			close(data_pipe->pipefd[1]);
-			close(data_pipe->pipefd[0]);*/
-		}
-		if (!tokens || !*tokens)
-			exit (1) ;
-		if (ft_is_built_in(tokens))
-			exit(ft_exec_builtin(tokens, env, NULL));
-		else if ((*tokens)->str[0] == '/')
-			ft_exec_absoluthe_path(tokens, new_envp);
-		else
-			exec_cmd(tokens, env, new_envp);
-	}
+	ft_child_process(d_exec, data_pipe, tokens, env);
+	free(d_exec);
 }
