@@ -231,6 +231,8 @@ int		ft_exit(t_token *tokens, int *exit_status);
 
 //---------PENDIENTE ORDENAR-----------
 
+void	ft_aux_envdup(t_env **tmp, char **envp, int x, char *div);
+
 void	ft_close(int fd);
 
 int		ft_close_v2(int *fd);
@@ -241,7 +243,7 @@ void	ft_dup2(int fd1, int fd2);
 
 void	ft_remove_token(t_token **tokens, t_token **curr_token);
 
-void	ft_aux_catch_env(t_env *tmp, int *shlvl_flag);
+void	ft_aux_catch_env(t_env **tmp, int *shlvl_flag);
 
 void	ft_catch_env(char **envp, t_env **head);
 
