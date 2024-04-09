@@ -91,6 +91,7 @@ typedef struct s_hd_append
 }
  t_hd_append;
 
+
 //STRUC PARA STRUCS EN EL PARSER
 typedef struct s_parser
 {
@@ -121,6 +122,16 @@ typedef	struct s_lexer
 	int		end;
 	int		flag;
 }	t_lexer;
+
+typedef struct s_executor
+{
+	char	**new_envp;
+	char	**cmd_argv;
+	char	*absolute_path;
+	char 	*cmd;
+	char 	**path;
+	int		pid;
+}	t_executor;
 
 //--------errors.c-----------
 
@@ -155,7 +166,7 @@ void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir, t_hd_append *data_hd_a
 
 void 	ft_wait_child_process(int *exit_status, int process);
 
-void	ft_exec_absoluthe_path(t_token **tokens, char **envp);
+void	ft_exec_absoluthe_path(t_token **tokens, /*char **envp*/ t_executor *d_exec);
 
 void	executor(t_token **tokens, t_env **env, t_pipe *data_pipe);
 
@@ -264,5 +275,7 @@ int		ft_token_lst_size(t_token *lst);
 void 	free_tokens(t_token **head);
 
 t_token	*ft_createtoken(char *input, int *i, t_env **env, int exit_status);
+
+
 
 #endif
