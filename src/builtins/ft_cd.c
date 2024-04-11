@@ -17,25 +17,53 @@
 //-Guardar valor inicial de PWD en OLDPWD (env list)
 //-Cambiar CWD al path especificado (o HOME si es NULL) con chdir
 //-Guardar el path en PWD (env list)
+static char	*ft_cd_noarg(t_env *env)
+{
+	while (env)
+	{
+		if (!ft_strncmp(env->key_name, "HOME", 4))
+			return (env->value);
+		env = env->next;
+	}
+	return (0);
+}
+
+static void	ft_update_pwd(t_env	*env, char **path)
+{
+	while (env)
+	{
+		if (!ft_strncmp(env->key_name, "PWD", 3))
+		{
+			*path = env->value;
+			env->value = getcwd(NULL, 0);
+			if (!env->value)
+				env->value = *path;
+			break ;
+		}
+		env = env->next;
+	}
+}
+
+static void	ft_update_oldpwd(t_env *env, char *path)
+{
+	while (env)
+	{
+		if (!ft_strncmp(env->key_name, "OLDPWD", 6))
+		{
+			free(env->value);
+			env->value = path;
+			break ;
+		}
+		env = env->next;
+	}
+}
+
 int	ft_cd(t_token *tokens, t_env *env)
 {
 	char	*path;
-	t_env	*tmp_env;
 
-	tmp_env = env;
 	if (!tokens)
-	{
-		while (tmp_env)
-		{
-			if (!ft_strncmp(tmp_env->key_name, "HOME", 4))
-			{
-				path = tmp_env->value;
-				break ;
-			}
-			tmp_env = tmp_env->next;
-		}
-		tmp_env = env;
-	}
+		path = ft_cd_noarg(env);
 	else
 		path = tokens->str;
 	if (chdir(path) != 0)
@@ -44,28 +72,7 @@ int	ft_cd(t_token *tokens, t_env *env)
 		perror(path);
 		return (1);
 	}
-	while (tmp_env)
-	{
-		if (!ft_strncmp(tmp_env->key_name, "PWD", 3))
-		{
-			path = tmp_env->value;
-			tmp_env->value = getcwd(NULL, 0);
-			if (!tmp_env->value)
-				tmp_env->value = path;
-			tmp_env = env;
-			break ;
-		}
-		tmp_env = tmp_env->next;
-	}
-	while (tmp_env)
-	{
-		if (!ft_strncmp(tmp_env->key_name, "OLDPWD", 6))
-		{
-			free(tmp_env->value);
-			tmp_env->value = path;
-			break ;
-		}
-		tmp_env = tmp_env->next;
-	}
+	ft_update_pwd(env, &path);
+	ft_update_oldpwd(env, path);
 	return (0);
 }

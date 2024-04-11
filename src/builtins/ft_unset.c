@@ -11,19 +11,7 @@
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
-
-static int	ft_isvalidkey(char *str)
-{
-	if (!(ft_isalpha(str[0]) || str[0] == '_'))
-		return (0);
-	while (*(++str) && *str != '=')
-	{
-		if (!(ft_isalnum(*str) || *str == '_'))
-			return (0);
-	}
-	return (1);
-}
-
+/*
 void	ft_remove_env_node(char *keyname, t_env *tmp_to_delete, t_env **curr_env)
 {
 	t_env *tmp;
@@ -66,6 +54,7 @@ void	ft_remove_env_node(char *keyname, t_env *tmp_to_delete, t_env **curr_env)
 	free (tmp_to_delete->value);
 	free (tmp_to_delete);
 }
+
 int	ft_unset(t_token *tokens, int *exit_status, t_env **env)
 {
 	t_env	*tmp_to_delete;
@@ -92,4 +81,53 @@ int	ft_unset(t_token *tokens, int *exit_status, t_env **env)
 		tokens = tokens->next;
 	}
 	return (*exit_status);
+}
+*/
+void	ft_remove_env_node(t_token *tokens, t_env **env, t_env **curr_env, \
+	t_env **tmp_to_delete)
+{
+	if (!ft_strxcmp(tokens->str, (*curr_env)->key_name))
+	{
+		*tmp_to_delete = *curr_env;
+		(*env) = (*env)->next;
+	}
+	else
+	{
+		while (*curr_env)
+		{
+			if ((*curr_env)->next && \
+		!ft_strxcmp(tokens->str, (*curr_env)->next->key_name))
+			{
+				*tmp_to_delete = (*curr_env)->next;
+				(*curr_env)->next = (*tmp_to_delete)->next;
+			}
+			*curr_env = (*curr_env)->next;
+		}
+	}
+}
+
+int	ft_unset(t_token *tokens, t_env **env)
+{
+	t_env	*curr_env;
+	t_env	*tmp_to_delete;
+	int		exit_status;
+
+	exit_status = 0;
+	tmp_to_delete = NULL;
+	while (tokens)
+	{
+		curr_env = *env;
+		if (!ft_isvalidkey(tokens->str))
+			exit_status = ft_error_keyname(tokens->str, 2);
+		else
+			ft_remove_env_node(tokens, env, &curr_env, &tmp_to_delete);
+		if (tmp_to_delete)
+		{
+			free (tmp_to_delete->key_name);
+			free (tmp_to_delete->value);
+			free (tmp_to_delete);
+		}
+		tokens = tokens->next;
+	}
+	return (exit_status);
 }

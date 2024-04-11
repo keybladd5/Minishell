@@ -55,7 +55,7 @@ static void	ft_err_red_errorfile(int *exit_status, t_token *t_current)
 	*exit_status = 1;
 }
 
-int	ft_error_syntax_aux(int *exit_status, t_token *t_current)
+static int	ft_error_syntax_aux(int *exit_status, t_token *t_current)
 {
 	if (t_current && (!ft_strncmp(t_current->str, "|", 1) || \
 		!ft_strncmp(t_current->str, "<", 1) \

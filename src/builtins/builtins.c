@@ -43,6 +43,6 @@ int	ft_exec_builtin(t_token **tokens, t_env **env, int *exit_status)
 	else if (!ft_strxcmp("exit\0", (*tokens)->str))
 		return (ft_exit((*tokens)->next, exit_status));
 	else if (!ft_strxcmp("unset\0", (*tokens)->str))
-		return (ft_unset((*tokens)->next, exit_status, env));
+		return (ft_unset((*tokens)->next, env));
 	return (0);
 }

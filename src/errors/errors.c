@@ -14,18 +14,12 @@
 
 void	ft_error_cmd(char *cmd, int type)
 {
+	ft_putstr_fd("\033[31mminishell: ", 2);
+	ft_putstr_fd(cmd, 2);
 	if (type == 1)
-	{
-		ft_putstr_fd("\033[31mminishell: ", 2);
-		ft_putstr_fd(cmd, 2);
 		ft_putstr_fd(": command not found\x1b[0m\n", 2);
-	}
-	else
-	{
-		ft_putstr_fd("\033[31mminishell: ", 2);
-		ft_putstr_fd(cmd, 2);
+	else if (type == 2)
 		ft_putstr_fd(": No such file or directory\x1b[0m\n", 2);
-	}
 }
 
 void	ft_error_system(int type)
@@ -41,4 +35,15 @@ void	ft_error_system(int type)
 	else if (type == CLOSE_ERROR)
 		perror("system error -> close() error\n");
 	exit(type);
+}
+
+int	ft_error_keyname(char *keyname, int type)
+{
+	if (type == 1)
+		ft_putstr_fd("\033[31Minishell: export: `", 2);
+	else if (type == 2)
+		ft_putstr_fd("\033[31Minishell: unset: `", 2);
+	ft_putstr_fd(keyname, 2);
+	ft_putstr_fd("': not a valid identifier\x1b[0m\n", 2);
+	return (1);
 }

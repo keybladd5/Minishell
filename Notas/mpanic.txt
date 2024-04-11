@@ -1,25 +1,41 @@
 TESTS ARREGLAR/IGNORAR
 
 ECHO 
-- T16: ~ no implementado [IGNORAR]
-- T18: unset no implementado [ARREGLAR]
+- T16: ~ no implementado [IGNORAR] ❓❓
+- T18: no detecta EcHo como comando [ARREGLAR] ❗️❗️
 
 EXPORT 
-- T12: export VAR+=value no implementado [IGNORAR]
+- T12: export VAR+=value no implementado [IGNORAR] ❓❓
 
 ENV
 - ALL TESTS PASSED ✅
 
 EXIT
-- T2: 
+- T2: "" borra el token y lo ejecuta como exit sin argumentos [IGNORAR] ❓❓
 
 DIRECTORY
+- T2: cd envia a Homebrew/Temp con mpanic [IGNORAR] 
+- T3: "" borra el token y lo ejecuta como cd sin argumentos [IGNORAR] ❓❓
+- T18: ~ no implementado [IGNORAR] ❓❓
+- T19: ~ no implementado [IGNORAR] ❓❓
 
-DOLLARS
+PARSER
+>dollars
+- T7: '\n' lo interpreta como 2 caracteres
+- T8: '\r' lo interpreta como 2 caracteres
+- T9: '\t' lo interpreta como 2 caracteres
+- T20: env var sin valor como comando pone exit_status en 127 (CMD not found)
+- T22: no ejecuta el comando con formato "  echo"
+- T23: no detecta EcHo como comando [ARREGLAR] ❗️❗️
+- T25: echo no detecta $VAR="-n -n" como una flag
+- T30: echo $VAR printea un espacio despues de la variable
+- T31: echo $VAR printea un espacio despues de la variable
+- T32: echo $VAR printea un espacio despues de la variable
+- T33: echo $VAR printea un espacio despues de la variable
 
-QUOTES
+>quotes
 
-SPACES
+>spaces
 
 TILDE
 

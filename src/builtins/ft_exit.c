@@ -12,31 +12,7 @@
 
 #include "../../inc/minishell.h"
 
-int	ft_atoi(const char *str)
-{
-	int	output;
-	int	sign;
-
-	output = 0;
-	sign = 1;
-	while (*str && (ft_strchr("\n\t\v\f\r ", *str)) != NULL)
-		str++;
-	if (*str == '+')
-		str++;
-	else if (*str == '-')
-	{
-		str++;
-		sign = -1;
-	}
-	while (*str && (ft_strchr("0123456789", *str)) != NULL)
-	{
-		output = (output * 10) + (*str - '0');
-		str++;
-	}
-	return (output * sign);
-}
-
-int	ft_print_exit_argerr(char *arg)
+static int	ft_print_exit_argerr(char *arg)
 {
 	ft_putstr_fd("Minishell: exit: ", 2);
 	ft_putstr_fd(arg, 2);
@@ -44,7 +20,7 @@ int	ft_print_exit_argerr(char *arg)
 	return (255);
 }
 
-void	ft_exit_argchecker(char *arg, int *i, char *sign, int *len)
+static void	ft_exit_argchecker(char *arg, int *i, char *sign, int *len)
 {
 	while (arg[*i] == ' ')
 	{

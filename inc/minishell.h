@@ -141,6 +141,8 @@ void 	ft_error_system(int type);
 
 void 	ft_error_cmd(char *cmd, int type);
 
+int		ft_error_keyname(char *keyname, int type);
+
 //--------signs.c-----------
 
 void	ctrl_c(int *exit_status);
@@ -240,7 +242,7 @@ int		ft_export(t_token *tokens, t_env *env);
 
 int		ft_exit(t_token *tokens, int *exit_status);
 
-int	ft_unset(t_token *tokens, int *exit_status, t_env **env);
+int		ft_unset(t_token *tokens, t_env **env);
 
 //---------PENDIENTE ORDENAR-----------
 
@@ -278,6 +280,6 @@ void 	free_tokens(t_token **head);
 
 t_token	*ft_createtoken(char *input, int *i, t_env **env, int exit_status);
 
-
+int		ft_isvalidkey(char *str);
 
 #endif

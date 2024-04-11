@@ -20,7 +20,8 @@ void	ctrl_c(int *exit_status)
 	signal(SIGINT, SIG_IGN);
 }
 
-//al recibir la señal SIGINT se ejecuta esta funcion, salta de linea y vuelve a mostrar el prompt
+//al recibir la señal SIGINT se ejecuta esta funcion, 
+//salta de linea y vuelve a mostrar el prompt
 void	sig_handler(int sig)//cambio anadido pendiente analizar🐸
 {
 	g_signal = sig;
@@ -32,13 +33,14 @@ void	sig_handler(int sig)//cambio anadido pendiente analizar🐸
 		rl_redisplay();
 	}
 }
+
 //cambio anadido pendiente analizar🐸
 void	process_sig_handler(int sig)
 {
 	g_signal = sig;
 	if (sig == SIGINT)
 	{
-		write(1, "^C\n", 3);//solo aparece asi en el proceso hijo
+		write(1, "^C\n", 3);
 		g_signal = 130;
 	}
 	else if (sig == SIGQUIT)
@@ -47,7 +49,9 @@ void	process_sig_handler(int sig)
 		g_signal = 131;
 	}
 }
-//inicializa variable global y las señales. Variable tc y sus funciones usan la libreria termios.h para no escribir ^C
+
+//inicializa variable global y las señales. 
+//Variable tc y sus funciones usan la libreria termios.h para no escribir ^C
 void	sig_init(int i)
 {
 	struct termios	tc;
@@ -56,15 +60,14 @@ void	sig_init(int i)
 	if (i == 1)
 	{
 		signal(SIGINT, sig_handler);
-		signal(SIGQUIT, SIG_IGN); 
+		signal(SIGQUIT, SIG_IGN);
 	}
 	else
 	{
 		signal(SIGINT, process_sig_handler);
 		signal(SIGQUIT, process_sig_handler);
 	}
-	tcgetattr(0, &tc); //Guarda los atributos del FD 0 (STDIN) en la estructura
-	tc.c_lflag &= ~ECHOCTL; //Modifica la flag 'local mode' para desactivar el printeo de ctrl+(X) como ^(X)
-	tcsetattr(0, TCSANOW, &tc); //Devuelve los atributos modificados al FD 0 (STDIN)
+	tcgetattr(0, &tc);
+	tc.c_lflag &= ~ECHOCTL;
+	tcsetattr(0, TCSANOW, &tc);
 }
-
