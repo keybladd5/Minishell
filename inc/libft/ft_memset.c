@@ -12,6 +12,7 @@
 
 #include "libft.h"
 
+//4Structs = (t_struct *ptr, NULL, sizeof(struct))
 void	*ft_memset(void *s, int c, size_t n)
 {
 	unsigned char	*p;
@@ -21,26 +22,3 @@ void	*ft_memset(void *s, int c, size_t n)
 		*p++ = (unsigned char)c;
 	return (s);
 }
-/*#include <string.h>
-#include <stdio.h>*/
-/*int	main(void)
-{
-	char p[20] = "hola que tal";
-	char x[20] = "hola que tal";
-	ft_memset(x, 'p', 20);
-	printf("%s\n", x);
-	memset(p, 'p', 20);
-	printf("%s\n", p);
-	return (0);
-}*/
-
-/*void	*ft_memset(void *s, int c, size_t n)
-{
-	while (n-- > 0)
-	{
-		*(unsigned char *)s = (unsigned char)c;
-		s++;
-	}
-	return (s);
-}*/ //Esta version no funciona porque la memset original espera un puntero
-//al inicio del string

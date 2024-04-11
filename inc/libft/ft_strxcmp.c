@@ -12,7 +12,7 @@
 
 #include "libft.h"
 
-int		ft_strxcmp(const char *s1, const char *s2)
+int	ft_strxcmp(const char *s1, const char *s2)
 {
 	size_t	len1;
 	size_t	len2;

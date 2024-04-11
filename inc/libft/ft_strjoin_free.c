@@ -12,12 +12,33 @@
 
 #include "../minishell.h"
 
+static	void	ft_aux(int i, char **rtrn, char *s1, char *s2)
+{
+	size_t	j;
+
+	i = ft_strlen(s1);
+	*rtrn = (char *)malloc(sizeof(char) * \
+	(ft_strlen(s1) + ft_strlen(s2) +1));
+	if (!*rtrn)
+		exit (MALLOC_ERROR);
+	*rtrn = ft_memcpy(rtrn, s1, (int)i);
+	free(s1);
+	j = 0;
+	while (s2[j])
+	{
+		*rtrn[i] = s2[j];
+		i++;
+		j++;
+	}
+	*rtrn[i] = '\0';
+}
+
 char	*ft_strjoin_free(char *s1, char *s2)
 {
 	char	*rtrn;
 	size_t	i;
-	size_t	j;
 
+	rtrn = NULL;
 	if (!s1)
 	{
 		rtrn = ft_strdup(s2);
@@ -25,22 +46,7 @@ char	*ft_strjoin_free(char *s1, char *s2)
 			exit (MALLOC_ERROR);
 	}
 	else
-	{
-		i = ft_strlen(s1);
-		rtrn = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) +1));
-		if (!rtrn)
-			exit (MALLOC_ERROR);
-		rtrn = ft_memcpy(rtrn, s1, (int)i);
-		free(s1);
-		j = 0;
-		while (s2[j])
-		{
-			rtrn[i] = s2[j];
-			i++;
-			j++;
-		}
-		rtrn[i] = '\0';
-	}
+		ft_aux(i, &rtrn, s1, s2);
 	free(s2);
 	return (rtrn);
 }
