@@ -240,6 +240,8 @@ int		ft_export(t_token *tokens, t_env *env);
 
 int		ft_exit(t_token *tokens, int *exit_status);
 
+int	ft_unset(t_token *tokens, int *exit_status, t_env **env);
+
 //---------PENDIENTE ORDENAR-----------
 
 void	ft_aux_envdup(t_env **tmp, char **envp, int x, char *div);
