@@ -42,9 +42,9 @@ void	ft_error_system(int type)
 int	ft_error_keyname(char *keyname, int type)
 {
 	if (type == 1)
-		ft_putstr_fd("\033[31Minishell: export: `", 2);
+		ft_putstr_fd("\033[31mminishell: export: `", 2);
 	else if (type == 2)
-		ft_putstr_fd("\033[31Minishell: unset: `", 2);
+		ft_putstr_fd("\033[31mminishell: unset: `", 2);
 	ft_putstr_fd(keyname, 2);
 	ft_putstr_fd("': not a valid identifier\x1b[0m\n", 2);
 	return (1);

@@ -1,44 +1,52 @@
 TESTS ARREGLAR/IGNORAR
 
-ECHO 
-- T16: ~ no implementado [IGNORAR] ❓❓
-- T18: no detecta EcHo como comando [ARREGLAR] ❗️❗️
+ECHO ✅
+- T16: ~ no implementado [IGNORAR] 
+- T18: no detecta EcHo como comando [IGNORAR]
 
-EXPORT 
-- T12: export VAR+=value no implementado [IGNORAR] ❓❓
+EXPORT ✅
+- T12: export VAR+=value no implementado [IGNORAR]
 
-ENV
-- ALL TESTS PASSED ✅
+ENV ✅
 
-EXIT
-- T2: "" borra el token y lo ejecuta como exit sin argumentos [IGNORAR] ❓❓
+EXIT ✅
+- T2: "" borra el token y lo ejecuta como exit sin argumentos [IGNORAR]
 
-DIRECTORY
-- T3: "" borra el token y lo ejecuta como cd sin argumentos [IGNORAR] ❓❓
-- T18: ~ no implementado [IGNORAR] ❓❓
-- T19: ~ no implementado [IGNORAR] ❓❓
+DIRECTORY ✅
+- T3: "" borra el token y lo ejecuta como cd sin argumentos [IGNORAR]
+- T18: ~ no implementado [IGNORAR]
+- T19: ~ no implementado [IGNORAR]
 
-PARSER
->dollars
-- T7: '\n' lo interpreta como 2 caracteres
-- T8: '\r' lo interpreta como 2 caracteres
-- T9: '\t' lo interpreta como 2 caracteres
-- T22: no ejecuta el comando con formato "  echo"
-- T23: no detecta EcHo como comando [ARREGLAR] ❗️❗️
-- T25: echo no detecta $VAR="-n -n" como una flag
+PARSER ✅
+>dollars ✅
+- T7: '\n' lo interpreta como 2 caracteres [IGNORAR]
+- T8: '\r' lo interpreta como 2 caracteres [IGNORAR]
+- T9: '\t' lo interpreta como 2 caracteres [IGNORAR]
+- T22: no ejecuta el comando con formato "  echo" [IGNORAR]
+- T23: no detecta EcHo como comando [IGNORAR]
+- T25: echo no detecta $VAR="-n -n" como una flag [IGNORAR]
 - T30: echo $VAR printea un espacio despues de la variable [IGNORAR] 
 - T31: echo $VAR printea un espacio despues de la variable [IGNORAR]
 - T32: echo $VAR printea un espacio despues de la variable [IGNORAR]
 - T33: echo $VAR printea un espacio despues de la variable [IGNORAR]
 
->quotes
-- T48: '' borra el token
+>quotes ✅
+- T48: '' borra el token en vez de dejar el string vacio [IGNORAR]
+- T53: "" borra el token en vez de dejar el string vacio [IGNORAR]
+- T55: ''/"" borra el token en vez de dejar el string vacio [IGNORAR]
+- T83: echo $VAR printea un espacio despues de la variable [IGNORAR] 
 
->spaces
+>spaces ✅
+- T86: ''/"" borra el token en vez de dejar el string vacio [IGNORAR]
 
->tilde
+>tilde ✅
+- T96: ~ no implementado [IGNORAR]
+- T98: ~ no implementado [IGNORAR]
+- T99: ~ no implementado [IGNORAR]
+- T102: ~ no implementado [IGNORAR]
+- T104: ~ no implementado [IGNORAR]
 
->syntax_error
+>syntax_error ✅
 
 PIPE
 

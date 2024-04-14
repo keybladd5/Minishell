@@ -32,7 +32,7 @@ void	ft_remove_env_node(t_token *tokens, t_env **env, t_env **curr_env, \
 			}
 			*curr_env = (*curr_env)->next;
 		}
-		}
+	}
 }
 
 int	ft_unset(t_token *tokens, t_env **env)

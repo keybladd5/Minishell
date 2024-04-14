@@ -51,7 +51,8 @@ char **str)
 
 	j = *i;
 	varvalue = NULL;
-	while ((ft_isalnum(tmp[j]) || tmp[j] == '_') && !ft_isspace(tmp[j]) && tmp[j])
+	while ((ft_isalnum(tmp[j]) || tmp[j] == '_') && \
+		!ft_isspace(tmp[j]) && tmp[j])
 		j++;
 	varname = ft_substr(tmp, *i, j - *i);
 	if (!varname)
