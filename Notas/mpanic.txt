@@ -14,7 +14,6 @@ EXIT
 - T2: "" borra el token y lo ejecuta como exit sin argumentos [IGNORAR] ❓❓
 
 DIRECTORY
-- T2: cd envia a Homebrew/Temp con mpanic [IGNORAR] 
 - T3: "" borra el token y lo ejecuta como cd sin argumentos [IGNORAR] ❓❓
 - T18: ~ no implementado [IGNORAR] ❓❓
 - T19: ~ no implementado [IGNORAR] ❓❓
@@ -28,18 +27,18 @@ PARSER
 - T22: no ejecuta el comando con formato "  echo"
 - T23: no detecta EcHo como comando [ARREGLAR] ❗️❗️
 - T25: echo no detecta $VAR="-n -n" como una flag
-- T30: echo $VAR printea un espacio despues de la variable
-- T31: echo $VAR printea un espacio despues de la variable
-- T32: echo $VAR printea un espacio despues de la variable
-- T33: echo $VAR printea un espacio despues de la variable
+- T30: echo $VAR printea un espacio despues de la variable [IGNORAR]
+- T31: echo $VAR printea un espacio despues de la variable [IGNORAR]
+- T32: echo $VAR printea un espacio despues de la variable [IGNORAR]
+- T33: echo $VAR printea un espacio despues de la variable [IGNORAR]
 
 >quotes
 
 >spaces
 
-TILDE
+>tilde
 
-SYNTAX_ERROR
+>syntax_error
 
 PIPE
 

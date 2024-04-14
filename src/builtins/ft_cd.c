@@ -21,23 +21,23 @@ static char	*ft_cd_noarg(t_env *env)
 {
 	while (env)
 	{
-		if (!ft_strncmp(env->key_name, "HOME", 4))
+		if (!ft_strxcmp(env->key_name, "HOME"))
 			return (env->value);
 		env = env->next;
 	}
 	return (0);
 }
 
-static void	ft_update_pwd(t_env	*env, char **path)
+static void	ft_update_pwd(t_env	*env, char *path)
 {
 	while (env)
 	{
-		if (!ft_strncmp(env->key_name, "PWD", 3))
+		if (!ft_strxcmp(env->key_name, "PWD"))
 		{
-			*path = env->value;
+			free(env->value);
 			env->value = getcwd(NULL, 0);
 			if (!env->value)
-				env->value = *path;
+				env->value = ft_strdup(path);
 			break ;
 		}
 		env = env->next;
@@ -48,31 +48,36 @@ static void	ft_update_oldpwd(t_env *env, char *path)
 {
 	while (env)
 	{
-		if (!ft_strncmp(env->key_name, "OLDPWD", 6))
+		if (!ft_strxcmp(env->key_name, "OLDPWD"))
 		{
 			free(env->value);
 			env->value = path;
-			break ;
+			return ;
 		}
 		env = env->next;
 	}
+	free (path);
 }
 
 int	ft_cd(t_token *tokens, t_env *env)
 {
-	char	*path;
+	char	*origin;
+	char	*dest;
 
+	origin = getcwd(NULL, 0);
+	if (!origin)
+		ft_error_system(MALLOC_ERROR);
 	if (!tokens)
-		path = ft_cd_noarg(env);
+		dest = ft_cd_noarg(env);
 	else
-		path = tokens->str;
-	if (chdir(path) != 0)
+		dest = tokens->str;
+	if (chdir(dest) != 0)
 	{
 		ft_putstr_fd("Minishell: cd: ", 2);
-		perror(path);
+		perror(dest);
 		return (1);
 	}
-	ft_update_pwd(env, &path);
-	ft_update_oldpwd(env, path);
+	ft_update_pwd(env, dest);
+	ft_update_oldpwd(env, origin);
 	return (0);
 }
