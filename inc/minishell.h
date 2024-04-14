@@ -202,7 +202,7 @@ int typer_append(t_token **curr_token, t_parser *d, int *consecutive_metachar, i
 
 //--------here_doc.c-------------
 
-void 	ft_here_doc(t_token *token, t_hd_append *data_here_doc, t_pipe *data_pipe);
+void 	ft_here_doc(t_token *token, t_parser *d, t_env **env, int *exit_status);
 
 //--------append.c-------------
 
@@ -218,7 +218,7 @@ void	l_red_out(t_parser *d, t_env **env);
 
 void	ft_init_data_parser(t_parser *d, t_token **tokens);
 
-int		selector_input(t_parser *d);
+int		selector_input(t_parser *d, t_env **env, int *exit_status);
 
 int selector_output(t_parser *d);
 
