@@ -18,7 +18,7 @@ int	typer_pipe(t_token **curr_token, t_parser *d, t_typer *t, int *exit_status)
 	t->c_m++;
 	d->data_pipe->pipe_counter++;
 	*curr_token = (*curr_token)->next;
-	if (!*curr_token || t->first_token)
+	if (!*curr_token || t->first_token || (*curr_token)->str[0] == '|')
 		return (ft_error_syntax(exit_status, PIPE, NULL), 1);
 	return (0);
 }

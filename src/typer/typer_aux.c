@@ -76,11 +76,7 @@ int *consecutive_metachar, int *exit_status)
 	(*consecutive_metachar)++;
 	*curr_token = (*curr_token)->next;
 	if (!*curr_token || (*curr_token && ft_ismetachar((*curr_token)->str[0])))
-	{
-		ft_error_syntax(exit_status, HERE_DOC, *curr_token);
-		if (!*curr_token)
-			return (1);
-	}
+		return (ft_error_syntax(exit_status, HERE_DOC, *curr_token), 1);
 	else
 		d->data_hd_append->heredoc_counter++;
 	(*curr_token)->type = LIMITER;
