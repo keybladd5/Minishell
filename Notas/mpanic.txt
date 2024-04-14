@@ -48,9 +48,18 @@ PARSER ✅
 
 >syntax_error ✅
 
-PIPE
+PIPE ✅
 
 REDIRECTION
+- T46: bonus [IGNORAR]
+- T47: 
+- T48: 
+- T49: 
+- T50: 
+- T51: 
+- T52: 
+- T53: 
+- T54: 
 
 STATUS
 

@@ -20,7 +20,7 @@ SRCS 		=  src/main.c src/utils/utils.c src/parser/parser.c src/parser/parser_aux
 			src/builtins/builtins.c src/builtins/ft_echo.c \
 			src/builtins/ft_cd.c src/builtins/ft_pwd.c \
 			src/builtins/ft_env.c src/builtins/ft_export.c \
-			src/builtins/ft_exit.c src/builtins/ft_unset.c src/ft_isvalidkey.c
+			src/builtins/ft_exit.c src/builtins/ft_unset.c
 
 INCLUDES 	= inc/minishell.h
 

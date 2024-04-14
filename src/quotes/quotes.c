@@ -20,19 +20,20 @@ int	ft_ismetachar(char c)
 	return (0);
 }
 
-
-void	handle_quotes(t_token **tmp_token, t_lexer **aux, t_env **env, \
+static void	handle_quotes(t_token **tmp_token, t_lexer **aux, t_env **env, \
 	int exit_status)
 {
 	char	c;
 
 	c = (*aux)->input[(*aux)->end];
 	while ((*aux)->input[++(*aux)->end] != c)
+	{
 		if (!((*aux)->input[(*aux)->end]))
 		{
 			ft_putendl_fd("\033[31mminishell: you must close quotes\x1b[0m", 2);
 			return ;
 		}
+	}
 	(*aux)->str = ft_substr((*aux)->input, (*aux)->start + 1, \
 		(*aux)->end - (*aux)->start - 1);
 	if (!(*aux)->str)
@@ -49,7 +50,7 @@ void	handle_quotes(t_token **tmp_token, t_lexer **aux, t_env **env, \
 		(*aux)->flag = 1;
 }
 
-void	handle_unquoted(t_lexer **aux)
+static void	handle_unquoted(t_lexer **aux)
 {
 	if (ft_ismetachar((*aux)->input[(*aux)->end]))
 	{
@@ -76,7 +77,7 @@ void	handle_unquoted(t_lexer **aux)
 		exit (MALLOC_ERROR);
 }
 
-void	ft_tokenstr(t_token **tmp_token, t_lexer **aux, t_env **env, \
+static void	ft_tokenstr(t_token **tmp_token, t_lexer **aux, t_env **env, \
 	int exit_status)
 {
 	while ((*aux)->input[(*aux)->end] && \

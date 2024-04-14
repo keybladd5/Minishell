@@ -46,3 +46,15 @@ int	ft_exec_builtin(t_token **tokens, t_env **env, int *exit_status)
 		return (ft_unset((*tokens)->next, env));
 	return (0);
 }
+
+int	ft_isvalidkey(char *str)
+{
+	if (!(ft_isalpha(str[0]) || str[0] == '_'))
+		return (0);
+	while (*(++str) && *str != '=')
+	{
+		if (!(ft_isalnum(*str) || *str == '_'))
+			return (0);
+	}
+	return (1);
+}
