@@ -66,7 +66,7 @@ void	ft_exec_absoluthe_path(t_token **tokens, t_executor *d_exec)
 	(ft_token_lst_size(*tokens) + 1));
 	if (!d_exec->cmd_argv)
 		ft_error_system(MALLOC_ERROR);
-	if (access(d_exec->absolute_path, X_OK) != 0)
+	if (access(d_exec->absolute_path, F_OK) != 0)
 	{
 		ft_error_cmd(d_exec->absolute_path, 2);
 		exit(127);
@@ -75,6 +75,11 @@ void	ft_exec_absoluthe_path(t_token **tokens, t_executor *d_exec)
 	ft_aux_exec_absoluthe_path(d_exec->cmd_argv, tokens);
 	if (access(d_exec->absolute_path, X_OK) == 0)
 		execve(d_exec->absolute_path, d_exec->cmd_argv, d_exec->new_envp);
+	else
+	{
+		ft_error_cmd(d_exec->cmd_argv[0], 3);
+		exit(126);
+	}
 	ft_error_cmd(d_exec->cmd_argv[0], 1);
 	exit(127);
 }

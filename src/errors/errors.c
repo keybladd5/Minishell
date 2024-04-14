@@ -20,6 +20,8 @@ void	ft_error_cmd(char *cmd, int type)
 		ft_putstr_fd(": command not found\x1b[0m\n", 2);
 	else if (type == 2)
 		ft_putstr_fd(": No such file or directory\x1b[0m\n", 2);
+	else if (type == 3)
+		ft_putstr_fd(": Permission denied\x1b[0m\n", 2);
 }
 
 void	ft_error_system(int type)
