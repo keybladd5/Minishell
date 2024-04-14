@@ -12,7 +12,7 @@
 
 #include "../../inc/minishell.h"
 
-void	ft_expand_exitstatus(char **str, int exit_status, int *i)
+static void	ft_expand_exitstatus(char **str, int exit_status, int *i)
 {
 	char	*status;
 
@@ -23,7 +23,7 @@ void	ft_expand_exitstatus(char **str, int exit_status, int *i)
 	(*i)++;
 }
 
-void	ft_checkvar(char *varname, char **varvalue, t_env *env)
+static void	ft_checkvar(char *varname, char **varvalue, t_env *env)
 {
 	if (!ft_strxcmp(varname, env->key_name))
 	{
@@ -42,7 +42,7 @@ void	ft_checkvar(char *varname, char **varvalue, t_env *env)
 	}
 }
 
-void	ft_expand_variable(char *tmp, int *i, t_env *env, \
+static void	ft_expand_variable(char *tmp, int *i, t_env *env, \
 char **str)
 {
 	int		j;
@@ -71,7 +71,7 @@ char **str)
 	*i = j;
 }
 
-void	ft_noexpansion(char *tmp, char **str, int *i)
+static void	ft_noexpansion(char *tmp, char **str, int *i)
 {
 	int		j;
 	char	*dst;
