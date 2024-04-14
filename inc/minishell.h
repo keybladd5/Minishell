@@ -190,16 +190,32 @@ void	expansor(char **str, t_env **env, int exit_status);
 void	ft_remove_token(t_token **tokens, t_token **curr_token);
 
 //PARSER
-
 //--------parser_utils.c-------------
 t_token	*ft_tokendup(t_token *token);
 void	ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens);
+int		selector_input(t_parser *d, t_env **env, int *exit_status);
+int		selector_output(t_parser *d);
 void	l_red_out(t_parser *d, t_env **env);
 //--------parser_aux.c-------------
 int		aux_parse_last_child(t_parser *d, int *exit_status);
 void	ft_init_data_parser(t_parser *d, t_token **tokens);
 //--------parser.c-------------
 void	parser(t_token **tokens, t_env **env, int *exit_status);
+
+//REDIRECTIONS
+//--------redirs.c-------------
+int		ft_red_in_aux(t_redir *data_redir, \
+		t_token *t_current, t_pipe *data_pipe);
+int		ft_red_out_aux(t_redir *data_redir, \
+		t_token *t_current, t_pipe *data_pipe);
+void	ft_aux_close(t_pipe *data_pipe, \
+		t_redir *data_redir, t_hd_append *data_hd_append);
+//--------append.c-------------
+int		ft_append(t_hd_append \
+		*data_hd_append, t_token *t_current, t_pipe *data_pipe);
+//--------here_doc.c-------------
+void	ft_here_doc(t_token *token, \
+		t_parser *d, t_env **env, int *exit_status);
 
 //SIGNS
 //--------signs.c-----------
@@ -209,23 +225,11 @@ void	process_sig_handler(int sig);
 void	sig_init(int i);
 int		g_signal;
 
-//--------redirs.c-------------
-
-int		ft_red_in_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe);
-
-int		ft_red_out_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe);
-
-void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir, t_hd_append *data_hd_append);
-
-int	ft_append (t_hd_append *data_hd_append, t_token *t_current, t_pipe *data_pipe);
-
+//TYPER
 //--------typer.c-------------
-
 int	typer_tokens(t_parser *d, t_token **t_current,  int *exit_status);
 
-void	typer_word(t_token **curr_token, int *consecutive_metachar, int mode);
-
-int	typer_pipe(t_token **curr_token, t_parser *d, t_typer *t, int *exit_status);
+//--------typer_aux.c-------------
 
 int	typer_red_in(t_token **curr_token, t_parser *d, int *consecutive_metachar, int *exit_status);
 

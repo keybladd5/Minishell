@@ -12,7 +12,7 @@
 
 #include "../../inc/minishell.h"
 
-int	ft_aux_red_in_aux(t_token *t_current)
+static int	ft_aux_red_in_aux(t_token *t_current)
 {
 	if (t_current->type == WORD)
 		t_current->type = ERROR_WORD;

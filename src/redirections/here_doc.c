@@ -24,7 +24,7 @@ static char	*ft_get_limiter(t_token *token)
 	return (t_current->str);
 }
 
-int	ft_aux_here_doc(t_parser *d, int tmp_fd[2], t_token *token)
+static int	ft_aux_here_doc(t_parser *d, int tmp_fd[2], t_token *token)
 {
 	if (!d->data_hd_append->heredoc_counter)
 		return (1);
@@ -36,7 +36,6 @@ int	ft_aux_here_doc(t_parser *d, int tmp_fd[2], t_token *token)
 	return (0);
 }
 
-//en caso de control+d lanzar directamente el string LIMITER para inalizar!!!!!
 void	ft_here_doc(t_token *token, t_parser *d, t_env **env, int *exit_status)
 {
 	int		tmp_fd[2];

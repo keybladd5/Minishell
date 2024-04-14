@@ -12,7 +12,8 @@
 
 #include "../../inc/minishell.h"
 
-int	typer_pipe(t_token **curr_token, t_parser *d, t_typer *t, int *exit_status)
+static int	typer_pipe(t_token **curr_token, t_parser *d, \
+t_typer *t, int *exit_status)
 {
 	(*curr_token)->type = PIPE;
 	t->c_m++;
@@ -24,7 +25,8 @@ int	typer_pipe(t_token **curr_token, t_parser *d, t_typer *t, int *exit_status)
 }
 
 //si recibe mode le da tipo, si no no.
-void	typer_word(t_token **curr_token, int *consecutive_metachar, int mode)
+static void	typer_word(t_token **curr_token, int \
+*consecutive_metachar, int mode)
 {
 	if (mode == 1 && (*curr_token)->type != ERROR_WORD)
 		(*curr_token)->type = WORD;
