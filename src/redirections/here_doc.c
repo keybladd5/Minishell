@@ -24,32 +24,44 @@ static char	*ft_get_limiter(t_token *token)
 	return (t_current->str);
 }
 
+int	ft_aux_here_doc(t_parser *d, int tmp_fd[2], t_token *token)
+{
+	if (!d->data_hd_append->heredoc_counter)
+		return (1);
+	ft_dup2(d->data_pipe->og_stdin, 0);
+	d->data_hd_append->limiter = ft_get_limiter(token);
+	if (!d->data_hd_append->limiter)
+		return (1);
+	pipe(tmp_fd);
+	return (0);
+}
+
 //en caso de control+d lanzar directamente el string LIMITER para inalizar!!!!!
-void	ft_here_doc(t_token *token, t_hd_append *d_hd, t_pipe *data_pipe)
+void	ft_here_doc(t_token *token, t_parser *d, t_env **env, int *exit_status)
 {
 	int		tmp_fd[2];
 
-	if (!d_hd->heredoc_counter)
+	if (ft_aux_here_doc(d, tmp_fd, token))
 		return ;
-	ft_dup2(data_pipe->og_stdin, 0);
-	d_hd->limiter = ft_get_limiter(token);
-	if (!d_hd->limiter)
-		return ;
-	pipe(tmp_fd);
 	while (42 - 41)
 	{
-		d_hd->tmp_input = readline("> ");
-		if (!d_hd->tmp_input || (d_hd->tmp_input \
-		&& d_hd->limiter && ft_strxcmp(d_hd->tmp_input, d_hd->limiter) == 0))
+		d->data_hd_append->tmp_input = readline("> ");
+		if (!d->data_hd_append->tmp_input || (d->data_hd_append->tmp_input \
+		&& d->data_hd_append->limiter && ft_strxcmp(\
+		d->data_hd_append->tmp_input, d->data_hd_append->limiter) == 0))
 		{
-			free(d_hd->tmp_input);
+			free(d->data_hd_append->tmp_input);
 			break ;
 		}
-		if (d_hd->tmp_input)
-			ft_putendl_fd(d_hd->tmp_input, tmp_fd[1]);
-		free(d_hd->tmp_input);
+		if (d->data_hd_append->tmp_input)
+		{
+			expansor(&d->data_hd_append->tmp_input, env, *exit_status);
+			if (d->data_hd_append->tmp_input)
+				ft_putendl_fd(d->data_hd_append->tmp_input, tmp_fd[1]);
+		}
+		free(d->data_hd_append->tmp_input);
 	}
 	ft_dup2(tmp_fd[0], 0);
 	ft_close2(tmp_fd[0], tmp_fd[1]);
-	d_hd->heredoc_counter--;
+	d->data_hd_append->heredoc_counter--;
 }

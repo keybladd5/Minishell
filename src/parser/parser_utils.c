@@ -78,7 +78,7 @@ void	l_red_out(t_parser *d, t_env **env)
 //itera sin modificar los tokens 
 //para comprobar prioridad de input en el comando, en caso de error de archivo
 //por falta de permisos o inexistente, devuelve un 2 otorgado por ft_red_in_aux;
-int	selector_input(t_parser *d)
+int	selector_input(t_parser *d, t_env **env, int *exit_status)
 {
 	int		i;
 	t_token	*tmp;
@@ -89,7 +89,7 @@ int	selector_input(t_parser *d)
 	{
 		if (tmp->type == HERE_DOC)
 		{
-			ft_here_doc(tmp, d->data_hd_append, d->data_pipe);
+			ft_here_doc(tmp, d, env, exit_status);
 			i = 0;
 		}
 		else if (tmp->type == RED_IN)

@@ -16,9 +16,9 @@
 //else return 0 to leave the execution cmd line
 //flag to close is a flag to say in the las_cmd to execute que no pille 
 // el fd de outfile para sacar el output
-static int	selector_redirs_child(t_parser *d, t_env **env)
+static int	selector_redirs_child(t_parser *d, t_env **env, int *exit_status)
 {
-	d->flag_input = selector_input(d);
+	d->flag_input = selector_input(d, env, exit_status);
 	if (d->flag_input)
 	{
 		d->data_pipe->flag = NO;
@@ -47,7 +47,7 @@ int *exit_status)
 {
 	if (!d->data_pipe->pipe_counter && d->t_current)
 	{
-		d->flag_input = selector_input(d);
+		d->flag_input = selector_input(d, env, exit_status);
 		if (d->flag_input == 2)
 			return (ft_aux_close(d->data_pipe, d->data_redir, \
 			d->data_hd_append), 1);
@@ -75,14 +75,14 @@ int *exit_status)
 // Procesa un solo comando en un proceso hijo, setea la flag
 // de pipe para la redireccion en el 
 // 	proceso hijo, cancela ejecucion en caso de red< in erronea
-static void	parse_child_cmd(t_parser *d, t_env **env)
+static void	parse_child_cmd(t_parser *d, t_env **env, int *exit_status)
 {
 	int	redir_flag;
 
 	redir_flag = -1;
 	if (d->t_current && d->data_pipe->pipe_counter)
 	{
-		redir_flag = selector_redirs_child(d, env);
+		redir_flag = selector_redirs_child(d, env, exit_status);
 		if (redir_flag == 0)
 			return ;
 		else if (redir_flag == 2)
@@ -112,7 +112,7 @@ int *exit_status)
 	{
 		d->data_pipe->flag = NO;
 		d->t_current = d->t_current->next;
-		d->flag_input = selector_input(d);
+		d->flag_input = selector_input(d, env, exit_status);
 		if (aux_parse_last_child(d, exit_status))
 			return (1);
 		ft_tokens_to_exec(&d->t_current, &d->t_tmp);
@@ -147,7 +147,7 @@ void	parser(t_token **tokens, t_env **env, int *exit_status)
 		return (free(d));
 	while (d->t_current)
 	{
-		parse_child_cmd(d, env);
+		parse_child_cmd(d, env, exit_status);
 		while (d->t_current && !(d->t_current->type == PIPE))
 			d->t_current = d->t_current->next;
 		if (parse_last_child(d, env, exit_status))
