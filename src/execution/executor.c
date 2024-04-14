@@ -87,7 +87,7 @@ t_token **tokens, t_env **env)
 			ft_close2(data_pipe->pipefd[1], data_pipe->pipefd[0]);
 		}
 		if (!tokens || !*tokens)
-			exit (1);
+			exit (0);
 		if (ft_is_built_in(tokens))
 			exit(ft_exec_builtin(tokens, env, NULL));
 		else if ((*tokens)->str[0] == '/')
