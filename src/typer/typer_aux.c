@@ -18,12 +18,16 @@ int *consecutive_metachar, int *exit_status)
 	(*curr_token)->type = RED_IN;
 	(*consecutive_metachar)++;
 	*curr_token = (*curr_token)->next;
+	if (*curr_token && ft_ismetachar((*curr_token)->str[0]))
+		return (ft_error_syntax(exit_status, RED_IN, *curr_token), 1);
 	if (*curr_token && (*curr_token)->str)
 		d->data_redir->fd_infile = open((*curr_token)->str, O_RDONLY);
 	if (!*curr_token || (d->data_redir->fd_infile == -1))
 	{
 		ft_error_syntax(exit_status, RED_IN, *curr_token);
-		if (!*curr_token || (*curr_token)->str[0] == '|')
+		if (!*curr_token)
+			return (1);
+		else if ((*curr_token)->str[0] == '|')
 			return ((ft_error_syntax(exit_status, PIPE, NULL), 1));
 	}
 	d->data_redir->red_in_counter++;

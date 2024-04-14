@@ -105,6 +105,8 @@ void	executor(t_token **tokens, t_env **env, t_pipe *data_pipe)
 
 	d_exec = malloc(sizeof(t_executor));
 	ft_memset(d_exec, 0, sizeof(t_executor));
+	if (!tokens || !*tokens)
+		return (free(d_exec));
 	d_exec->pid = fork();
 	if (d_exec->pid < 0)
 		ft_error_system(FORK_ERROR);
