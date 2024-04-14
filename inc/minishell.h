@@ -23,6 +23,7 @@
 # include "readline/readline.h"
 # include "readline/history.h"
 # include <termios.h>
+# include <dirent.h>
 
 //--------system_errros_definitions-------------
 # define MALLOC_ERROR 1
@@ -182,6 +183,24 @@ int		ft_aux_abs(char *str);
 int		ft_env_lst_size(t_env *lst);
 char	**ft_copy_env(t_env **env);
 
+//EXPANSOR
+//--------expansor.c-----------
+void	expansor(char **str, t_env **env, int exit_status);
+//--------expansor_utils.c-----------
+void	ft_remove_token(t_token **tokens, t_token **curr_token);
+
+//PARSER
+
+//--------parser_utils.c-------------
+t_token	*ft_tokendup(t_token *token);
+void	ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens);
+void	l_red_out(t_parser *d, t_env **env);
+//--------parser_aux.c-------------
+int		aux_parse_last_child(t_parser *d, int *exit_status);
+void	ft_init_data_parser(t_parser *d, t_token **tokens);
+//--------parser.c-------------
+void	parser(t_token **tokens, t_env **env, int *exit_status);
+
 //SIGNS
 //--------signs.c-----------
 void	ctrl_c(int *exit_status);
@@ -198,6 +217,7 @@ int		ft_red_out_aux(t_redir *data_redir, t_token *t_current, t_pipe *data_pipe);
 
 void	ft_aux_close(t_pipe *data_pipe, t_redir *data_redir, t_hd_append *data_hd_append);
 
+int	ft_append (t_hd_append *data_hd_append, t_token *t_current, t_pipe *data_pipe);
 
 //--------typer.c-------------
 
@@ -222,23 +242,6 @@ void 	ft_here_doc(t_token *token, t_parser *d, t_env **env, int *exit_status);
 
 //--------append.c-------------
 
-int	ft_append (t_hd_append *data_hd_append, t_token *t_current, t_pipe *data_pipe);
-
-//--------parser_utils.c-------------
-
-t_token *ft_tokendup(t_token *token);
-
-void 	ft_tokens_to_exec(t_token **og_tokens, t_token **new_tokens);
-
-void	l_red_out(t_parser *d, t_env **env);
-
-void	ft_init_data_parser(t_parser *d, t_token **tokens);
-
-int		selector_input(t_parser *d, t_env **env, int *exit_status);
-
-int selector_output(t_parser *d);
-
-int	aux_parse_last_child(t_parser *d, int *exit_status);
 
 
 
@@ -253,18 +256,11 @@ void	ft_close2(int fd1, int fd2);
 
 void	ft_dup2(int fd1, int fd2);
 
-void	ft_remove_token(t_token **tokens, t_token **curr_token);
 
 
 char	**ft_copy_env(t_env **env);
 
 int		ft_ismetachar(char c);
-
-void	ft_remove_token(t_token **tokens, t_token **t_current);
-
-void	expansor(char **str, t_env **env, int exit_status);
-
-void	parser(t_token **tokens, t_env **env, int *exit_status);
 
 void	print_tokens(t_token **head);
 
