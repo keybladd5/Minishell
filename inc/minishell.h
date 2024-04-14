@@ -136,6 +136,7 @@ typedef struct s_executor
 //--------builtins.c----------
 int		ft_is_built_in(t_token **tokens);
 int		ft_exec_builtin(t_token **tokens, t_env **env, int *exit_status);
+int		ft_isvalidkey(char *str);
 
 //--------ft_echo.c-----------
 int		ft_echo(t_token *tokens);
@@ -202,6 +203,16 @@ void	ft_init_data_parser(t_parser *d, t_token **tokens);
 //--------parser.c-------------
 void	parser(t_token **tokens, t_env **env, int *exit_status);
 
+//QUOTES
+//--------quotes.c-------------
+t_token	*ft_createtoken(char *input, int *i, t_env **env, int exit_status);
+void	ft_tokenstr(t_token **tmp_token, t_lexer **aux, t_env **env, \
+		int exit_status);
+void	handle_unquoted(t_lexer **aux);
+void	handle_quotes(t_token **tmp_token, t_lexer **aux, t_env **env, \
+		int exit_status);
+int		ft_ismetachar(char c);
+
 //REDIRECTIONS
 //--------redirs.c-------------
 int		ft_red_in_aux(t_redir *data_redir, \
@@ -227,53 +238,28 @@ int		g_signal;
 
 //TYPER
 //--------typer.c-------------
-int	typer_tokens(t_parser *d, t_token **t_current,  int *exit_status);
-
+int		typer_tokens(t_parser *d, t_token **t_current, int *exit_status);
 //--------typer_aux.c-------------
+int		typer_red_in(t_token **curr_token, t_parser *d, \
+		int *consecutive_metachar, int *exit_status);
+int		typer_red_out(t_token **curr_token, t_parser *d, \
+		int *consecutive_metachar, int *exit_status);
+int		typer_here_doc(t_token **curr_token, t_parser *d, \
+		int *consecutive_metachar, int *exit_status);
+int		typer_append(t_token **curr_token, t_parser *d, \
+		int *consecutive_metachar, int *exit_status);
 
-int	typer_red_in(t_token **curr_token, t_parser *d, int *consecutive_metachar, int *exit_status);
-
-int  typer_red_out(t_token **curr_token, t_parser *d, int *consecutive_metachar, int *exit_status);
-
-int	typer_here_doc(t_token **curr_token, t_parser *d, int *consecutive_metachar, int *exit_status);
-
-int typer_append(t_token **curr_token, t_parser *d, int *consecutive_metachar, int *exit_status);
-
-
-//--------here_doc.c-------------
-
-void 	ft_here_doc(t_token *token, t_parser *d, t_env **env, int *exit_status);
-
-//--------append.c-------------
-
-
-
-
-
-//---------PENDIENTE ORDENAR-----------
-
+//UTILS
+//--------utils.c-------------
 void	ft_close(int fd);
-
-int		ft_close_v2(int *fd);
-
 void	ft_close2(int fd1, int fd2);
-
+int		ft_close_v2(int *fd);
 void	ft_dup2(int fd1, int fd2);
+void	free_tokens(t_token **head);
 
-
-
-char	**ft_copy_env(t_env **env);
-
-int		ft_ismetachar(char c);
-
-void	print_tokens(t_token **head);
-
-int		ft_token_lst_size(t_token *lst);
-
-void 	free_tokens(t_token **head);
-
-t_token	*ft_createtoken(char *input, int *i, t_env **env, int exit_status);
-
-int		ft_isvalidkey(char *str);
+//MAIN
+////--------main.c-------------
+void	lexer(t_token **tokens, char *input, t_env **env, int exit_status);
+void	input_loop(t_env **env, t_token	*tokens);
 
 #endif
