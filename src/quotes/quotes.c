@@ -55,9 +55,9 @@ void	handle_unquoted(t_lexer **aux)
 {
 	if (ft_ismetachar((*aux)->input[(*aux)->end]))
 	{
-		while ((*aux)->input[(*aux)->end] && \
-			ft_ismetachar((*aux)->input[(*aux)->end]))
+		if (!ft_strncmp((*aux)->input + (*aux)->end, ">>", 2) || !ft_strncmp((*aux)->input + (*aux)->end, "<<", 2))
 			(*aux)->end++;
+		(*aux)->end++;
 		if ((*aux)->input[(*aux)->end])
 			(*aux)->flag = 1;
 	}

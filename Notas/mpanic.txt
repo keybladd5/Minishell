@@ -23,16 +23,16 @@ PARSER
 - T7: '\n' lo interpreta como 2 caracteres
 - T8: '\r' lo interpreta como 2 caracteres
 - T9: '\t' lo interpreta como 2 caracteres
-- T20: env var sin valor como comando pone exit_status en 127 (CMD not found)
 - T22: no ejecuta el comando con formato "  echo"
 - T23: no detecta EcHo como comando [ARREGLAR] ❗️❗️
 - T25: echo no detecta $VAR="-n -n" como una flag
-- T30: echo $VAR printea un espacio despues de la variable [IGNORAR]
+- T30: echo $VAR printea un espacio despues de la variable [IGNORAR] 
 - T31: echo $VAR printea un espacio despues de la variable [IGNORAR]
 - T32: echo $VAR printea un espacio despues de la variable [IGNORAR]
 - T33: echo $VAR printea un espacio despues de la variable [IGNORAR]
 
 >quotes
+- T48: '' borra el token
 
 >spaces
 
