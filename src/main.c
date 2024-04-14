@@ -100,7 +100,7 @@ void	input_loop(t_env **env, t_token	*tokens)
 	{
 		sig_init(1);
 		prompt = prompt_builder(*env);
-		input = readline(prompt);
+		input = readline("minishell$ ");
 		ctrl_c(&exit_status);
 		if (!input)
 		{

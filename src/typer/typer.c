@@ -26,7 +26,7 @@ int	typer_pipe(t_token **curr_token, t_parser *d, t_typer *t, int *exit_status)
 //si recibe mode le da tipo, si no no.
 void	typer_word(t_token **curr_token, int *consecutive_metachar, int mode)
 {
-	if (mode == 1)
+	if (mode == 1 && (*curr_token)->type != ERROR_WORD)
 		(*curr_token)->type = WORD;
 	*consecutive_metachar = 0;
 	*curr_token = (*curr_token)->next;

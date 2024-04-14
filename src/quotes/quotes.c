@@ -126,6 +126,8 @@ t_token	*ft_createtoken(char *input, int *i, t_env **env, int exit_status)
 	tmp_token->type = 0;
 	tmp_token->next = NULL;
 	ft_tokenstr(&tmp_token, &aux, env, exit_status);
+	if (!ft_strxcmp(tmp_token->str, ""))
+		tmp_token->type = ERROR_WORD;
 	*i = aux->end;
 	free(aux);
 	return (tmp_token);
