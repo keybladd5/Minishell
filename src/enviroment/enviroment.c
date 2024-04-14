@@ -12,14 +12,14 @@
 
 #include "../../inc/minishell.h"
 
-void	ft_soft_itoa(t_env **tmp, int n)
+static void	ft_soft_itoa(t_env **tmp, int n)
 {
 	(*tmp)->value = ft_itoa(n);
 	if (!(*tmp)->value)
 		ft_error_system(MALLOC_ERROR);
 }
 
-void	ft_aux_catch_env(t_env **tmp, int *shlvl_flag)
+static void	ft_aux_catch_env(t_env **tmp, int *shlvl_flag)
 {
 	int	shlvl;
 
@@ -46,7 +46,7 @@ void	ft_aux_catch_env(t_env **tmp, int *shlvl_flag)
 	}
 }
 
-void	ft_aux_shlvl(t_env **tmp, t_env **last, int shlvl_flag)
+static void	ft_aux_shlvl(t_env **tmp, t_env **last, int shlvl_flag)
 {
 	if (shlvl_flag == 0)
 	{
@@ -64,7 +64,7 @@ void	ft_aux_shlvl(t_env **tmp, t_env **last, int shlvl_flag)
 	}
 }
 
-void	ft_aux_envdup(t_env **tmp, char **envp, int x, char *div)
+static void	ft_aux_envdup(t_env **tmp, char **envp, int x, char *div)
 {
 	*tmp = (t_env *)malloc(sizeof(t_env));
 	if (!tmp)

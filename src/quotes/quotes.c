@@ -20,12 +20,7 @@ int	ft_ismetachar(char c)
 	return (0);
 }
 
-//////////////////////////////////////////
-///ALL NEW FUNCTIONS NOT FULLLY TESTED////
-//////////////////////////////////////////
 
-//Pendiente cambiar exit(1) por mensaje de syntax 
-//error cuando no se cierran las quotes
 void	handle_quotes(t_token **tmp_token, t_lexer **aux, t_env **env, \
 	int exit_status)
 {
@@ -34,7 +29,10 @@ void	handle_quotes(t_token **tmp_token, t_lexer **aux, t_env **env, \
 	c = (*aux)->input[(*aux)->end];
 	while ((*aux)->input[++(*aux)->end] != c)
 		if (!((*aux)->input[(*aux)->end]))
-			exit (1);
+		{
+			ft_putendl_fd("\033[31mminishell: you must close quotes\x1b[0m", 2);
+			return ;
+		}
 	(*aux)->str = ft_substr((*aux)->input, (*aux)->start + 1, \
 		(*aux)->end - (*aux)->start - 1);
 	if (!(*aux)->str)
