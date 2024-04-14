@@ -26,7 +26,7 @@ static void	ft_err_red_metachar(t_token *t_current)
 	ft_putstr_fd("'\x1b[0m\n", 2);
 }
 
-static void	ft_err_red_errorfile(int *exit_status, t_token *t_current)
+char	*ft_get_abs_path(char *rel_path)
 {
 	char	*tmp_abs_path;
 
@@ -36,14 +36,28 @@ static void	ft_err_red_errorfile(int *exit_status, t_token *t_current)
 	tmp_abs_path = ft_strjoin_s(tmp_abs_path, "/");
 	if (!tmp_abs_path)
 		ft_error_system(MALLOC_ERROR);
-	tmp_abs_path = ft_strjoin_s(tmp_abs_path, t_current->str);
+	tmp_abs_path = ft_strjoin_s(tmp_abs_path, rel_path);
 	if (!tmp_abs_path)
 		ft_error_system(MALLOC_ERROR);
+	return (tmp_abs_path);
+}
+
+static void	ft_err_red_errorfile(int *exit_status, t_token *t_current)
+{
+	char	*tmp_abs_path;
+
+	tmp_abs_path = ft_get_abs_path(t_current->str);
 	if (access(tmp_abs_path, F_OK) != 0)
 	{
 		ft_putstr_fd("\033[31mminishell: ", 2);
 		ft_putstr_fd(t_current->str, 2);
 		ft_putstr_fd(": No such file or directory\x1b[0m\n", 2);
+	}
+	else if (opendir(tmp_abs_path) != 0)
+	{
+		ft_putstr_fd("\033[31mminishell: ", 2);
+		ft_putstr_fd(t_current->str, 2);
+		ft_putstr_fd(": Is a directory\x1b[0m\n", 2);
 	}
 	else
 	{
