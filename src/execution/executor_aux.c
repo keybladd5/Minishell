@@ -25,9 +25,15 @@ void	ft_wait_child_process(int *exit_status, int process)
 		else if (WIFSIGNALED(status))
 		{
 			if (WTERMSIG(status) == SIGINT)
+			{
 				*exit_status = 130;
+				write(1, "\n", 1);
+			}
 			else if (WTERMSIG(status) == SIGQUIT)
+			{
 				*exit_status = 131;
+				ft_putstr_fd("Quit: 3\n", 1);
+			}
 		}
 		process--;
 	}

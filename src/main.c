@@ -125,7 +125,7 @@ int	main(int argc, char *argv[], char **envp)
 	tokens = NULL;
 	if (argc != 1 || !argv[0])
 	{
-		ft_putendl_fd("minishell: only one argument authorized ❌", 2);
+		ft_putendl_fd("minishell: no input arguments authorized ❌", 2);
 		return (1);
 	}
 	if (!*envp)

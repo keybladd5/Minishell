@@ -80,6 +80,7 @@ t_token **tokens, t_env **env)
 {
 	if (d_exec->pid == 0)
 	{
+		sig_init(0);
 		d_exec->new_envp = ft_copy_env(env);
 		if (data_pipe->flag == YES)
 		{
@@ -107,10 +108,11 @@ void	executor(t_token **tokens, t_env **env, t_pipe *data_pipe)
 	ft_memset(d_exec, 0, sizeof(t_executor));
 	if (!tokens || !*tokens)
 		return (free(d_exec));
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 	d_exec->pid = fork();
 	if (d_exec->pid < 0)
 		ft_error_system(FORK_ERROR);
-	sig_init(0);
 	ft_child_process(d_exec, data_pipe, tokens, env);
 	free(d_exec);
 }

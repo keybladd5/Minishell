@@ -28,7 +28,7 @@ void	sig_handler(int sig)//cambio anadido pendiente analizar🐸
 	if (sig == SIGINT)
 	{
 		write(1, "\n", 1);
-		rl_replace_line("", 0);
+		rl_replace_line("", 1);
 		rl_on_new_line();
 		rl_redisplay();
 	}
@@ -40,12 +40,12 @@ void	process_sig_handler(int sig)
 	g_signal = sig;
 	if (sig == SIGINT)
 	{
-		write(1, "^C\n", 3);
+		write(2, "\n", 1);
 		g_signal = 130;
 	}
 	else if (sig == SIGQUIT)
 	{
-		ft_putstr_fd("^\\Quit: 3\n", 1);
+		ft_putstr_fd("Quit: 3\n", 1);
 		g_signal = 131;
 	}
 }
@@ -56,18 +56,20 @@ void	sig_init(int i)
 {
 	struct termios	tc;
 
-	g_signal = 0;
 	if (i == 1)
 	{
+		g_signal = 0;
 		signal(SIGINT, sig_handler);
 		signal(SIGQUIT, SIG_IGN);
 	}
 	else
 	{
-		signal(SIGINT, process_sig_handler);
-		signal(SIGQUIT, process_sig_handler);
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
 	}
 	tcgetattr(0, &tc);
 	tc.c_lflag &= ~ECHOCTL;
+	if (i == 0)
+		tc.c_lflag |= ECHOCTL;
 	tcsetattr(0, TCSANOW, &tc);
 }

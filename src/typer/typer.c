@@ -21,6 +21,7 @@ t_typer *t, int *exit_status)
 	*curr_token = (*curr_token)->next;
 	if (!*curr_token || t->first_token || (*curr_token)->str[0] == '|')
 		return (ft_error_syntax(exit_status, PIPE, NULL), 1);
+	t->c_m = 0;
 	return (0);
 }
 

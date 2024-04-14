@@ -50,18 +50,18 @@ PARSER ✅
 
 PIPE ✅
 
-REDIRECTION
+REDIRECTION ✅
 - T46: bonus [IGNORAR]
-- T47: 
-- T48: 
-- T49: 
-- T50: 
-- T51: 
-- T52: 
-- T53: 
-- T54: 
+- T51: bonus [IGNORAR]
+- T52: bonus [IGNORAR]
+- T53: bonus [IGNORAR]
+- T54: bonus [IGNORAR]
+- T64: bonus [IGNORAR]
 
-STATUS
+STATUS ✅
+- T12: Ambiguo [IGNORAR]
+- T13: Ambiguo [IGNORAR]
+- T17: Ambiguo [IGNORAR]
 
 SHLVL
 

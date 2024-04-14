@@ -29,6 +29,18 @@ int *consecutive_metachar, int *exit_status)
 			return (1);
 		else if ((*curr_token)->str[0] == '|')
 			return ((ft_error_syntax(exit_status, PIPE, NULL), 1));
+		else
+		{
+			while (*curr_token && ft_strxcmp("|", (*curr_token)->str))
+			{
+				(*curr_token)->type = ERROR_FILE;
+				*curr_token = (*curr_token)->next;
+			}
+			if (!*curr_token)
+				return (1);
+			return (0);
+		}
+
 	}
 	d->data_redir->red_in_counter++;
 	if (d->data_redir->fd_infile >= 0)
