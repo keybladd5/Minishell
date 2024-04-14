@@ -40,7 +40,7 @@ void	lexer(t_token **tokens, char *input, t_env **env, int exit_status)
 	}
 }
 
-char	*prompt_builder_aux(t_env *env)
+static char	*prompt_builder_aux(t_env *env)
 {
 	char	*cwd;
 
@@ -60,7 +60,7 @@ char	*prompt_builder_aux(t_env *env)
 	return (cwd);
 }
 
-char	*prompt_builder(t_env *env)
+static char	*prompt_builder(t_env *env)
 {
 	char	*cwd;
 	char	*aux;
