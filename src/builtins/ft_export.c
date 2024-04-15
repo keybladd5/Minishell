@@ -30,16 +30,24 @@ static int	ft_export_noargs(t_env	*env)
 	return (0);
 }
 
-static void	ft_export_new(char *variable, char *div, t_env **last)
+static void	ft_export_new(char *variable, char *div, t_env *env)
 {
 	t_env	*tmp;
+	t_env	*last;
 
-	tmp = (t_env *)malloc(sizeof(t_env));
-	if (!tmp)
-		exit(MALLOC_ERROR);
-	tmp->key_name = NULL;
-	tmp->value = NULL;
-	tmp->next = NULL;
+	last = env;
+	while (last->next)
+		last = last->next;
+	if (!env->key_name)
+		tmp = env;
+	else
+	{
+		tmp = (t_env *)malloc(sizeof(t_env));
+		if (!tmp)
+			exit(MALLOC_ERROR);
+		ft_memset(tmp, 0, sizeof(t_env));
+		last->next = tmp;
+	}
 	tmp->key_name = ft_substr(variable, 0, (div - variable));
 	if (!tmp->key_name)
 		exit (MALLOC_ERROR);
@@ -49,8 +57,6 @@ static void	ft_export_new(char *variable, char *div, t_env **last)
 		if (!tmp->value)
 			exit (MALLOC_ERROR);
 	}
-	(*last)->next = tmp;
-	*last = tmp;
 }
 
 static void	ft_update_variable(t_env **curr_env, char *mid)
@@ -61,7 +67,7 @@ static void	ft_update_variable(t_env **curr_env, char *mid)
 		exit (MALLOC_ERROR);
 }
 
-static void	ft_export_variable(char *variable, t_env **curr_env, t_env **last)
+static void	ft_export_variable(char *variable, t_env **curr_env, t_env *env)
 {
 	int		var_flag;
 	char	*mid;
@@ -72,7 +78,7 @@ static void	ft_export_variable(char *variable, t_env **curr_env, t_env **last)
 	keyname = ft_substr(variable, 0, (mid - variable));
 	if (!keyname)
 		exit (MALLOC_ERROR);
-	while (*curr_env)
+	while (*curr_env && (*curr_env)->key_name)
 	{
 		if (!ft_strxcmp(keyname, (*curr_env)->key_name))
 		{
@@ -83,26 +89,26 @@ static void	ft_export_variable(char *variable, t_env **curr_env, t_env **last)
 	}
 	if (var_flag && mid)
 		ft_update_variable(curr_env, mid);
-	else
-		ft_export_new(variable, mid, last);
+	else if (!var_flag)
+		ft_export_new(variable, mid, env);
 	free(keyname);
 }
 
 //esta fallando en casos de NULL
 int	ft_export(t_token *tokens, t_env *env)
 {
-	t_env	*last;
 	t_env	*curr_env;
 	int		exit_status;
 
 	exit_status = 0;
-	curr_env = env;
 	if (!tokens)
 		return (ft_export_noargs(env));
-	while (curr_env->next)
+	if (!env)
 	{
-		last = curr_env->next;
-		curr_env = last;
+		env = (t_env *)malloc(sizeof(t_env));
+		if (!env)
+			exit(MALLOC_ERROR);
+		ft_memset(env, 0, sizeof(t_env));
 	}
 	while (tokens)
 	{
@@ -110,7 +116,7 @@ int	ft_export(t_token *tokens, t_env *env)
 		if (!ft_isvalidkey(tokens->str))
 			exit_status = ft_error_keyname(tokens->str, 1);
 		else
-			ft_export_variable(tokens->str, &curr_env, &last);
+			ft_export_variable(tokens->str, &curr_env, env);
 		tokens = tokens->next;
 	}
 	return (exit_status);

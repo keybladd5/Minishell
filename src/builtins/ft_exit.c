@@ -46,7 +46,6 @@ static void	ft_exit_argchecker(char *arg, int *i, char *sign, int *len)
 	}
 }
 
-//ft_putendl_fd("exit", 1);
 int	ft_exit(t_token *tokens, int *exit_status)
 {
 	int		i;
@@ -71,5 +70,6 @@ int	ft_exit(t_token *tokens, int *exit_status)
 		if (tokens->next)
 			return (ft_putendl_fd("Minishell: exit: too many arguments", 2), 1);
 	}
+	ft_putendl_fd("exit", 1);
 	exit (*exit_status);
 }
