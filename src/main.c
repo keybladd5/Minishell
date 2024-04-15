@@ -131,7 +131,7 @@ int	main(int argc, char *argv[], char **envp)
 	}
 	if (!*envp)
 	{
-		ft_putendl_fd("minishell: enviroment required ❌", 2);
+		ft_putendl_fd("minishell: env required ❌", 2);
 		return (1);
 	}
 	ft_catch_env(envp, &head);

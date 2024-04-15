@@ -100,7 +100,7 @@ void	ft_error_syntax(int *exit_status, int name, t_token *t_current)
 	{
 		ft_putstr_fd("\033[31mminishell: syntax error ", 2);
 		ft_putstr_fd("near unexpected token `|'\x1b[0m\n", 2);
-		*exit_status = 2 ;
+		*exit_status = 258 ;
 		return ;
 	}
 	else if (name == RED_IN || name == RED_OUT || \
