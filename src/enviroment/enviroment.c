@@ -33,7 +33,7 @@ static void	ft_aux_catch_env(t_env **tmp, int *shlvl_flag)
 			free((*tmp)->value);
 			ft_soft_itoa(tmp, shlvl + 1);
 			ft_putstr_fd((*tmp)->value, 2);
-			ft_putstr_fd(") too high, resetting to 1", 2);
+			ft_putstr_fd(") too high, resetting to 1\n", 2);
 			shlvl = 1;
 		}
 		else if (shlvl < 999 && shlvl >= 0)

@@ -17,7 +17,7 @@ void	ft_path_finder(t_env **env, t_token **tokens, t_executor **d_exec)
 	while (ft_strncmp("PATH", (*env)->key_name, 4) != 0)
 	{
 		*env = (*env)->next;
-		if (!*env || (*env)->next == NULL)
+		if (!*env)
 		{
 			ft_error_cmd((*tokens)->str, 2);
 			exit(127);

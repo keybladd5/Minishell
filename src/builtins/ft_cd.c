@@ -68,18 +68,18 @@ int	ft_cd(t_token *tokens, t_env *env)
 	if (!origin)
 		ft_error_system(MALLOC_ERROR);
 	if (!tokens)
+	{
 		dest = ft_cd_noarg(env);
+		if (!dest)
+			return (ft_putstr_fd("HOME not set\n", 2), free(origin), 1);
+	}
 	else
 		dest = tokens->str;
 	if (chdir(dest) != 0)
 	{
 		ft_putstr_fd("Minishell: cd: ", 2);
-		if (!dest)
-			ft_putstr_fd("HOME not set\n", 2);
-		else
-			perror(dest);
-		free(origin);
-		return (1);
+		perror(dest);
+		return (free(origin), 1);
 	}
 	ft_update_pwd(env, dest);
 	ft_update_oldpwd(env, origin);

@@ -53,6 +53,7 @@ int	ft_env_lst_size(t_env *lst)
 
 //if (ref->value)//para casos como export 
 //AAA= que bash si los toma en el nuevo env
+//esta funcion no  PONE EL ULTIMO elemento en la matriz 
 char	**ft_copy_env(t_env **env)
 {
 	int		i;
@@ -77,6 +78,7 @@ char	**ft_copy_env(t_env **env)
 		ref = ref->next;
 		i++;
 	}
+	i++;
 	new_env[i] = NULL;
 	return (new_env);
 }

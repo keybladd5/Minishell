@@ -56,8 +56,10 @@ int	typer_tokens(t_parser *d, t_token **curr_token, int *exit_status)
 			t.cntrl = typer_append(curr_token, d, &t.c_m, exit_status);
 		else
 			typer_word(curr_token, &t.c_m, 1);
+		if (t.cntrl == 1)
+			return (1);
 		t.first_token = 0;
-		if (t.c_m > 1 || t.cntrl == 1)
+		if (t.c_m > 1)
 			return (1);
 	}
 	return (0);
