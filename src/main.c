@@ -95,12 +95,13 @@ void	input_loop(t_env **env, t_token	*tokens)
 	char	*prompt;
 
 	input = NULL;
+	prompt = NULL;
 	exit_status = 0;
 	while (42)
 	{
 		sig_init(1);
 		prompt = prompt_builder(*env);
-		input = readline("minishell$ ");
+		input = readline(prompt);
 		ctrl_c(&exit_status);
 		if (!input)
 		{
