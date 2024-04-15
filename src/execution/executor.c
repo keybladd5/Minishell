@@ -19,7 +19,7 @@ void	ft_path_finder(t_env **env, t_token **tokens, t_executor **d_exec)
 		*env = (*env)->next;
 		if (!*env || (*env)->next == NULL)
 		{
-			ft_error_cmd((*tokens)->str, 1);
+			ft_error_cmd((*tokens)->str, 2);
 			exit(127);
 		}
 	}
