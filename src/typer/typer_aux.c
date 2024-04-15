@@ -12,6 +12,26 @@
 
 #include "../../inc/minishell.h"
 
+static int	ft_aux_typer_red_in(t_token **curr_token, int *exit_status)
+{
+	ft_error_syntax(exit_status, RED_IN, *curr_token);
+	if (!*curr_token)
+		return (1);
+	else if ((*curr_token)->str[0] == '|')
+		return ((ft_error_syntax(exit_status, PIPE, NULL), 1));
+	else
+	{
+		while (*curr_token && ft_strxcmp("|", (*curr_token)->str))
+		{
+			(*curr_token)->type = ERROR_FILE;
+			*curr_token = (*curr_token)->next;
+		}
+		if (!*curr_token)
+			return (1);
+		return (0);
+	}
+}
+
 int	typer_red_in(t_token **curr_token, t_parser *d, \
 int *consecutive_metachar, int *exit_status)
 {
@@ -24,23 +44,9 @@ int *consecutive_metachar, int *exit_status)
 		d->data_redir->fd_infile = open((*curr_token)->str, O_RDONLY);
 	if (!*curr_token || (d->data_redir->fd_infile == -1))
 	{
-		ft_error_syntax(exit_status, RED_IN, *curr_token);
-		if (!*curr_token)
+		if (ft_aux_typer_red_in(curr_token, exit_status))
 			return (1);
-		else if ((*curr_token)->str[0] == '|')
-			return ((ft_error_syntax(exit_status, PIPE, NULL), 1));
-		else
-		{
-			while (*curr_token && ft_strxcmp("|", (*curr_token)->str))
-			{
-				(*curr_token)->type = ERROR_FILE;
-				*curr_token = (*curr_token)->next;
-			}
-			if (!*curr_token)
-				return (1);
-			return (0);
-		}
-
+		return (0);
 	}
 	d->data_redir->red_in_counter++;
 	if (d->data_redir->fd_infile >= 0)
@@ -49,8 +55,7 @@ int *consecutive_metachar, int *exit_status)
 	if ((*curr_token)->type != ERROR_FILE)
 		(*curr_token)->type = DOC;
 	*consecutive_metachar = 0;
-	*curr_token = (*curr_token)->next;
-	return (0);
+	return (*curr_token = (*curr_token)->next, 0);
 }
 
 int	typer_red_out(t_token **curr_token, t_parser *d, \

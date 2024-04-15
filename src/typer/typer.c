@@ -26,13 +26,14 @@ t_typer *t, int *exit_status)
 }
 
 //si recibe mode le da tipo, si no no.
-static void	typer_word(t_token **curr_token, int \
+static int	typer_word(t_token **curr_token, int \
 *consecutive_metachar, int mode)
 {
 	if (mode == 1 && (*curr_token)->type != ERROR_WORD)
 		(*curr_token)->type = WORD;
 	*consecutive_metachar = 0;
 	*curr_token = (*curr_token)->next;
+	return (0);
 }
 
 int	typer_tokens(t_parser *d, t_token **curr_token, int *exit_status)
@@ -55,10 +56,8 @@ int	typer_tokens(t_parser *d, t_token **curr_token, int *exit_status)
 			t.cntrl = typer_append(curr_token, d, &t.c_m, exit_status);
 		else
 			typer_word(curr_token, &t.c_m, 1);
-		if (t.cntrl == 1)
-			return (1);
 		t.first_token = 0;
-		if (t.c_m > 1)
+		if (t.c_m > 1 || t.cntrl == 1)
 			return (1);
 	}
 	return (0);
