@@ -74,7 +74,11 @@ int	ft_cd(t_token *tokens, t_env *env)
 	if (chdir(dest) != 0)
 	{
 		ft_putstr_fd("Minishell: cd: ", 2);
-		perror(dest);
+		if (!dest)
+			ft_putstr_fd("HOME not set\n", 2);
+		else
+			perror(dest);
+		free(origin);
 		return (1);
 	}
 	ft_update_pwd(env, dest);
