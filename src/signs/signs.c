@@ -22,7 +22,7 @@ void	ctrl_c(int *exit_status)
 
 //al recibir la señal SIGINT se ejecuta esta funcion, 
 //salta de linea y vuelve a mostrar el prompt
-void	sig_handler(int sig)//cambio anadido pendiente analizar🐸
+void	sig_handler(int sig)
 {
 	g_signal = sig;
 	if (sig == SIGINT)
@@ -34,28 +34,13 @@ void	sig_handler(int sig)//cambio anadido pendiente analizar🐸
 	}
 }
 
-//cambio anadido pendiente analizar🐸
-void	process_sig_handler(int sig)
-{
-	g_signal = sig;
-	if (sig == SIGINT)
-	{
-		write(2, "\n", 1);
-		g_signal = 130;
-	}
-	else if (sig == SIGQUIT)
-	{
-		ft_putstr_fd("Quit: 3\n", 1);
-		g_signal = 131;
-	}
-}
-
 //inicializa variable global y las señales. 
 //Variable tc y sus funciones usan la libreria termios.h para no escribir ^C
 void	sig_init(int i)
 {
 	struct termios	tc;
 
+	ft_memset(&tc, 0, sizeof(struct termios));
 	if (i == 1)
 	{
 		g_signal = 0;
