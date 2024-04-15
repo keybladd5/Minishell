@@ -206,11 +206,6 @@ void	parser(t_token **tokens, t_env **env, int *exit_status);
 //QUOTES
 //--------quotes.c-------------
 t_token	*ft_createtoken(char *input, int *i, t_env **env, int exit_status);
-void	ft_tokenstr(t_token **tmp_token, t_lexer **aux, t_env **env, \
-		int exit_status);
-void	handle_unquoted(t_lexer **aux);
-void	handle_quotes(t_token **tmp_token, t_lexer **aux, t_env **env, \
-		int exit_status);
 int		ft_ismetachar(char c);
 
 //REDIRECTIONS
